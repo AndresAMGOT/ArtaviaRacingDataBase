@@ -149,7 +149,106 @@ CREATE TABLE "HR"."TELEFONOPORUSUARIO"
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE "USERS" ;
+  
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Requerimiento: AR-001
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
+Enunciado: Esta tabla se creo  para guardar la informacion de los telefonos por usaurio.
+****************************************************************************************************************************************************************/  
+CREATE TABLE "HR"."CREDENCIALESPORUSUARIO" 
+(
+    CREDENCIALID         VARCHAR2(20)         NOT NULL,
+    CORREOELECTRONICO    VARCHAR2(50)         NOT NULL,
+    CONTRASEÑA           VARCHAR2(500)        NOT NULL,
+    ESCONTRASEÑATEMPORAL NUMBER(1)            NOT NULL,
+    EDITADOPOR           VARCHAR2(10)         NOT NULL,
+    HABILITADO           NUMBER(1)            NOT NULL,
+    FECHACREACION        DATE                 NOT NULL
+);
 
- 
+-- Agregar la restricción de llave primaria
+ALTER TABLE "HR"."CREDENCIALESPORUSUARIO"
+ADD CONSTRAINT "CREDENCIALESPORUSUARIO_PK" PRIMARY KEY (CREDENCIALID);
 
+-- Agregar la restricción de llave foránea a la tabla PERSONAL
+ALTER TABLE "HR"."CREDENCIALESPORUSUARIO"
+ADD CONSTRAINT "CREDENCIALESPORUSUARIO_PERSONAL_FK" FOREIGN KEY (CREDENCIALID)
+    REFERENCES "HR"."PERSONAL" (CREDENCIALID);
 
+-- Agregar la restricción de llave foránea a la tabla CLIENTE
+ALTER TABLE "HR"."CREDENCIALESPORUSUARIO"
+ADD CONSTRAINT "CREDENCIALESPORUSUARIO_CLIENTE_FK" FOREIGN KEY (CREDENCIALID)
+    REFERENCES "HR"."CLIENTE" (CREDENCIALID);
+    
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Requerimiento: AR-001
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
+Enunciado: Esta tabla se creo  para guardar la informacion de las categorias de los menus del sitio
+****************************************************************************************************************************************************************/  
+CREATE TABLE "HR"."CATEGORIAMENU"
+(
+    CATEGORIAMENUID  NUMBER(10)       NOT NULL,
+    TIPOMENU         VARCHAR2(50)     NOT NULL,
+    DESCRIPCION      VARCHAR2(250)    NOT NULL,
+    EDITADOPOR       VARCHAR2(10)     NOT NULL,
+    HABILITADO       NUMBER(1)        NOT NULL,
+    FECHACREACION    DATE             NOT NULL,
+    CONSTRAINT "CATEGORIAMENU_PK" PRIMARY KEY (CATEGORIAMENUID)
+);
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Requerimiento: AR-001
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
+Enunciado: Esta tabla se creo  para guardar la informacion del menu del sitio
+****************************************************************************************************************************************************************/  
+CREATE TABLE "HR"."MENU"
+(
+    MENUID             NUMBER              NOT NULL,
+    CATEGORIAMENUID    NUMBER(10)          NOT NULL,
+    MENUPADREID        NUMBER              NULL,
+    NOMBRE             VARCHAR2(100)       NOT NULL,
+    DESCRIPCION        VARCHAR2(250)       NOT NULL,
+    NIVEL              NUMBER              NOT NULL,
+    URL                VARCHAR2(250)       NOT NULL,
+    ICONO              VARCHAR2(250)       NULL,
+    EDITADOPOR         VARCHAR2(10)        NOT NULL,
+    HABILITADO         NUMBER(1)           NOT NULL,
+    FECHACREACION      DATE                NOT NULL,
+    CONSTRAINT "MENU_PK" PRIMARY KEY (MENUID)
+);
+-- Agregar la restricción de clave foránea a CATEGORIAMENU
+ALTER TABLE "HR"."MENU"
+ADD CONSTRAINT "MENU_CATEGORIAMENU_FK" FOREIGN KEY (CATEGORIAMENUID)
+    REFERENCES "HR"."CATEGORIAMENU" (CATEGORIAMENUID);
+
+-- Agregar la restricción de clave foránea a MENUPADRE
+ALTER TABLE "HR"."MENU"
+ADD CONSTRAINT "MENU_MENUPADRE_FK" FOREIGN KEY (MENUPADREID)
+    REFERENCES "HR"."MENU" (MENUID);
+
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Requerimiento: AR-001
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
+Enunciado: Esta tabla se creo  para guardar la informacion del menu por rol
+****************************************************************************************************************************************************************/      
+CREATE TABLE "HR"."MENUPORROL"
+(
+    ROLID           NUMBER              NOT NULL,
+    MENUID          NUMBER              NOT NULL,
+    EDITADOPOR      VARCHAR2(10)        NOT NULL,
+    HABILITADO      NUMBER(1)           NOT NULL,
+    FECHACREACION   DATE                NOT NULL,
+    CONSTRAINT "MENUPORROL_PK" PRIMARY KEY (ROLID, MENUID)
+);
+-- Agregar la restricción de clave foránea a ROL
+ALTER TABLE "HR"."MENUPORROL"
+ADD CONSTRAINT "MENUPORROL_ROL_FK" FOREIGN KEY (ROLID)
+    REFERENCES "HR"."ROL" (ROLID);
+
+-- Agregar la restricción de clave foránea a MENU
+ALTER TABLE "HR"."MENUPORROL"
+ADD CONSTRAINT "MENUPORROL_MENU_FK" FOREIGN KEY (MENUID)
+    REFERENCES "HR"."MENU" (MENUID);
