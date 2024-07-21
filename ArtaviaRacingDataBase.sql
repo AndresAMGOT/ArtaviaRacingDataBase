@@ -873,7 +873,7 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: nos muestra todos los datos importantes del cliente
 ****************************************************************************************************************************************************************/  
-CREATE VIEW ARTAVIARACING.vw_personal_detalle AS ClientesCompletos
+CREATE VIEW ARTAVIARACING.vw_personal_detalle AS 
 SELECT 
     p.CREDENCIALID,
     p.NOMBRE,
@@ -898,7 +898,7 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: Esta vista muestra toda la dirrecion del cliente
 ****************************************************************************************************************************************************************/  
-CREATE VIEW ARTAVIARACING.vw_clientes_con_direccion AS ClientesDireccion
+CREATE VIEW ARTAVIARACING.vw_clientes_con_direccion AS 
 SELECT 
     c.CREDENCIALID,
     c.NOMBRE,
@@ -916,7 +916,7 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: Esta vista muestra informacion del cliente y sus citas
 ****************************************************************************************************************************************************************/  
- CREATE VIEW ARTAVIARACING.vw_citas_detalle AS CitasDetalles
+ CREATE VIEW ARTAVIARACING.vw_citas_detalle AS 
 SELECT 
     c.CITAID,
     c.FechaAgendada,
@@ -937,7 +937,7 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: Esta vista muestra todo el diagnostico
 ****************************************************************************************************************************************************************/  
-CREATE VIEW ARTAVIARACING.vw_diagnosticos_detalle AS DiagnosticosDetalle
+CREATE VIEW ARTAVIARACING.vw_diagnosticos_detalle AS 
 SELECT 
     d.DIAGNOSTICOID,
     d.DESCRIPCION AS DIAGNOSTICO_DESCRIPCION,
