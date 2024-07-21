@@ -136,7 +136,7 @@ CREATE TABLE "ARTAVIARACING"."TELEFONOPORUSUARIO"
 	,"EDITADOPOR" VARCHAR2(10 BYTE) NOT NULL ENABLE
 	,"HABILITADO" NUMBER(1,0) NOT NULL ENABLE
 	,"FECHACREACION" DATE NOT NULL ENABLE
-	 CONSTRAINT "TELEFONOPORUSUARIO_PK" PRIMARY KEY ("NUMEROTELEFONO", "CREDENCIALID")
+    , CONSTRAINT "TELEFONOPORUSUARIO_PK" PRIMARY KEY ("NUMEROTELEFONO", "CREDENCIALID")
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE "USERS"  ENABLE, 
 	 CONSTRAINT "TELEFONOPORUSUARIO_CATEGORIATELEFONO_FK" FOREIGN KEY ("CATEGORIATELEFONOID")
@@ -916,7 +916,7 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: Esta vista muestra informacion del cliente y sus citas
 ****************************************************************************************************************************************************************/  
- CREATE VIEW ARTAVIARACING.vw_citas_detalle AS 
+CREATE VIEW ARTAVIARACING.vw_citas_detalle AS 
 SELECT 
     c.CITAID,
     c.FechaAgendada,
@@ -930,7 +930,7 @@ SELECT
 FROM ARTAVIARACING.CITAS c
 JOIN ARTAVIARACING.CLIENTE cl ON c.CREDENCIALID = cl.CREDENCIALID
 JOIN ARTAVIARACING.VEHICULO v ON c.PLACAVEHICULOID = v.PLACAVEHICULOID;
- /****************************************************************************************************************************************************************  
+/****************************************************************************************************************************************************************  
 Creacion de la vista: DiagnosticosDetalle
 Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
@@ -1004,6 +1004,86 @@ SELECT
     ,NOMBRE          
     ,CODIGOCONDADO   
 FROM DISTRITO;
+
+/****************************************************************************************************************************************************************  
+Creacion de la vista: ProductosDetalle
+Autor: Horacio Porras Marín
+Requerimiento: AR-001
+Fecha de Creacion: 21-07-24 DD-MM-YYYY
+Enunciado de la vista: Muestra toda la información del producto, incluyendo la categoria por nombre.
+****************************************************************************************************************************************************************/  
+CREATE OR REPLACE VIEW ARTAVIARACING.vw_producto_detalle AS 
+SELECT 
+    p.PRODUCTOID,
+    p.NOMBRE,
+    p.DESCRIPCION,
+    p.PRECIOUNITARIO,
+    p.CANTIDAD,
+    p.EDITADOPOR,
+    p.HABILITADO,
+    p.FECHACREACION,
+    cp.NOMBRE AS CATEGORIA_NOMBRE
+FROM ARTAVIARACING.PRODUCTO p
+JOIN ARTAVIARACING.CATEGORIAPRODUCTO cp ON p.CATEGORIAPRODUCTOID = cp.CATEGORIAPRODUCTOID;
+
+/****************************************************************************************************************************************************************  
+Creacion de la vista: ServiciosDetalle
+Autor: Horacio Porras Marín
+Requerimiento: AR-001
+Fecha de Creacion: 21-07-24 DD-MM-YYYY
+Enunciado de la vista: Muestra toda la información del servicio, incluyendo la categoria por nombre.
+****************************************************************************************************************************************************************/  
+CREATE OR REPLACE VIEW ARTAVIARACING.vw_servicio_detalle AS 
+SELECT 
+    s.SERVICIOID,
+    s.NOMBRE,
+    s.DESCRIPCION,
+    s.PRECIO,
+    s.TIEMPOSERVICIO,
+    s.EDITADOPOR,
+    s.HABILITADO,
+    s.FECHACREACION,
+    cs.NOMBRE AS CATEGORIA_NOMBRE
+FROM ARTAVIARACING.SERVICIO s
+JOIN ARTAVIARACING.CATEGORIASERVICIO cs ON s.CATEGORIASERVICIOID = cs.CATEGORIASERVICIOID;
+
+/****************************************************************************************************************************************************************  
+Creacion de la vista: DiagnosticosDetalle
+Autor: Horacio Porras Marín
+Requerimiento: AR-001
+Fecha de Creacion: 21-07-24 DD-MM-YYYY
+Enunciado de la vista: Muestra la información de los vehiculos.
+****************************************************************************************************************************************************************/  
+CREATE OR REPLACE VIEW ARTAVIARACING.vw_ObtenerVehiculo AS
+SELECT 
+     PLACAVEHICULOID  
+    ,VIN       
+    ,MARCA
+    ,MODELO
+    ,AÑO
+    ,COLOR
+    ,ALDIA
+    ,TITULOPROPIEDAD
+    ,HABILITADO
+    ,FECHACREACION
+FROM VEHICULO;
+
+/****************************************************************************************************************************************************************  
+Creacion de la vista: DiagnosticosDetalle
+Autor: Horacio Porras Marín
+Requerimiento: AR-001
+Fecha de Creacion: 21-07-24 DD-MM-YYYY
+Enunciado de la vista: Muestra la información de los puestos.
+****************************************************************************************************************************************************************/  
+CREATE OR REPLACE VIEW ARTAVIARACING.vw_ObtenerPuesto AS
+SELECT 
+     PUESTOTRABAJOID  
+    ,PUESTO       
+    ,DESCRIPCION
+    ,EDITADOPOR
+    ,HABILITADO
+    ,FECHACREACION
+FROM PUESTOTRABAJO;
 
 /****************************************************************************************************************************************************************
 ***                                                 PROCEDIMIENTOS ALMACENADOS A PARTIR DE AQUI                                                               ***
