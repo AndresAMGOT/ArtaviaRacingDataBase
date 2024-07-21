@@ -332,6 +332,246 @@ ALTER TABLE "HR"."DISTRITO"
 ADD CONSTRAINT "DISTRITO_FK_CONDADO"
 FOREIGN KEY (CODIGOCONDADO) REFERENCES "HR"."CONDADO" (CODIGOCONDADO);
 
+/****************************************************************************************************************************************************************  
+Creacion de la tabla: ProductoPorDiagnostico
+Autor: Jason zuñiga solorzano
+Requerimiento: AR-001
+Fecha de Creacion: 14-07-24 DD-MM-YYYY
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
+****************************************************************************************************************************************************************/  
+CREATE TABLE CategoriaMenu (
+    CategoriaMenuId NUMBER(10) PRIMARY KEY NOT NULL,
+    TipoMenu VARCHAR2(100) NOT NULL,
+    Descripcion VARCHAR2(250) NOT NULL,
+    EditadoPor VARCHAR2(10) NOT NULL,
+    Habilitado NUMBER(1) NOT NULL,
+    FechaCreacion DATE NOT NULL
+);
+/****************************************************************************************************************************************************************  
+Creacion de la tabla: ProductoPorDiagnostico
+Autor: Jason zuñiga solorzano
+Requerimiento: AR-001
+Fecha de Creacion: 14-07-24 DD-MM-YYYY
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
+****************************************************************************************************************************************************************/  
+CREATE TABLE CategoriaServicio (
+    CategoriaServicioId NUMBER PRIMARY KEY NOT NULL,
+    Nombre VARCHAR2(50) NOT NULL,
+    Descripcion VARCHAR2(250) NULL,
+    EditadoPor VARCHAR2(10) NOT NULL,
+    Habilitado NUMBER(1) NOT NULL,
+    FechaCreacion DATE NOT NULL
+);
+/****************************************************************************************************************************************************************  
+Creacion de la tabla: ProductoPorDiagnostico
+Autor: Jason zuñiga solorzano
+Requerimiento: AR-001
+Fecha de Creacion: 14-07-24 DD-MM-YYYY
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
+****************************************************************************************************************************************************************/  
+CREATE TABLE CategoriaProducto (
+    CategoriaProductoId NUMBER PRIMARY KEY NOT NULL,
+    Nombre VARCHAR2(255) NOT NULL,
+    Descripcion VARCHAR2(250) NULL,
+    EditadoPor VARCHAR2(10) NOT NULL,
+    Habilitado NUMBER(1) NOT NULL,
+    FechaCreacion DATE NOT NULL
+);
+/****************************************************************************************************************************************************************  
+Creacion de la tabla: ProductoPorDiagnostico
+Autor: Jason zuñiga solorzano
+Requerimiento: AR-001
+Fecha de Creacion: 14-07-24 DD-MM-YYYY
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
+****************************************************************************************************************************************************************/  
+CREATE TABLE DireccionPorUsuario (
+    CredencialId VARCHAR2(20) PRIMARY KEY NOT NULL,
+    CodigoPais NUMBER NOT NULL,
+    CodigoEstado NUMBER NOT NULL,
+    CodigoCondado NUMBER NOT NULL,
+    CodigoDistrito NUMBER NOT NULL,
+    Descripcion VARCHAR2(250) NOT NULL,
+    EditadoPor VARCHAR2(10) NOT NULL,
+    Habilitado NUMBER(1) NOT NULL,
+    FechaCreacion DATE NOT NULL,
+    FOREIGN KEY (CodigoPais) REFERENCES Pais(CodigoPais),
+    FOREIGN KEY (CodigoEstado) REFERENCES Estado(CodigoEstado),
+    FOREIGN KEY (CodigoCondado) REFERENCES Condado(CodigoCondado),
+    FOREIGN KEY (CodigoDistrito) REFERENCES Distrito(CodigoDistrito)
+);
+
+/****************************************************************************************************************************************************************  
+Creacion de la tabla: ProductoPorDiagnostico
+Autor: Jason zuñiga solorzano
+Requerimiento: AR-001
+Fecha de Creacion: 14-07-24 DD-MM-YYYY
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
+****************************************************************************************************************************************************************/  
+CREATE TABLE Servicio (
+    ServicioId NUMBER PRIMARY KEY NOT NULL,
+    CategoriaServicioId NUMBER NOT NULL,
+    Nombre VARCHAR2(80) NOT NULL,
+    Descripcion VARCHAR2(250) NULL,
+    Precio NUMBER NOT NULL,
+    TiempoServicio NUMBER NOT NULL,
+    EditadoPor VARCHAR2(10) NOT NULL,
+    Habilitado NUMBER(1) NOT NULL,
+    FechaCreacion DATE NOT NULL,
+    FOREIGN KEY (CategoriaServicioId) REFERENCES CategoriaServicio(CategoriaServicioId)
+);
+****************************************************************************************************************************************************************/  
+
+/****************************************************************************************************************************************************************  
+Creacion de la tabla: ProductoPorDiagnostico
+Autor: Jason zuñiga solorzano
+Requerimiento: AR-001
+Fecha de Creacion: 14-07-24 DD-MM-YYYY
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
+****************************************************************************************************************************************************************/  
+CREATE TABLE EstadoCita (
+    EstadoCitaId NUMBER(10) PRIMARY KEY NOT NULL,
+    Estado VARCHAR2(50) NOT NULL,
+    Descripcion VARCHAR2(250) NOT NULL,
+    EditadoPor VARCHAR2(10) NOT NULL,
+    Habilitado NUMBER(1) NOT NULL,
+    FechaCreacion DATE NOT NULL
+);
+/****************************************************************************************************************************************************************  
+Creacion de la tabla: ProductoPorDiagnostico
+Autor: Jason zuñiga solorzano
+Requerimiento: AR-001
+Fecha de Creacion: 14-07-24 DD-MM-YYYY
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
+****************************************************************************************************************************************************************/  
+CREATE TABLE Vehiculo (
+    PlacaVehiculoId VARCHAR2(20) PRIMARY KEY NOT NULL,
+    VIN VARCHAR2(50) NOT NULL,
+    Marca VARCHAR2(80) NOT NULL,
+    Modelo VARCHAR2(80) NOT NULL,
+    Año NUMBER NOT NULL,
+    Color VARCHAR2(80) NOT NULL,
+    AlDia NUMBER(1) NULL,
+    TituloPropiedad BLOB NOT NULL,
+    Habilitado NUMBER(1) NOT NULL,
+    FechaCreacion DATE NOT NULL
+);
+/****************************************************************************************************************************************************************  
+Creacion de la tabla: ProductoPorDiagnostico
+Autor: Jason zuñiga solorzano
+Requerimiento: AR-001
+Fecha de Creacion: 14-07-24 DD-MM-YYYY
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
+****************************************************************************************************************************************************************/  
+CREATE TABLE Citas (
+    CitaId NUMBER PRIMARY KEY NOT NULL,
+    CredencialId VARCHAR2(20) NOT NULL,
+    PlacaVehiculoId VARCHAR2(20) NOT NULL,
+    VIN VARCHAR2(50) NOT NULL,
+    ServicioId NUMBER NOT NULL,
+    EstadoCitaId NUMBER(10) NOT NULL,
+    FechaAgendada DATE NOT NULL,
+    Descripcion VARCHAR2(250) NULL,
+    HoraAgendada TIMESTAMP NOT NULL,
+    HoraFinalizacion TIMESTAMP NULL,
+    EditadoPor VARCHAR2(10) NOT NULL,
+    Habilitado NUMBER(1) NOT NULL,
+    FechaCreacion DATE NOT NULL,
+    FOREIGN KEY (CredencialId) REFERENCES Cliente(CredencialId),
+    FOREIGN KEY (PlacaVehiculoId) REFERENCES Vehiculo(PlacaVehiculoId),
+    FOREIGN KEY (ServicioId) REFERENCES Servicio(ServicioId),
+    FOREIGN KEY (EstadoCitaId) REFERENCES EstadoCita(EstadoCitaId)
+);
+/****************************************************************************************************************************************************************  
+Creacion de la tabla: ProductoPorDiagnostico
+Autor: Jason zuñiga solorzano
+Requerimiento: AR-001
+Fecha de Creacion: 14-07-24 DD-MM-YYYY
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
+****************************************************************************************************************************************************************/  
+CREATE TABLE VehiculoPorCliente (
+    CredencialId VARCHAR2(20) NOT NULL,
+    PlacaVehiculo VARCHAR2(20) NOT NULL,
+    VIN VARCHAR2(50) NOT NULL,
+    EditadoPor VARCHAR2(10) NOT NULL,
+    Habilitado NUMBER(1) NOT NULL,
+    FechaCreacion DATE NOT NULL,
+    PRIMARY KEY (VIN),
+    FOREIGN KEY (CredencialId) REFERENCES Cliente(CredencialId),
+    FOREIGN KEY (PlacaVehiculo) REFERENCES Vehiculo(PlacaVehiculoId)
+);
+/****************************************************************************************************************************************************************  
+Creacion de la tabla: ProductoPorDiagnostico
+Autor: Jason zuñiga solorzano
+Requerimiento: AR-001
+Fecha de Creacion: 14-07-24 DD-MM-YYYY
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
+****************************************************************************************************************************************************************/  
+CREATE TABLE Diagnostico (
+    DiagnosticoId NUMBER PRIMARY KEY NOT NULL,
+    CitaId NUMBER NOT NULL,
+    Descripcion VARCHAR2(250) NULL,
+    CodTrabajador VARCHAR2(10) NOT NULL,
+    EditadoPor VARCHAR2(10) NOT NULL,
+    Habilitado NUMBER(1) NOT NULL,
+    FechaCreacion DATE NOT NULL,
+    FOREIGN KEY (CitaId) REFERENCES Citas(CitaId)
+);
+
+/****************************************************************************************************************************************************************  
+Creacion de la tabla: ProductoPorDiagnostico
+Autor: Jason zuñiga solorzano
+Requerimiento: AR-001
+Fecha de Creacion: 14-07-24 DD-MM-YYYY
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
+****************************************************************************************************************************************************************/  
+CREATE TABLE ServiciosPorDiagnostico (
+    DiagnosticoId NUMBER NOT NULL,
+    ServicioId NUMBER NOT NULL,
+    EditadoPor VARCHAR2(10) NOT NULL,
+    Habilitado NUMBER(1) NOT NULL,
+    FechaCreacion DATE NOT NULL,
+    PRIMARY KEY (ServicioId),
+    FOREIGN KEY (DiagnosticoId) REFERENCES Diagnostico(DiagnosticoId),
+    FOREIGN KEY (ServicioId) REFERENCES Servicio(ServicioId)
+);
+/****************************************************************************************************************************************************************  
+Creacion de la tabla: ProductoPorDiagnostico
+Autor: Jason zuñiga solorzano
+Requerimiento: AR-001
+Fecha de Creacion: 14-07-24 DD-MM-YYYY
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
+****************************************************************************************************************************************************************/  
+CREATE TABLE Producto (
+    ProductoId NUMBER PRIMARY KEY NOT NULL,
+    CategoriaProductoId NUMBER NOT NULL,
+    Nombre VARCHAR2(80) NOT NULL,
+    Descripcion VARCHAR2(250) NULL,
+    PrecioUnitario NUMBER NOT NULL,
+    Cantidad NUMBER NOT NULL,
+    EditadoPor VARCHAR2(10) NOT NULL,
+    Habilitado NUMBER(1) NOT NULL,
+    FechaCreacion DATE NOT NULL,
+    FOREIGN KEY (CategoriaProductoId) REFERENCES CategoriaProducto(CategoriaProductoId)
+);
+/****************************************************************************************************************************************************************  
+Creacion de la tabla: ProductoPorDiagnostico
+Autor: Jason zuñiga solorzano
+Requerimiento: AR-001
+Fecha de Creacion: 14-07-24 DD-MM-YYYY
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
+****************************************************************************************************************************************************************/  
+CREATE TABLE ProductoPorDiagnostico (
+    DiagnosticoId NUMBER NOT NULL,
+    ProductoId NUMBER NOT NULL,
+    Cantidad NUMBER NOT NULL,
+    EditadoPor VARCHAR2(10) NOT NULL,
+    Habilitado NUMBER(1) NOT NULL,
+    FechaCreacion DATE NOT NULL,
+    PRIMARY KEY (ProductoId),
+    FOREIGN KEY (DiagnosticoId) REFERENCES Diagnostico(DiagnosticoId),
+    FOREIGN KEY (ProductoId) REFERENCES Producto(ProductoId)
+);
+
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
