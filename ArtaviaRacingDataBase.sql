@@ -332,21 +332,7 @@ ALTER TABLE "HR"."DISTRITO"
 ADD CONSTRAINT "DISTRITO_FK_CONDADO"
 FOREIGN KEY (CODIGOCONDADO) REFERENCES "HR"."CONDADO" (CODIGOCONDADO);
 
-/****************************************************************************************************************************************************************  
-Creacion de la tabla: CategoriaMenu
-Autor: Jason zuñiga solorzano
-Requerimiento: AR-001
-Fecha de Creacion: 14-07-24 DD-MM-YYYY
-Enunciado de la Tabla: Tabla que almacena los tipos de menu
-****************************************************************************************************************************************************************/  
-CREATE TABLE CategoriaMenu (
-    CategoriaMenuId NUMBER(10) PRIMARY KEY NOT NULL,
-    TipoMenu        VARCHAR2(100)   NOT NULL,
-    Descripcion     VARCHAR2(250)   NOT NULL,
-    EditadoPor      VARCHAR2(10)    NOT NULL,
-    Habilitado      NUMBER(1)       NOT NULL,
-    FechaCreacion   DATE            NOT NULL
-);
+
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: CategoriaServicio
 Autor: Jason zuñiga solorzano
@@ -354,13 +340,13 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena los servicios especificos
 ****************************************************************************************************************************************************************/  
-CREATE TABLE CategoriaServicio (
-    CategoriaServicioId     NUMBER          PRIMARY KEY NOT NULL,
-    Nombre                  VARCHAR2(50)    NOT NULL,
-    Descripcion             VARCHAR2(250)   NULL,
-    EditadoPor              VARCHAR2(10)    NOT NULL,
-    Habilitado              NUMBER(1)       NOT NULL,
-    FechaCreacion           DATE            NOT NULL
+CREATE TABLE CATEGORIASERVICIO (
+    CATEGORIASERVICIOID     NUMBER          PRIMARY KEY NOT NULL,
+    NOMBRE                  VARCHAR2(50)    NOT NULL,
+    DESCRIPCION             VARCHAR2(250)   NULL,
+    EDITADOPOR              VARCHAR2(10)    NOT NULL,
+    HABILITADO              NUMBER(1)       NOT NULL,
+    FECHACREACION           DATE            NOT NULL
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: CategoriaProducto
@@ -369,13 +355,13 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena las categorias de los productos
 ****************************************************************************************************************************************************************/  
-CREATE TABLE CategoriaProducto (
-    CategoriaProductoId NUMBER          PRIMARY KEY NOT NULL,
-    Nombre              VARCHAR2(255)   NOT NULL,
-    Descripcion         VARCHAR2(250)   NULL,
-    EditadoPor          VARCHAR2(10)    NOT NULL,
-    Habilitado          NUMBER(1)       NOT NULL,
-    FechaCreacion       DATE            NOt NULL
+CREATE TABLE CATEGORIAPRODUCTO (
+    CATEGORIAPRODUCTOID    NUMBER          PRIMARY KEY NOT NULL,
+    NOMBRE                 VARCHAR2(255)   NOT NULL,
+    DESCRIPCION            VARCHAR2(250)   NULL,
+    EDITADOPOR             VARCHAR2(10)    NOT NULL,
+    HABILITADO             NUMBER(1)       NOT NULL,
+    FECHACREACION          DATE            NOT NULL
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: DireccionPorUsuario
@@ -384,22 +370,21 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena la dirrecion del usuario
 ****************************************************************************************************************************************************************/  
-CREATE TABLE DireccionPorUsuario (
-    CredencialId VARCHAR2(20) PRIMARY KEY NOT NULL,
-    CodigoPais NUMBER NOT NULL,
-    CodigoEstado NUMBER NOT NULL,
-    CodigoCondado NUMBER NOT NULL,
-    CodigoDistrito NUMBER NOT NULL,
-    Descripcion VARCHAR2(250) NOT NULL,
-    EditadoPor VARCHAR2(10) NOT NULL,
-    Habilitado NUMBER(1) NOT NULL,
-    FechaCreacion DATE NOT NULL,
-    FOREIGN KEY (CodigoPais) REFERENCES Pais(CodigoPais),
-    FOREIGN KEY (CodigoEstado) REFERENCES Estado(CodigoEstado),
-    FOREIGN KEY (CodigoCondado) REFERENCES Condado(CodigoCondado),
-    FOREIGN KEY (CodigoDistrito) REFERENCES Distrito(CodigoDistrito)
+CREATE TABLE DIRECCIONPORUSUARIO (
+    CREDENCIALID        VARCHAR2(20) PRIMARY KEY NOT NULL,
+    CODIGOPAIS          NUMBER NOT NULL,
+    CODIGOESTADO        NUMBER NOT NULL,
+    CODIGOCONDADO       NUMBER NOT NULL,
+    CODIGODISTRITO      NUMBER NOT NULL,
+    DESCRIPCION         VARCHAR2(250) NOT NULL,
+    EDITADOPOR          VARCHAR2(10) NOT NULL,
+    HABILITADO          NUMBER(1) NOT NULL,
+    FECHACREACION       DATE NOT NULL,
+    FOREIGN KEY (CODIGOPAIS) REFERENCES PAIS(CODIGOPAIS),
+    FOREIGN KEY (CODIGOESTADO) REFERENCES ESTADO(CODIGOESTADO),
+    FOREIGN KEY (CODIGOCONDADO) REFERENCES CONDADO(CODIGOCONDADO),
+    FOREIGN KEY (CODIGODISTRITO) REFERENCES DISTRITO(CODIGODISTRITO)
 );
-
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Servicio
 Autor: Jason zuñiga solorzano
@@ -407,19 +392,19 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena los servicios del taller
 ****************************************************************************************************************************************************************/  
-CREATE TABLE Servicio (
-    ServicioId NUMBER PRIMARY KEY NOT NULL,
-    CategoriaServicioId NUMBER NOT NULL,
-    Nombre VARCHAR2(80) NOT NULL,
-    Descripcion VARCHAR2(250) NULL,
-    Precio NUMBER NOT NULL,
-    TiempoServicio NUMBER NOT NULL,
-    EditadoPor VARCHAR2(10) NOT NULL,
-    Habilitado NUMBER(1) NOT NULL,
-    FechaCreacion DATE NOT NULL,
-    FOREIGN KEY (CategoriaServicioId) REFERENCES CategoriaServicio(CategoriaServicioId)
+CREATE TABLE SERVICIO (
+    SERVICIOID              NUMBER PRIMARY KEY NOT NULL,
+    CATEGORIASERVICIOID     NUMBER NOT NULL,
+    NOMBRE                  VARCHAR2(80) NOT NULL,
+    DESCRIPCION             VARCHAR2(250) NULL,
+    PRECIO                  NUMBER NOT NULL,
+    TIEMPOSERVICIO          NUMBER NOT NULL,
+    EDITADOPOR              VARCHAR2(10) NOT NULL,
+    HABILITADO              NUMBER(1) NOT NULL,
+    FECHACREACION           DATE NOT NULL,
+    FOREIGN KEY (CATEGORIASERVICIOID) REFERENCES CATEGORIASERVICIO(CATEGORIASERVICIOID)
 );
-****************************************************************************************************************************************************************/  
+/****************************************************************************************************************************************************************/  
 
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: EstadoCita
@@ -428,14 +413,15 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena el estado de la cita
 ****************************************************************************************************************************************************************/  
-CREATE TABLE EstadoCita (
-    EstadoCitaId NUMBER(10) PRIMARY KEY NOT NULL,
-    Estado VARCHAR2(50) NOT NULL,
-    Descripcion VARCHAR2(250) NOT NULL,
-    EditadoPor VARCHAR2(10) NOT NULL,
-    Habilitado NUMBER(1) NOT NULL,
-    FechaCreacion DATE NOT NULL
+CREATE TABLE ESTADOCITA (
+    ESTADOCITAID     NUMBER(10) PRIMARY KEY NOT NULL,
+    ESTADO           VARCHAR2(50) NOT NULL,
+    DESCRIPCION      VARCHAR2(250) NOT NULL,
+    EDITADOPOR       VARCHAR2(10) NOT NULL,
+    HABILITADO       NUMBER(1) NOT NULL,
+    FECHACREACION    DATE NOT NULL
 );
+
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Vehiculo
 Autor: Jason zuñiga solorzano
@@ -443,17 +429,17 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena los vehiculos
 ****************************************************************************************************************************************************************/  
-CREATE TABLE Vehiculo (
-    PlacaVehiculoId VARCHAR2(20) PRIMARY KEY NOT NULL,
-    VIN VARCHAR2(50) NOT NULL,
-    Marca VARCHAR2(80) NOT NULL,
-    Modelo VARCHAR2(80) NOT NULL,
-    Año NUMBER NOT NULL,
-    Color VARCHAR2(80) NOT NULL,
-    AlDia NUMBER(1) NULL,
-    TituloPropiedad BLOB NOT NULL,
-    Habilitado NUMBER(1) NOT NULL,
-    FechaCreacion DATE NOT NULL
+CREATE TABLE VEHICULO (
+    PLACAVEHICULOID   VARCHAR2(20) PRIMARY KEY NOT NULL,
+    VIN              VARCHAR2(50) NOT NULL,
+    MARCA            VARCHAR2(80) NOT NULL,
+    MODELO           VARCHAR2(80) NOT NULL,
+    AÑO              NUMBER NOT NULL,
+    COLOR            VARCHAR2(80) NOT NULL,
+    ALDIA            NUMBER(1) NULL,
+    TITULOPROPIEDAD  BLOB NOT NULL,
+    HABILITADO       NUMBER(1) NOT NULL,
+    FECHACREACION    DATE NOT NULL
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Citas
@@ -462,24 +448,24 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena las citas
 ****************************************************************************************************************************************************************/  
-CREATE TABLE Citas (
-    CitaId              NUMBER          PRIMARY KEY NOT NULL,
-    CredencialId        VARCHAR2(20)    NOT NULL,
-    PlacaVehiculoId     VARCHAR2(20)    NOT NULL,
+CREATE TABLE CITAS (
+    CITAID              NUMBER          PRIMARY KEY NOT NULL,
+    CREDENCIALID        VARCHAR2(20)    NOT NULL,
+    PLACAVEHICULOID     VARCHAR2(20)    NOT NULL,
     VIN                 VARCHAR2(50)    NOT NULL,
-    ServicioId          NUMBER          NOT NULL,
-    EstadoCitaId        NUMBER(10)      NOT NULL,
-    FechaAgendada       DATE            NOT NULL,
-    Descripcion         VARCHAR2(250)   NULL,
-    HoraAgendada        TIMESTAMP       NOT NULL,
-    HoraFinalizacion    TIMESTAMP       NULL,
-    EditadoPor          VARCHAR2(10)    NOT NULL,
-    Habilitado          NUMBER(1)       NOT NULL,
-    FechaCreacion       DATE            NOT NULL,
-    FOREIGN KEY (CredencialId)    REFERENCES Cliente(CredencialId),
-    FOREIGN KEY (PlacaVehiculoId) REFERENCES Vehiculo(PlacaVehiculoId),
-    FOREIGN KEY (ServicioId)      REFERENCES Servicio(ServicioId),
-    FOREIGN KEY (EstadoCitaId)    REFERENCES EstadoCita(EstadoCitaId)
+    SERVICIOID          NUMBER          NOT NULL,
+    ESTADOCITAID        NUMBER(10)      NOT NULL,
+    FECHAAGENDADA       DATE            NOT NULL,
+    DESCRIPCION         VARCHAR2(250)   NULL,
+    HORAAGENDADA        TIMESTAMP       NOT NULL,
+    HORAFINALIZACION    TIMESTAMP       NULL,
+    EDITADOPOR          VARCHAR2(10)    NOT NULL,
+    HABILITADO          NUMBER(1)       NOT NULL,
+    FECHACREACION       DATE            NOT NULL,
+    FOREIGN KEY (CREDENCIALID)    REFERENCES CLIENTE(CREDENCIALID),
+    FOREIGN KEY (PLACAVEHICULOID) REFERENCES VEHICULO(PLACAVEHICULOID),
+    FOREIGN KEY (SERVICIOID)      REFERENCES SERVICIO(SERVICIOID),
+    FOREIGN KEY (ESTADOCITAID)    REFERENCES ESTADOCITA(ESTADOCITAID)
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: VehiculoPorCliente
@@ -488,16 +474,16 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena la informacion de los vehiculos y su cliente
 ****************************************************************************************************************************************************************/  
-CREATE TABLE VehiculoPorCliente (
-    CredencialId VARCHAR2(20) NOT NULL,
-    PlacaVehiculo VARCHAR2(20) NOT NULL,
-    VIN VARCHAR2(50) NOT NULL,
-    EditadoPor VARCHAR2(10) NOT NULL,
-    Habilitado NUMBER(1) NOT NULL,
-    FechaCreacion DATE NOT NULL,
+CREATE TABLE VEHICULOPORCLIENTE (
+    CREDENCIALID       VARCHAR2(20) NOT NULL,
+    PLACAVEHICULO      VARCHAR2(20) NOT NULL,
+    VIN                VARCHAR2(50) NOT NULL,
+    EDITADOPOR         VARCHAR2(10) NOT NULL,
+    HABILITADO         NUMBER(1) NOT NULL,
+    FECHACREACION      DATE NOT NULL,
     PRIMARY KEY (VIN),
-    FOREIGN KEY (CredencialId) REFERENCES Cliente(CredencialId),
-    FOREIGN KEY (PlacaVehiculo) REFERENCES Vehiculo(PlacaVehiculoId)
+    FOREIGN KEY (CREDENCIALID) REFERENCES CLIENTE(CREDENCIALID),
+    FOREIGN KEY (PLACAVEHICULO) REFERENCES VEHICULO(PLACAVEHICULOID)
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Diagnostico
@@ -506,17 +492,16 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena la informacion de los diagnosticos
 ****************************************************************************************************************************************************************/  
-CREATE TABLE Diagnostico (
-    DiagnosticoId NUMBER PRIMARY KEY NOT NULL,
-    CitaId NUMBER NOT NULL,
-    Descripcion VARCHAR2(250) NULL,
-    CodTrabajador VARCHAR2(10) NOT NULL,
-    EditadoPor VARCHAR2(10) NOT NULL,
-    Habilitado NUMBER(1) NOT NULL,
-    FechaCreacion DATE NOT NULL,
-    FOREIGN KEY (CitaId) REFERENCES Citas(CitaId)
+CREATE TABLE DIAGNOSTICO (
+    DIAGNOSTICOID       NUMBER PRIMARY KEY NOT NULL,
+    CITAID              NUMBER NOT NULL,
+    DESCRIPCION         VARCHAR2(250) NULL,
+    CODTRABAJADOR       VARCHAR2(10) NOT NULL,
+    EDITADOPOR          VARCHAR2(10) NOT NULL,
+    HABILITADO          NUMBER(1) NOT NULL,
+    FECHACREACION       DATE NOT NULL,
+    FOREIGN KEY (CITAID) REFERENCES CITAS(CITAID)
 );
-
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: ServiciosPorDiagnostico
 Autor: Jason zuñiga solorzano
@@ -524,15 +509,15 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y servicios
 ****************************************************************************************************************************************************************/  
-CREATE TABLE ServiciosPorDiagnostico (
-    DiagnosticoId NUMBER NOT NULL,
-    ServicioId NUMBER NOT NULL,
-    EditadoPor VARCHAR2(10) NOT NULL,
-    Habilitado NUMBER(1) NOT NULL,
-    FechaCreacion DATE NOT NULL,
-    PRIMARY KEY (ServicioId),
-    FOREIGN KEY (DiagnosticoId) REFERENCES Diagnostico(DiagnosticoId),
-    FOREIGN KEY (ServicioId) REFERENCES Servicio(ServicioId)
+CREATE TABLE SERVICIOSPORDIAGNOSTICO (
+    DIAGNOSTICOID       NUMBER NOT NULL,
+    SERVICIOID          NUMBER NOT NULL,
+    EDITADOPOR          VARCHAR2(10) NOT NULL,
+    HABILITADO          NUMBER(1) NOT NULL,
+    FECHACREACION       DATE NOT NULL,
+    PRIMARY KEY (SERVICIOID),
+    FOREIGN KEY (DIAGNOSTICOID) REFERENCES DIAGNOSTICO(DIAGNOSTICOID),
+    FOREIGN KEY (SERVICIOID) REFERENCES SERVICIO(SERVICIOID)
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Producto
@@ -541,17 +526,17 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena los datos del producto
 ****************************************************************************************************************************************************************/  
-CREATE TABLE Producto (
-    ProductoId          NUMBER          PRIMARY KEY NOT NULL,
-    CategoriaProductoId NUMBER          NOT NULL,
-    Nombre              VARCHAR2(80)    NOT NULL,
-    Descripcion         VARCHAR2(250)   NULL,
-    PrecioUnitario      NUMBER          NOT NULL,
-    Cantidad            NUMBER          NOT NULL,
-    EditadoPor          VARCHAR2(10)    NOT NULL,
-    Habilitado          NUMBER(1)       NOT NULL,
-    FechaCreacion       DATE            NOT NULL,
-    FOREIGN KEY (CategoriaProductoId) REFERENCES CategoriaProducto(CategoriaProductoId)
+CREATE TABLE PRODUCTO (
+    PRODUCTOID           NUMBER          PRIMARY KEY NOT NULL,
+    CATEGORIAPRODUCTOID  NUMBER          NOT NULL,
+    NOMBRE               VARCHAR2(80)    NOT NULL,
+    DESCRIPCION          VARCHAR2(250)   NULL,
+    PRECIOUNITARIO       NUMBER          NOT NULL,
+    CANTIDAD             NUMBER          NOT NULL,
+    EDITADOPOR           VARCHAR2(10)    NOT NULL,
+    HABILITADO           NUMBER(1)       NOT NULL,
+    FECHACREACION        DATE            NOT NULL,
+    FOREIGN KEY (CATEGORIAPRODUCTOID) REFERENCES CATEGORIAPRODUCTO(CATEGORIAPRODUCTOID)
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: ProductoPorDiagnostico
@@ -560,18 +545,17 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
 ****************************************************************************************************************************************************************/  
-CREATE TABLE ProductoPorDiagnostico (
-    DiagnosticoId   NUMBER          NOT NULL,
-    ProductoId      NUMBER          NOT NULL,
-    Cantidad        NUMBER          NOT NULL,
-    EditadoPor      VARCHAR2(10)    NOT NULL,
-    Habilitado      NUMBER(1)       NOT NULL,
-    FechaCreacion   DATE            NOT NULL,
-    PRIMARY KEY (ProductoId),
-    FOREIGN KEY (DiagnosticoId) REFERENCES Diagnostico(DiagnosticoId),
-    FOREIGN KEY (ProductoId)    REFERENCES Producto(ProductoId)
+CREATE TABLE PRODUCTOPORDIAGNOSTICO (
+    DIAGNOSTICOID   NUMBER          NOT NULL,
+    PRODUCTOID      NUMBER          NOT NULL,
+    CANTIDAD        NUMBER          NOT NULL,
+    EDITADOPOR      VARCHAR2(10)    NOT NULL,
+    HABILITADO      NUMBER(1)       NOT NULL,
+    FECHACREACION   DATE            NOT NULL,
+    PRIMARY KEY (PRODUCTOID),
+    FOREIGN KEY (DIAGNOSTICOID) REFERENCES DIAGNOSTICO(DIAGNOSTICOID),
+    FOREIGN KEY (PRODUCTOID)    REFERENCES PRODUCTO(PRODUCTOID)
 );
-
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
