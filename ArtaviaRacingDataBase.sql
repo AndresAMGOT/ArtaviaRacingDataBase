@@ -566,13 +566,13 @@ VALUES ('Administrador', 'Dueño del Sistema', '00000001', 1, SYSDATE);
 INSERT INTO "ARTAVIARACING"."ROL" (NOMBRE, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES ('Cliente', 'Cliente que adquiere nuestros servicios', '00000001', 1, SYSDATE);
 -- SELECT * FROM  "ARTAVIARACING"."ROL" -- 1= Administrador , 2 = Cliente
-INSERT INTO "ARTAVIARACING"."PUESTOTRABAJO"()
+/*INSERT INTO "ARTAVIARACING"."PUESTOTRABAJO"()
 VALUES ();
 
 --Insert Tabla Personal como administrador
 INSERT INTO "ARTAVIARACING"."PERSONAL"(CREDENCIALID,ROLID,NOMBRE, PRIMERAPELLIDO, SEGUNDOAPELLIDO,FECHANACIMIENTO, CODTRABAJADOR, FECHACONTRATACION, PUESTOTRABAJOID, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUE ('000000001',1,'Admin','N/A','N/A',SYSDATE,'N/A',SYSDATE,1,'00000001', 1, SYSDATE);
--- SELECT * FROM  "ARTAVIARACING"."PERSONAL"
+-- SELECT * FROM  "ARTAVIARACING"."PERSONAL"*/
 
 --Insert Tabla Pais
 INSERT INTO "ARTAVIARACING"."PAIS" (CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
@@ -847,7 +847,7 @@ VALUES (79, 7, 'MATINA', '00000001', 1, SYSDATE);
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (80, 7, 'GUÁCIMO', '00000001', 1, SYSDATE);
 
-select * from "ARTAVIARACING"."CONDADO"
+select * from "ARTAVIARACING"."CONDADO";
 -- Inserts para los distritos del cant?n Para?so
 INSERT INTO "ARTAVIARACING"."DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES  (1, 37, 'Para?so', '00000001', 1, SYSDATE);
@@ -857,7 +857,7 @@ INSERT INTO "ARTAVIARACING"."DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, E
 VALUES   (3, 37, 'Orosi', '00000001', 1, SYSDATE);
 INSERT INTO "ARTAVIARACING"."DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES   (4, 37, 'Cach?', '00000001', 1, SYSDATE);
-select * from "ARTAVIARACING"."DISTRITO"
+select * from "ARTAVIARACING"."DISTRITO";
 /****************************************************************************************************************************************************************  
 Creacion de las vistas: Apartir de aqui estaran todas las vistas de la DB
 Autor: Jason zuñiga solorzano
@@ -873,7 +873,7 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: nos muestra todos los datos importantes del cliente
 ****************************************************************************************************************************************************************/  
-CREATE VIEW HR.vw_personal_detalle AS ClientesCompletos
+CREATE VIEW ARTAVIARACING.vw_personal_detalle AS ClientesCompletos
 SELECT 
     p.CREDENCIALID,
     p.NOMBRE,
@@ -887,9 +887,9 @@ SELECT
     p.FECHACREACION,
     r.NOMBRE AS ROL_NOMBRE,
     pt.PUESTO AS PUESTO_NOMBRE
-FROM HR.PERSONAL p
-JOIN HR.ROL r ON p.ROLID = r.ROLID
-JOIN HR.PUESTOTRABAJO pt ON p.PUESTOTRABAJOID = pt.PUESTOTRABAJOID;
+FROM ARTAVIARACING.PERSONAL p
+JOIN ARTAVIARACING.ROL r ON p.ROLID = r.ROLID
+JOIN ARTAVIARACING.PUESTOTRABAJO pt ON p.PUESTOTRABAJOID = pt.PUESTOTRABAJOID;
   
 /****************************************************************************************************************************************************************  
 Creacion de la vista: ClientesDireccion
@@ -898,7 +898,7 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: Esta vista muestra toda la dirrecion del cliente
 ****************************************************************************************************************************************************************/  
-CREATE VIEW HR.vw_clientes_con_direccion AS ClientesDireccion
+CREATE VIEW ARTAVIARACING.vw_clientes_con_direccion AS ClientesDireccion
 SELECT 
     c.CREDENCIALID,
     c.NOMBRE,
@@ -906,8 +906,8 @@ SELECT
     c.SEGUNDOAPELLIDO,
     c.FECHANACIMIENTO,
     d.DESCRIPCION AS DIRECCION
-FROM HR.CLIENTE c
-JOIN HR.DIRECCIONPORUSUARIO d ON c.CREDENCIALID = d.CREDENCIALID;
+FROM ARTAVIARACING.CLIENTE c
+JOIN ARTAVIARACING.DIRECCIONPORUSUARIO d ON c.CREDENCIALID = d.CREDENCIALID;
 
 /****************************************************************************************************************************************************************  
 Creacion de la vista: CitasDetalles
@@ -916,7 +916,7 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: Esta vista muestra informacion del cliente y sus citas
 ****************************************************************************************************************************************************************/  
- CREATE VIEW HR.vw_citas_detalle AS CitasDetalles
+ CREATE VIEW ARTAVIARACING.vw_citas_detalle AS CitasDetalles
 SELECT 
     c.CITAID,
     c.FechaAgendada,
@@ -927,9 +927,9 @@ SELECT
     v.PLACAVEHICULOID,
     v.MARCA,
     v.MODELO
-FROM HR.CITAS c
-JOIN HR.CLIENTE cl ON c.CREDENCIALID = cl.CREDENCIALID
-JOIN HR.VEHICULO v ON c.PLACAVEHICULOID = v.PLACAVEHICULOID;
+FROM ARTAVIARACING.CITAS c
+JOIN ARTAVIARACING.CLIENTE cl ON c.CREDENCIALID = cl.CREDENCIALID
+JOIN ARTAVIARACING.VEHICULO v ON c.PLACAVEHICULOID = v.PLACAVEHICULOID;
  /****************************************************************************************************************************************************************  
 Creacion de la vista: DiagnosticosDetalle
 Autor: Jason zuñiga solorzano
@@ -937,7 +937,7 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: Esta vista muestra todo el diagnostico
 ****************************************************************************************************************************************************************/  
-CREATE VIEW HR.vw_diagnosticos_detalle AS DiagnosticosDetalle
+CREATE VIEW ARTAVIARACING.vw_diagnosticos_detalle AS DiagnosticosDetalle
 SELECT 
     d.DIAGNOSTICOID,
     d.DESCRIPCION AS DIAGNOSTICO_DESCRIPCION,
@@ -946,9 +946,9 @@ SELECT
     c.HoraAgendada,
     c.HoraFinalizacion,
     p.NOMBRE AS TRABAJADOR_NOMBRE
-FROM HR.DIAGNOSTICO d
-JOIN HR.CITAS c ON d.CITAID = c.CITAID
-JOIN HR.PERSONAL p ON d.CODTRABAJADOR = p.CODTRABAJADOR;
+FROM ARTAVIARACING.DIAGNOSTICO d
+JOIN ARTAVIARACING.CITAS c ON d.CITAID = c.CITAID
+JOIN ARTAVIARACING.PERSONAL p ON d.CODTRABAJADOR = p.CODTRABAJADOR;
 
 --Prueba de conexion a GitHub
 
