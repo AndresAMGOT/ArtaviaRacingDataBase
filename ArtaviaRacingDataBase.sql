@@ -950,5 +950,108 @@ FROM ARTAVIARACING.DIAGNOSTICO d
 JOIN ARTAVIARACING.CITAS c ON d.CITAID = c.CITAID
 JOIN ARTAVIARACING.PERSONAL p ON d.CODTRABAJADOR = p.CODTRABAJADOR;
 
---Prueba de conexion a GitHub
+/****************************************************************************************************************************************************************  
+Creacion de la vista: DiagnosticosDetalle
+Autor: José Andrés Alvarado Matamoros
+Requerimiento: AR-001
+Fecha de Creacion: 21-07-24 DD-MM-YYYY
+Enunciado de la vista: Vista encargada de devolver la informacion de los Paises
+****************************************************************************************************************************************************************/  
+CREATE OR REPLACE VIEW ARTAVIARACING.vw_ObtenerPais AS
+SELECT 
+     CODIGOPAIS  
+    ,NOMBRE      
+FROM PAIS;
 
+/****************************************************************************************************************************************************************  
+Creacion de la vista: DiagnosticosDetalle
+Autor: José Andrés Alvarado Matamoros
+Requerimiento: AR-001
+Fecha de Creacion: 21-07-24 DD-MM-YYYY
+Enunciado de la vista: Vista encargada de devolver la informacion de los Estados  de un Paises
+****************************************************************************************************************************************************************/  
+CREATE OR REPLACE VIEW ARTAVIARACING.vw_ObtenerEstado AS
+SELECT 
+     CODIGOESTADO  
+    ,NOMBRE       
+    ,CODIGOPAIS    
+FROM ESTADO;
+
+/****************************************************************************************************************************************************************  
+Creacion de la vista: DiagnosticosDetalle
+Autor: José Andrés Alvarado Matamoros
+Requerimiento: AR-001
+Fecha de Creacion: 21-07-24 DD-MM-YYYY
+Enunciado de la vista: Vista encargada de devolver la informacion de los Condados de un Paises
+****************************************************************************************************************************************************************/  
+CREATE OR REPLACE VIEW ARTAVIARACING.vw_ObtenerCondado AS
+SELECT 
+     CODIGOCONDADO  
+    ,NOMBRE         
+    ,CODIGOESTADO   
+FROM CONDADO;
+
+/****************************************************************************************************************************************************************  
+Creacion de la vista: DiagnosticosDetalle
+Autor: José Andrés Alvarado Matamoros
+Requerimiento: AR-001
+Fecha de Creacion: 21-07-24 DD-MM-YYYY
+Enunciado de la vista: Vista encargada de devolver la informacion de los Paises
+****************************************************************************************************************************************************************/  
+CREATE OR REPLACE VIEW ARTAVIARACING.vw_ObtenerDistritos AS
+SELECT 
+     CODIGODISTRITO  
+    ,NOMBRE          
+    ,CODIGOCONDADO   
+FROM DISTRITO;
+
+/****************************************************************************************************************************************************************
+***                                                 PROCEDIMIENTOS ALMACENADOS A PARTIR DE AQUI                                                               ***
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado encargado de obtener los paises desde base de datos
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE  USP_SeleccionarPaises (
+    RespuestaPaises OUT SYS_REFCURSOR
+) AS
+BEGIN
+  OPEN RespuestaPaises FOR
+    SELECT 
+         CODIGOPAIS
+        ,NOMBRE
+    FROM vw_ObtenerPais;   
+END;
+
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado encargado de obtener los estados de los paises desde base de datos
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE  USP_SeleccionarEstados (
+     CodigoPais     IN  NUMBER
+    ,RespuestaEstados OUT SYS_REFCURSOR
+) AS
+BEGIN
+  OPEN RespuestaEstados FOR
+    SELECT 
+         CODIGOESTADO
+        ,NOMBRE
+    FROM vw_ObtenerEstado
+    WHERE CODIGOPAIS = CodigoPais;
+END;
+
+ 
