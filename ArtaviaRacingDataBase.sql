@@ -1562,7 +1562,54 @@ BEGIN
 END USP_SeleccionarClientePorCredencial;
 
 
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement:  Procedimiento encargado de verificar si existe el usuario, en caso de existir devolveria el rol y el credencial sino iria un nulo
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_VerificarUsuario (
+    p_correo_electronico IN VARCHAR2,
+    p_contrasena         IN VARCHAR2, -- Contraseña ya encriptada en SHA-512
+    p_credencial_id      OUT VARCHAR2, -- CREDENCIALID del usuario si existe
+    p_rol_id             OUT NUMBER     -- ROLID del usuario si existe
+) AS
+BEGIN
+    -- Inicializa los parámetros de salida
+    p_credencial_id := NULL;
+    p_rol_id := NULL;
+    
+    -- Verifica si el usuario existe con el correo electrónico y la contraseña proporcionados
+    BEGIN
+        SELECT 
+              c.CREDENCIALID,
+              c.ROLID
+        INTO p_credencial_id, p_rol_id
+        FROM ARTAVIARACING.CREDENCIALESPORUSUARIO cr
+        INNER JOIN ARTAVIARACING.CLIENTE c
+            ON cr.CREDENCIALID = c.CREDENCIALID
+        WHERE cr.CORREOELECTRONICO = p_correo_electronico
+            AND cr.CONTRASEÑA = p_contrasena;
+        
+        -- Si no se encuentra ningún registro, p_credencial_id y p_rol_id serán NULL
+    EXCEPTION
+        -- Captura cualquier error y muestra un mensaje
+        WHEN NO_DATA_FOUND THEN
+            -- Si no se encuentra ningún dato, p_credencial_id y p_rol_id permanecen NULL
+            p_credencial_id := NULL;
+            p_rol_id := NULL;
+        WHEN OTHERS THEN
+            -- Muestra el mensaje de error y asigna NULL
+            DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+            p_credencial_id := NULL;
+            p_rol_id := NULL;
+    END;
+END USP_VerificarUsuario;
 
 
 
