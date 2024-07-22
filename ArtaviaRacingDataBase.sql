@@ -181,6 +181,11 @@ ALTER TABLE "CREDENCIALESPORUSUARIO"
 ADD CONSTRAINT "CREDENCIALESPORUSUARIO_CLIENTE_FK" FOREIGN KEY (CREDENCIALID)
     REFERENCES "CLIENTE" (CREDENCIALID);
     
+    
+
+    
+    
+    
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
@@ -1611,36 +1616,41 @@ BEGIN
     END;
 END USP_VerificarUsuario;
 
-/****************************************************************************************************************************************************************
-Autor: Jason Zuñiga Solorzano
-Id Requirement: AR-001 
-Creation Date: 21/07/2024   (MM/dd/YYYY)
-Requirement:  Este procedimiento es el encargado de desabilitar y por ende eliminar las citas
-*************************************************************************************************************************/
 
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_EliminarCita (
-    -- Parámetro para identificar la cita
-    p_CITAID IN NUMBER
+/****************************************************************************************************************************************************************
+Autor: Luis Solorzano Campos
+Id Requirement: AR-001
+Creation Date: [22/07/2024]   (MM/dd/YYYY)
+Requirement: Procedimiento encargado de cancelar una cita previamente agendada.
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_CancelarCita (
+    p_cita_id       IN NUMBER,    -- ID de la cita a cancelar
+    p_credencial_id IN VARCHAR2,  -- ID de la credencial del cliente
+    p_editado_por   IN VARCHAR2 DEFAULT '000000001'  -- Usuario que realiza la edición
 ) AS
 BEGIN
     -- Inicia una transacción
     BEGIN
-        -- Actualiza la tabla CITA para deshabilitar la cita
-        UPDATE CITAS
-        SET HABILITADO = '0'
-        WHERE CITAID = p_CITAID;
+        -- Actualiza el estado de la cita a 'Cancelada' en la tabla CITAS
+        UPDATE ARTAVIARACING.CITAS
+        SET ESTADO = 'Cancelada',
+            EDITADOPOR = p_editado_por,
+            FECHAMODIFICACION = SYSDATE
+        WHERE CITAID = p_cita_id
+          AND CREDENCIALID = p_credencial_id;
 
         -- Confirma la transacción si la actualización es exitosa
         COMMIT;
     EXCEPTION
-        -- Captura cualquier error y realiza rollback
+        -- Captura cualquier error 
         WHEN OTHERS THEN
             ROLLBACK;
-            -- Muestra un mensaje genérico
-            DBMS_OUTPUT.PUT_LINE('Se ha producido un error al intentar desactivar la cita.');
+            -- Muestra un mensaje
+            DBMS_OUTPUT.PUT_LINE('Se ha producido un error al intentar cancelar la cita.');
             RAISE;
     END;
-END USP_EliminarCita;
+END USP_CancelarCita;
 
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga Solorzano
@@ -1698,4 +1708,32 @@ BEGIN
     VALUES (p_CITAID, p_CREDENCIALID, p_PLACAVEHICULOID, p_VIN, p_SERVICIOID, p_ESTADOCITAID, p_FECHAAGENDADA, p_HORAAGENDADA, p_EDITADOPOR, p_HABILITADO, SYSDATE);
 END USP_AGREGAR_CITA;
 
- 
+ /****************************************************************************************************************************************************************
+Autor: Luis Solorzano Campos
+Id Requirement: AR-001 
+Creation Date: [22/07/2024]   (MM/dd/YYYY)
+Requirement: Procedimiento encargado de enviar una confirmación de cancelación de cita al cliente.
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_EnviarConfirmacionCancelacion (
+    p_cita_id       IN NUMBER,    -- ID de la cita cancelada
+    p_credencial_id IN VARCHAR2   -- ID de la credencial del cliente
+) AS
+    p_correo_electronico VARCHAR2(100);
+BEGIN
+    -- Obtiene el correo electrónico del cliente
+    SELECT CORREOELECTRONICO
+    INTO p_correo_electronico
+    FROM ARTAVIARACING.CREDENCIALESPORUSUARIO
+    WHERE CREDENCIALID = p_credencial_id;
+
+    -- Enviar correo electrónico de confirmación
+    BEGIN
+        SEND_EMAIL(p_correo_electronico, 
+                   'Confirmación de Cancelación de Cita', 
+                   'Su cita con ID ' || p_cita_id || ' ha sido cancelada exitosamente.');
+       
+        -- Confirma la transacción si el envío es exitoso
+        COMMIT;
+    END;
+END USP_EnviarConfirmacionCancelacion;
