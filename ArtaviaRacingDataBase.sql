@@ -1,7 +1,7 @@
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 06/07/2024   (MM/dd/YYYY)
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion del puesto de trabajo
 ****************************************************************************************************************************************************************/
 CREATE TABLE "ARTAVIARACING"."PUESTOTRABAJO" 
@@ -20,9 +20,9 @@ CREATE TABLE "ARTAVIARACING"."PUESTOTRABAJO"
  NOCOMPRESS LOGGING
   TABLESPACE "USERS" ;
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 06/07/2024   (MM/dd/YYYY)
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion del rol de los usaurios
 ****************************************************************************************************************************************************************/  
 CREATE TABLE "ARTAVIARACING"."ROL" 
@@ -42,9 +42,9 @@ CREATE TABLE "ARTAVIARACING"."ROL"
   TABLESPACE "USERS" ;
 
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 06/07/2024   (MM/dd/YYYY)
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion del personal
 ****************************************************************************************************************************************************************/  
 CREATE TABLE "ARTAVIARACING"."PERSONAL" 
@@ -72,9 +72,9 @@ CREATE TABLE "ARTAVIARACING"."PERSONAL"
   TABLESPACE "USERS" ;
 
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 06/07/2024   (MM/dd/YYYY)
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion del cliente
 ****************************************************************************************************************************************************************/  
 CREATE TABLE "ARTAVIARACING"."CLIENTE" 
@@ -99,9 +99,9 @@ CREATE TABLE "ARTAVIARACING"."CLIENTE"
   TABLESPACE "USERS" ;
 
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 06/07/2024   (MM/dd/YYYY)
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion de los diferentes tipos de categorias telefoncias.
 ****************************************************************************************************************************************************************/  
 CREATE TABLE "ARTAVIARACING"."CATEGORIATELEFONO" 
@@ -121,9 +121,9 @@ CREATE TABLE "ARTAVIARACING"."CATEGORIATELEFONO"
   TABLESPACE "USERS" ;
   
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 06/07/2024   (MM/dd/YYYY)
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion de los telefonos por usaurio.
 ****************************************************************************************************************************************************************/  
 CREATE TABLE "ARTAVIARACING"."TELEFONOPORUSUARIO" 
@@ -151,40 +151,40 @@ CREATE TABLE "ARTAVIARACING"."TELEFONOPORUSUARIO"
   TABLESPACE "USERS" ;
   
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 06/07/2024   (MM/dd/YYYY)
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion de los telefonos por usaurio.
 ****************************************************************************************************************************************************************/  
 CREATE TABLE "ARTAVIARACING"."CREDENCIALESPORUSUARIO" 
 (
     CREDENCIALID         VARCHAR2(20)         NOT NULL,
     CORREOELECTRONICO    VARCHAR2(50)         NOT NULL,
-    CONTRASEï¿½A           VARCHAR2(500)        NOT NULL,
-    ESCONTRASEï¿½ATEMPORAL NUMBER(1)            NOT NULL,
+    CONTRASEÑA           VARCHAR2(500)        NOT NULL,
+    ESCONTRASEÑATEMPORAL NUMBER(1)            NOT NULL,
     EDITADOPOR           VARCHAR2(10)         NOT NULL,
     HABILITADO           NUMBER(1)            NOT NULL,
     FECHACREACION        DATE                 NOT NULL
 );
 
--- Agregar la restricciï¿½n de llave primaria
+-- Agregar la restricción de llave primaria
 ALTER TABLE "ARTAVIARACING"."CREDENCIALESPORUSUARIO"
 ADD CONSTRAINT "CREDENCIALESPORUSUARIO_PK" PRIMARY KEY (CREDENCIALID);
 
--- Agregar la restricciï¿½n de llave forï¿½nea a la tabla PERSONAL
+-- Agregar la restricción de llave foránea a la tabla PERSONAL
 ALTER TABLE "ARTAVIARACING"."CREDENCIALESPORUSUARIO"
 ADD CONSTRAINT "CREDENCIALESPORUSUARIO_PERSONAL_FK" FOREIGN KEY (CREDENCIALID)
     REFERENCES "ARTAVIARACING"."PERSONAL" (CREDENCIALID);
 
--- Agregar la restricciï¿½n de llave forï¿½nea a la tabla CLIENTE
+-- Agregar la restricción de llave foránea a la tabla CLIENTE
 ALTER TABLE "ARTAVIARACING"."CREDENCIALESPORUSUARIO"
 ADD CONSTRAINT "CREDENCIALESPORUSUARIO_CLIENTE_FK" FOREIGN KEY (CREDENCIALID)
     REFERENCES "ARTAVIARACING"."CLIENTE" (CREDENCIALID);
     
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 06/07/2024   (MM/dd/YYYY)
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion de las categorias de los menus del sitio
 ****************************************************************************************************************************************************************/  
 CREATE TABLE "ARTAVIARACING"."CATEGORIAMENU"
@@ -198,9 +198,9 @@ CREATE TABLE "ARTAVIARACING"."CATEGORIAMENU"
     CONSTRAINT "CATEGORIAMENU_PK" PRIMARY KEY (CATEGORIAMENUID)
 );
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 06/07/2024   (MM/dd/YYYY)
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion del menu del sitio
 ****************************************************************************************************************************************************************/  
 CREATE TABLE "ARTAVIARACING"."MENU"
@@ -218,20 +218,20 @@ CREATE TABLE "ARTAVIARACING"."MENU"
     FECHACREACION      DATE                NOT NULL,
     CONSTRAINT "MENU_PK" PRIMARY KEY (MENUID)
 );
--- Agregar la restricciï¿½n de clave forï¿½nea a CATEGORIAMENU
+-- Agregar la restricción de clave foránea a CATEGORIAMENU
 ALTER TABLE "ARTAVIARACING"."MENU"
 ADD CONSTRAINT "MENU_CATEGORIAMENU_FK" FOREIGN KEY (CATEGORIAMENUID)
     REFERENCES "ARTAVIARACING"."CATEGORIAMENU" (CATEGORIAMENUID);
 
--- Agregar la restricciï¿½n de clave forï¿½nea a MENUPADRE
+-- Agregar la restricción de clave foránea a MENUPADRE
 ALTER TABLE "ARTAVIARACING"."MENU"
 ADD CONSTRAINT "MENU_MENUPADRE_FK" FOREIGN KEY (MENUPADREID)
     REFERENCES "ARTAVIARACING"."MENU" (MENUID);
 
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 06/07/2024   (MM/dd/YYYY)
+Fecha Creación: 06/07/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion del menu por rol
 ****************************************************************************************************************************************************************/      
 CREATE TABLE "ARTAVIARACING"."MENUPORROL"
@@ -243,20 +243,20 @@ CREATE TABLE "ARTAVIARACING"."MENUPORROL"
     FECHACREACION   DATE                NOT NULL,
     CONSTRAINT "MENUPORROL_PK" PRIMARY KEY (ROLID, MENUID)
 );
--- Agregar la restricciï¿½n de clave forï¿½nea a ROL
+-- Agregar la restricción de clave foránea a ROL
 ALTER TABLE "ARTAVIARACING"."MENUPORROL"
 ADD CONSTRAINT "MENUPORROL_ROL_FK" FOREIGN KEY (ROLID)
     REFERENCES "ARTAVIARACING"."ROL" (ROLID);
 
--- Agregar la restricciï¿½n de clave forï¿½nea a MENU
+-- Agregar la restricción de clave foránea a MENU
 ALTER TABLE "ARTAVIARACING"."MENUPORROL"
 ADD CONSTRAINT "MENUPORROL_MENU_FK" FOREIGN KEY (MENUID)
     REFERENCES "ARTAVIARACING"."MENU" (MENUID);
     
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 07/09/2024   (MM/dd/YYYY)
+Fecha Creación: 07/09/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion del Pais
 ****************************************************************************************************************************************************************/      
 CREATE TABLE "ARTAVIARACING"."PAIS"
@@ -269,9 +269,9 @@ CREATE TABLE "ARTAVIARACING"."PAIS"
     CONSTRAINT "PAIS_PK" PRIMARY KEY (CODIGOPAIS)
 );
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 07/09/2024   (MM/dd/YYYY)
+Fecha Creación: 07/09/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion de los estados del Pais
 ****************************************************************************************************************************************************************/  
 
@@ -290,9 +290,9 @@ ALTER TABLE "ARTAVIARACING"."ESTADO"
 ADD CONSTRAINT "ESTADO_FK_PAIS"
 FOREIGN KEY (CODIGOPAIS) REFERENCES "ARTAVIARACING"."PAIS" (CODIGOPAIS);
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 07/09/2024   (MM/dd/YYYY)
+Fecha Creación: 07/09/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion de los contados del Pais
 ****************************************************************************************************************************************************************/  
 CREATE TABLE "ARTAVIARACING"."CONDADO"
@@ -310,9 +310,9 @@ ALTER TABLE "ARTAVIARACING"."CONDADO"
 ADD CONSTRAINT "CONDADO_FK_ESTADO"
 FOREIGN KEY (CODIGOESTADO) REFERENCES "ARTAVIARACING"."ESTADO" (CODIGOESTADO);
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 07/09/2024   (MM/dd/YYYY)
+Fecha Creación: 07/09/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion del distrito.
 ****************************************************************************************************************************************************************/  
 CREATE TABLE "ARTAVIARACING"."DISTRITO"
@@ -333,7 +333,7 @@ FOREIGN KEY (CODIGOCONDADO) REFERENCES "ARTAVIARACING"."CONDADO" (CODIGOCONDADO)
 
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: CategoriaServicio
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena los servicios especificos
@@ -348,7 +348,7 @@ CREATE TABLE CATEGORIASERVICIO (
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: CategoriaProducto
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena las categorias de los productos
@@ -363,7 +363,7 @@ CREATE TABLE CATEGORIAPRODUCTO (
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: DireccionPorUsuario
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena la dirrecion del usuario
@@ -385,7 +385,7 @@ CREATE TABLE DIRECCIONPORUSUARIO (
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Servicio
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena los servicios del taller
@@ -406,7 +406,7 @@ CREATE TABLE SERVICIO (
 
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: EstadoCita
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena el estado de la cita
@@ -422,7 +422,7 @@ CREATE TABLE ESTADOCITA (
 
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Vehiculo
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena los vehiculos
@@ -432,7 +432,7 @@ CREATE TABLE VEHICULO (
     VIN              VARCHAR2(50) NOT NULL,
     MARCA            VARCHAR2(80) NOT NULL,
     MODELO           VARCHAR2(80) NOT NULL,
-    Aï¿½O              NUMBER NOT NULL,
+    AÑO              NUMBER NOT NULL,
     COLOR            VARCHAR2(80) NOT NULL,
     ALDIA            NUMBER(1) NULL,
     TITULOPROPIEDAD  BLOB NOT NULL,
@@ -441,7 +441,7 @@ CREATE TABLE VEHICULO (
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Citas
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena las citas
@@ -467,7 +467,7 @@ CREATE TABLE CITAS (
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: VehiculoPorCliente
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena la informacion de los vehiculos y su cliente
@@ -485,7 +485,7 @@ CREATE TABLE VEHICULOPORCLIENTE (
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Diagnostico
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena la informacion de los diagnosticos
@@ -502,10 +502,10 @@ CREATE TABLE DIAGNOSTICO (
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: ServiciosPorDiagnostico
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
-Enunciado de la Tabla: Tabla que almacena la relaciï¿½n entre diagnï¿½sticos y servicios
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y servicios
 ****************************************************************************************************************************************************************/  
 CREATE TABLE SERVICIOSPORDIAGNOSTICO (
     DIAGNOSTICOID       NUMBER NOT NULL,
@@ -519,7 +519,7 @@ CREATE TABLE SERVICIOSPORDIAGNOSTICO (
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Producto
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena los datos del producto
@@ -538,10 +538,10 @@ CREATE TABLE PRODUCTO (
 );
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: ProductoPorDiagnostico
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
-Enunciado de la Tabla: Tabla que almacena la relaciï¿½n entre diagnï¿½sticos y productos
+Enunciado de la Tabla: Tabla que almacena la relación entre diagnósticos y productos
 ****************************************************************************************************************************************************************/  
 CREATE TABLE PRODUCTOPORDIAGNOSTICO (
     DIAGNOSTICOID   NUMBER          NOT NULL,
@@ -555,14 +555,14 @@ CREATE TABLE PRODUCTOPORDIAGNOSTICO (
     FOREIGN KEY (PRODUCTOID)    REFERENCES PRODUCTO(PRODUCTOID)
 );
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
-Fecha Creaciï¿½n: 07/09/2024   (MM/dd/YYYY)
-Enunciado: A partir de este punto se estarï¿½n agregando los insert harcodeados para los diferentes catalogos.
+Fecha Creación: 07/09/2024   (MM/dd/YYYY)
+Enunciado: A partir de este punto se estarán agregando los insert harcodeados para los diferentes catalogos.
 ****************************************************************************************************************************************************************/  
 --Insert Tabla ROL
 INSERT INTO "ARTAVIARACING"."ROL" (NOMBRE, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES ('Administrador', 'Dueï¿½o del Sistema', '00000001', 1, SYSDATE);
+VALUES ('Administrador', 'Dueño del Sistema', '00000001', 1, SYSDATE);
 INSERT INTO "ARTAVIARACING"."ROL" (NOMBRE, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES ('Cliente', 'Cliente que adquiere nuestros servicios', '00000001', 1, SYSDATE);
 -- SELECT * FROM  "ARTAVIARACING"."ROL" -- 1= Administrador , 2 = Cliente
@@ -616,7 +616,7 @@ VALUES (1, 'COSTA RICA', '00000001', 1, SYSDATE);
 
 --Insert Provincias
 INSERT INTO "ARTAVIARACING"."ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (1, 1, 'SAN JOSï¿½', '00000001', 1, SYSDATE);
+VALUES (1, 1, 'SAN JOSÉ', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (2, 1, 'ALAJUELA', '00000001', 1, SYSDATE);
@@ -634,14 +634,14 @@ INSERT INTO "ARTAVIARACING"."ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOP
 VALUES (6, 1, 'PUNTARENAS', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (7, 1, 'LIMï¿½N', '00000001', 1, SYSDATE);
+VALUES (7, 1, 'LIMÓN', '00000001', 1, SYSDATE);
 
--- Cantones de la provincia de San Josï¿½
+-- Cantones de la provincia de San José
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (1, 1, 'SAN JOSï¿½', '00000001', 1, SYSDATE);
+VALUES (1, 1, 'SAN JOSÉ', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (2, 1, 'ESCAZï¿½', '00000001', 1, SYSDATE);
+VALUES (2, 1, 'ESCAZÚ', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (3, 1, 'DESAMPARADOS', '00000001', 1, SYSDATE);
@@ -650,10 +650,10 @@ INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDIT
 VALUES (4, 1, 'PURISCAL', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (5, 1, 'TARRAZï¿½', '00000001', 1, SYSDATE);
+VALUES (5, 1, 'TARRAZÚ', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (6, 1, 'ASERRï¿½', '00000001', 1, SYSDATE);
+VALUES (6, 1, 'ASERRÍ', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (7, 1, 'MORA', '00000001', 1, SYSDATE);
@@ -674,7 +674,7 @@ INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDIT
 VALUES (12, 1, 'ACOSTA', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (13, 1, 'TIBï¿½S', '00000001', 1, SYSDATE);
+VALUES (13, 1, 'TIBÁS', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (14, 1, 'MORAVIA', '00000001', 1, SYSDATE);
@@ -692,17 +692,17 @@ INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDIT
 VALUES (18, 1, 'CURRIDABAT', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (19, 1, 'Pï¿½REZ ZELEDï¿½N', '00000001', 1, SYSDATE);
+VALUES (19, 1, 'PÉREZ ZELEDÓN', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (20, 1, 'LEï¿½N CORTï¿½S', '00000001', 1, SYSDATE);
+VALUES (20, 1, 'LEÓN CORTÉS', '00000001', 1, SYSDATE);
 
 -- Cantones de la provincia de Alajuela
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (21, 2, 'ALAJUELA', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (22, 2, 'SAN RAMï¿½N', '00000001', 1, SYSDATE);
+VALUES (22, 2, 'SAN RAMÓN', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (23, 2, 'GRECIA', '00000001', 1, SYSDATE);
@@ -720,7 +720,7 @@ INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDIT
 VALUES (27, 2, 'PALMARES', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (28, 2, 'POï¿½S', '00000001', 1, SYSDATE);
+VALUES (28, 2, 'POÁS', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (29, 2, 'OROTINA', '00000001', 1, SYSDATE);
@@ -748,13 +748,13 @@ INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDIT
 VALUES (36, 3, 'CARTAGO', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (37, 3, 'PARAï¿½SO', '00000001', 1, SYSDATE);
+VALUES (37, 3, 'PARAÍSO', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (38, 3, 'LA UNIï¿½N', '00000001', 1, SYSDATE);
+VALUES (38, 3, 'LA UNIÓN', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (39, 3, 'JIMï¿½NEZ', '00000001', 1, SYSDATE);
+VALUES (39, 3, 'JIMÉNEZ', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (40, 3, 'TURRIALBA', '00000001', 1, SYSDATE);
@@ -779,7 +779,7 @@ INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDIT
 VALUES (46, 4, 'SANTO DOMINGO', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (47, 4, 'SANTA Bï¿½RBARA', '00000001', 1, SYSDATE);
+VALUES (47, 4, 'SANTA BÁRBARA', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (48, 4, 'SAN RAFAEL', '00000001', 1, SYSDATE);
@@ -788,7 +788,7 @@ INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDIT
 VALUES (49, 4, 'SAN ISIDRO', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (50, 4, 'BELï¿½N', '00000001', 1, SYSDATE);
+VALUES (50, 4, 'BELÉN', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (51, 4, 'FLORES', '00000001', 1, SYSDATE);
@@ -813,13 +813,13 @@ INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDIT
 VALUES (57, 5, 'CARRILLO', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (58, 5, 'CAï¿½AS', '00000001', 1, SYSDATE);
+VALUES (58, 5, 'CAÑAS', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (59, 5, 'ABANGARES', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (60, 5, 'TILARï¿½N', '00000001', 1, SYSDATE);
+VALUES (60, 5, 'TILARÁN', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (61, 5, 'NANDAYURE', '00000001', 1, SYSDATE);
@@ -864,12 +864,12 @@ VALUES (73, 6, 'CORREDORES', '00000001', 1, SYSDATE);
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (74, 6, 'GARABITO', '00000001', 1, SYSDATE);
 
--- Cantones de la provincia de Limï¿½n
+-- Cantones de la provincia de Limón
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (75, 7, 'LIMï¿½N', '00000001', 1, SYSDATE);
+VALUES (75, 7, 'LIMÓN', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (76, 7, 'POCOCï¿½', '00000001', 1, SYSDATE);
+VALUES (76, 7, 'POCOCÍ', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (77, 7, 'SIQUIRRES', '00000001', 1, SYSDATE);
@@ -881,7 +881,7 @@ INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDIT
 VALUES (79, 7, 'MATINA', '00000001', 1, SYSDATE);
 
 INSERT INTO "ARTAVIARACING"."CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (80, 7, 'GUï¿½CIMO', '00000001', 1, SYSDATE);
+VALUES (80, 7, 'GUÁCIMO', '00000001', 1, SYSDATE);
 
 select * from "ARTAVIARACING"."CONDADO";
 -- Inserts para los distritos del cant?n Para?so
@@ -896,7 +896,7 @@ VALUES   (4, 37, 'Cach?', '00000001', 1, SYSDATE);
 select * from "ARTAVIARACING"."DISTRITO";
 /****************************************************************************************************************************************************************  
 Creacion de las vistas: Apartir de aqui estaran todas las vistas de la DB
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 17-07-24 DD-MM-YYYY
 Enunciado de la vista: Creacion de las vistas
@@ -904,7 +904,7 @@ Enunciado de la vista: Creacion de las vistas
 
 /****************************************************************************************************************************************************************  
 Creacion de la vista: ClientesCompletos
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: nos muestra todos los datos importantes del cliente
@@ -929,7 +929,7 @@ JOIN ARTAVIARACING.PUESTOTRABAJO pt ON p.PUESTOTRABAJOID = pt.PUESTOTRABAJOID;
   
 /****************************************************************************************************************************************************************  
 Creacion de la vista: ClientesDireccion
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: Esta vista muestra toda la dirrecion del cliente
@@ -947,7 +947,7 @@ JOIN ARTAVIARACING.DIRECCIONPORUSUARIO d ON c.CREDENCIALID = d.CREDENCIALID;
 
 /****************************************************************************************************************************************************************  
 Creacion de la vista: CitasDetalles
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: Esta vista muestra informacion del cliente y sus citas
@@ -968,7 +968,7 @@ JOIN ARTAVIARACING.CLIENTE cl ON c.CREDENCIALID = cl.CREDENCIALID
 JOIN ARTAVIARACING.VEHICULO v ON c.PLACAVEHICULOID = v.PLACAVEHICULOID;
 /****************************************************************************************************************************************************************  
 Creacion de la vista: DiagnosticosDetalle
-Autor: Jason zuï¿½iga solorzano
+Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: Esta vista muestra todo el diagnostico
@@ -988,7 +988,7 @@ JOIN ARTAVIARACING.PERSONAL p ON d.CODTRABAJADOR = p.CODTRABAJADOR;
 
 /****************************************************************************************************************************************************************  
 Creacion de la vista: DiagnosticosDetalle
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
 Enunciado de la vista: Vista encargada de devolver la informacion de los Paises
@@ -1001,7 +1001,7 @@ FROM PAIS;
 
 /****************************************************************************************************************************************************************  
 Creacion de la vista: DiagnosticosDetalle
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
 Enunciado de la vista: Vista encargada de devolver la informacion de los Estados  de un Paises
@@ -1014,7 +1014,7 @@ SELECT
 FROM ESTADO;
 /****************************************************************************************************************************************************************  
 Creacion de la vista: DiagnosticosDetalle
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
 Enunciado de la vista: Vista encargada de devolver la informacion de los Condados de un Paises
@@ -1028,7 +1028,7 @@ FROM CONDADO;
 
 /****************************************************************************************************************************************************************  
 Creacion de la vista: DiagnosticosDetalle
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
 Enunciado de la vista: Vista encargada de devolver la informacion de los Paises
@@ -1042,10 +1042,10 @@ FROM DISTRITO;
 
 /****************************************************************************************************************************************************************  
 Creacion de la vista: ProductosDetalle
-Autor: Horacio Porras Marï¿½n
+Autor: Horacio Porras Marín
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
-Enunciado de la vista: Muestra toda la informaciï¿½n del producto, incluyendo la categoria por nombre.
+Enunciado de la vista: Muestra toda la información del producto, incluyendo la categoria por nombre.
 ****************************************************************************************************************************************************************/  
 CREATE OR REPLACE VIEW ARTAVIARACING.vw_producto_detalle AS 
 SELECT 
@@ -1063,10 +1063,10 @@ JOIN ARTAVIARACING.CATEGORIAPRODUCTO cp ON p.CATEGORIAPRODUCTOID = cp.CATEGORIAP
 
 /****************************************************************************************************************************************************************  
 Creacion de la vista: ServiciosDetalle
-Autor: Horacio Porras Marï¿½n
+Autor: Horacio Porras Marín
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
-Enunciado de la vista: Muestra toda la informaciï¿½n del servicio, incluyendo la categoria por nombre.
+Enunciado de la vista: Muestra toda la información del servicio, incluyendo la categoria por nombre.
 ****************************************************************************************************************************************************************/  
 CREATE OR REPLACE VIEW ARTAVIARACING.vw_servicio_detalle AS 
 SELECT 
@@ -1084,10 +1084,10 @@ JOIN ARTAVIARACING.CATEGORIASERVICIO cs ON s.CATEGORIASERVICIOID = cs.CATEGORIAS
 
 /****************************************************************************************************************************************************************  
 Creacion de la vista: DiagnosticosDetalle
-Autor: Horacio Porras Marï¿½n
+Autor: Horacio Porras Marín
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
-Enunciado de la vista: Muestra la informaciï¿½n de los vehiculos.
+Enunciado de la vista: Muestra la información de los vehiculos.
 ****************************************************************************************************************************************************************/  
 CREATE OR REPLACE VIEW ARTAVIARACING.vw_ObtenerVehiculo AS
 SELECT 
@@ -1095,7 +1095,7 @@ SELECT
     ,VIN       
     ,MARCA
     ,MODELO
-    ,Aï¿½O
+    ,AÑO
     ,COLOR
     ,ALDIA
     ,TITULOPROPIEDAD
@@ -1105,10 +1105,10 @@ FROM VEHICULO;
 
 /****************************************************************************************************************************************************************  
 Creacion de la vista: DiagnosticosDetalle
-Autor: Horacio Porras Marï¿½n
+Autor: Horacio Porras Marín
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
-Enunciado de la vista: Muestra la informaciï¿½n de los puestos.
+Enunciado de la vista: Muestra la información de los puestos.
 ****************************************************************************************************************************************************************/  
 CREATE OR REPLACE VIEW ARTAVIARACING.vw_ObtenerPuesto AS
 SELECT 
@@ -1124,7 +1124,7 @@ FROM PUESTOTRABAJO;
 ***                                                 PROCEDIMIENTOS ALMACENADOS A PARTIR DE AQUI                                                               ***
 ****************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
 Creation Date: 21/07/2024   (MM/dd/YYYY)
 Requirement: Procedimiento Almacenado encargado de obtener los paises desde base de datos
@@ -1146,7 +1146,7 @@ BEGIN
 END;
 
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
 Creation Date: 21/07/2024   (MM/dd/YYYY)
 Requirement: Procedimiento Almacenado encargado de obtener los estados de los paises desde base de datos
@@ -1170,7 +1170,7 @@ BEGIN
 END USP_SeleccionarEstados;
  
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
 Creation Date: 21/07/2024   (MM/dd/YYYY)
 Requirement: Procedimiento Almacenado encargado de obtener los condados de los estados desde base de datos
@@ -1195,7 +1195,7 @@ END USP_SeleccionarCondado;
 
 
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
 Creation Date: 21/07/2024   (MM/dd/YYYY)
 Requirement: Procedimiento Almacenado encargado de obtener los condados de los estados desde base de datos
@@ -1220,7 +1220,7 @@ END USP_SeleccionarDistritos;
  
  
  /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
 Creation Date: 21/07/2024   (MM/dd/YYYY)
 Requirement:  Procedimiento encargado de almacenar la informacion de los clientes
@@ -1231,7 +1231,7 @@ Updated By                                  (MM/dd/YYYY)                        
 
 ****************************************************************************************************************************************************************/
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_RegistrarCliente (
-    -- Parï¿½metros para CLIENTE
+    -- Parámetros para CLIENTE
     p_credencial_id       IN VARCHAR2,
     p_rol_id              IN NUMBER,
     p_nombre              IN VARCHAR2,
@@ -1242,26 +1242,26 @@ CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_RegistrarCliente (
     p_habilitado          IN NUMBER DEFAULT 1,
     p_fecha_creacion      IN DATE DEFAULT SYSDATE,
 
-    -- Parï¿½metros para TELEFONOPORUSUARIO
+    -- Parámetros para TELEFONOPORUSUARIO
     p_numero_telefono     IN VARCHAR2,
     p_categoria_telefono_id IN NUMBER,
     p_numero_extension    IN NUMBER DEFAULT NULL,
     p_descripcion         IN VARCHAR2 DEFAULT NULL,
 
-    -- Parï¿½metros para DIRECCIONPORUSUARIO
+    -- Parámetros para DIRECCIONPORUSUARIO
     p_codigo_pais         IN NUMBER,
     p_codigo_estado       IN NUMBER,
     p_codigo_condado      IN NUMBER,
     p_codigo_distrito     IN NUMBER,
     p_descripcion_direccion IN VARCHAR2,
 
-    -- Parï¿½metros para CREDENCIALESPORUSUARIO
+    -- Parámetros para CREDENCIALESPORUSUARIO
     p_correo_electronico  IN VARCHAR2,
     p_contrasena          IN VARCHAR2,
     p_es_contrasena_temporal IN NUMBER DEFAULT 0
 ) AS
 BEGIN
-    -- Inicia una transacciï¿½n
+    -- Inicia una transacción
     BEGIN
         -- Inserta en CLIENTE
         INSERT INTO ARTAVIARACING.CLIENTE (
@@ -1334,8 +1334,8 @@ BEGIN
         INSERT INTO ARTAVIARACING.CREDENCIALESPORUSUARIO (
             CREDENCIALID,
             CORREOELECTRONICO,
-            CONTRASEï¿½A,
-            ESCONTRASEï¿½ATEMPORAL,
+            CONTRASEÑA,
+            ESCONTRASEÑATEMPORAL,
             EDITADOPOR,
             HABILITADO,
             FECHACREACION
@@ -1349,20 +1349,20 @@ BEGIN
             p_fecha_creacion
         );
 
-        -- Confirma la transacciï¿½n si todos los inserts son exitosos
+        -- Confirma la transacción si todos los inserts son exitosos
         COMMIT;
     EXCEPTION
         -- Captura cualquier error y realiza rollback
         WHEN OTHERS THEN
             ROLLBACK;
-            -- Muestra un mensaje genï¿½rico
+            -- Muestra un mensaje genérico
             DBMS_OUTPUT.PUT_LINE('Se ha producido un error al intentar registrar los datos.');
             RAISE;
     END;
 END USP_RegistrarCliente;
 
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
 Creation Date: 21/07/2024   (MM/dd/YYYY)
 Requirement:  Procedimiento encargado de actualizar la informacion de los clientes
@@ -1373,7 +1373,7 @@ Updated By                                  (MM/dd/YYYY)                        
 
 ****************************************************************************************************************************************************************/
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_ActualizarCliente (
-    -- Parï¿½metros para CLIENTE
+    -- Parámetros para CLIENTE
     p_credencial_id       IN VARCHAR2,
     p_rol_id              IN NUMBER DEFAULT NULL,
     p_nombre              IN VARCHAR2 DEFAULT NULL,
@@ -1384,26 +1384,26 @@ CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_ActualizarCliente (
     p_habilitado          IN NUMBER DEFAULT 1,
     p_fecha_creacion      IN DATE DEFAULT SYSDATE,
 
-    -- Parï¿½metros para TELEFONOPORUSUARIO
+    -- Parámetros para TELEFONOPORUSUARIO
     p_numero_telefono     IN VARCHAR2 DEFAULT NULL,
     p_categoria_telefono_id IN NUMBER DEFAULT NULL,
     p_numero_extension    IN NUMBER DEFAULT NULL,
     p_descripcion         IN VARCHAR2 DEFAULT NULL,
 
-    -- Parï¿½metros para DIRECCIONPORUSUARIO
+    -- Parámetros para DIRECCIONPORUSUARIO
     p_codigo_pais         IN NUMBER DEFAULT NULL,
     p_codigo_estado       IN NUMBER DEFAULT NULL,
     p_codigo_condado      IN NUMBER DEFAULT NULL,
     p_codigo_distrito     IN NUMBER DEFAULT NULL,
     p_descripcion_direccion IN VARCHAR2 DEFAULT NULL,
 
-    -- Parï¿½metros para CREDENCIALESPORUSUARIO
+    -- Parámetros para CREDENCIALESPORUSUARIO
     p_correo_electronico  IN VARCHAR2 DEFAULT NULL,
     p_contrasena          IN VARCHAR2 DEFAULT NULL,
     p_es_contrasena_temporal IN NUMBER DEFAULT NULL
 ) AS
 BEGIN
-    -- Inicia una transacciï¿½n
+    -- Inicia una transacción
     BEGIN
         -- Actualiza CLIENTE
         UPDATE ARTAVIARACING.CLIENTE
@@ -1447,27 +1447,27 @@ BEGIN
         UPDATE ARTAVIARACING.CREDENCIALESPORUSUARIO
         SET
             CORREOELECTRONICO = NVL(p_correo_electronico, CORREOELECTRONICO),
-            CONTRASEï¿½A = NVL(p_contrasena, CONTRASEï¿½A),
-            ESCONTRASEï¿½ATEMPORAL = NVL(p_es_contrasena_temporal, ESCONTRASEï¿½ATEMPORAL),
+            CONTRASEÑA = NVL(p_contrasena, CONTRASEÑA),
+            ESCONTRASEÑATEMPORAL = NVL(p_es_contrasena_temporal, ESCONTRASEÑATEMPORAL),
             EDITADOPOR = p_editado_por,
             HABILITADO = NVL(p_habilitado, HABILITADO),
             FECHACREACION = NVL(p_fecha_creacion, FECHACREACION)
         WHERE CREDENCIALID = p_credencial_id;
 
-        -- Confirma la transacciï¿½n si todas las actualizaciones son exitosas
+        -- Confirma la transacción si todas las actualizaciones son exitosas
         COMMIT;
     EXCEPTION
         -- Captura cualquier error y realiza rollback
         WHEN OTHERS THEN
             ROLLBACK;
-            -- Muestra un mensaje genï¿½rico
+            -- Muestra un mensaje genérico
             DBMS_OUTPUT.PUT_LINE('Se ha producido un error al intentar actualizar los datos.');
             RAISE;
     END;
 END USP_ActualizarCliente;
 
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
 Creation Date: 21/07/2024   (MM/dd/YYYY)
 Requirement:  Procedimiento encargado de realizar un eliminado logico de la informacion de los clientes, es decir la informacion
@@ -1478,11 +1478,11 @@ Updated By                                  (MM/dd/YYYY)                        
 
 ****************************************************************************************************************************************************************/
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_EliminarCliente (
-    -- Parï¿½metro para identificar al cliente
+    -- Parámetro para identificar al cliente
     p_credencial_id IN VARCHAR2
 ) AS
 BEGIN
-    -- Inicia una transacciï¿½n
+    -- Inicia una transacción
     BEGIN
         -- Actualiza en CLIENTE
         UPDATE ARTAVIARACING.CLIENTE
@@ -1504,19 +1504,19 @@ BEGIN
         SET HABILITADO = 0
         WHERE CREDENCIALID = p_credencial_id;
 
-        -- Confirma la transacciï¿½n si todas las actualizaciones son exitosas
+        -- Confirma la transacción si todas las actualizaciones son exitosas
         COMMIT;
     EXCEPTION
         -- Captura cualquier error y realiza rollback
         WHEN OTHERS THEN
             ROLLBACK;
-            -- Muestra un mensaje genï¿½rico
+            -- Muestra un mensaje genérico
             DBMS_OUTPUT.PUT_LINE('Se ha producido un error al intentar desactivar el cliente.');
             RAISE;
     END;
 END USP_EliminarCliente;
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
 Creation Date: 21/07/2024   (MM/dd/YYYY)
 Requirement:  Procedimiento encargado de obtener la informacion de los clientes por su identificador.
@@ -1550,7 +1550,7 @@ BEGIN
         d.CODIGODISTRITO,
         d.DESCRIPCION AS DIRECCION_DESCRIPCION,
         cr.CORREOELECTRONICO,
-        cr.CONTRASEï¿½A
+        cr.CONTRASEÑA
     FROM ARTAVIARACING.CLIENTE c
     INNER JOIN ARTAVIARACING.TELEFONOPORUSUARIO t
         ON c.CREDENCIALID = t.CREDENCIALID
@@ -1563,7 +1563,7 @@ END USP_SeleccionarClientePorCredencial;
 
 
 /****************************************************************************************************************************************************************
-Autor: Josï¿½ Andrï¿½s Alvarado Matamoros
+Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
 Creation Date: 21/07/2024   (MM/dd/YYYY)
 Requirement:  Procedimiento encargado de verificar si existe el usuario, en caso de existir devolveria el rol y el credencial sino iria un nulo
@@ -1575,16 +1575,16 @@ Updated By                                  (MM/dd/YYYY)                        
 ****************************************************************************************************************************************************************/
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_VerificarUsuario (
     p_correo_electronico IN VARCHAR2,
-    p_contrasena         IN VARCHAR2, -- Contraseï¿½a ya encriptada en SHA-512
+    p_contrasena         IN VARCHAR2, -- Contraseña ya encriptada en SHA-512
     p_credencial_id      OUT VARCHAR2, -- CREDENCIALID del usuario si existe
     p_rol_id             OUT NUMBER     -- ROLID del usuario si existe
 ) AS
 BEGIN
-    -- Inicializa los parï¿½metros de salida
+    -- Inicializa los parámetros de salida
     p_credencial_id := NULL;
     p_rol_id := NULL;
     
-    -- Verifica si el usuario existe con el correo electrï¿½nico y la contraseï¿½a proporcionados
+    -- Verifica si el usuario existe con el correo electrónico y la contraseña proporcionados
     BEGIN
         SELECT 
               c.CREDENCIALID,
@@ -1594,13 +1594,13 @@ BEGIN
         INNER JOIN ARTAVIARACING.CLIENTE c
             ON cr.CREDENCIALID = c.CREDENCIALID
         WHERE cr.CORREOELECTRONICO = p_correo_electronico
-            AND cr.CONTRASEï¿½A = p_contrasena;
+            AND cr.CONTRASEÑA = p_contrasena;
         
-        -- Si no se encuentra ningï¿½n registro, p_credencial_id y p_rol_id serï¿½n NULL
+        -- Si no se encuentra ningún registro, p_credencial_id y p_rol_id serán NULL
     EXCEPTION
         -- Captura cualquier error y muestra un mensaje
         WHEN NO_DATA_FOUND THEN
-            -- Si no se encuentra ningï¿½n dato, p_credencial_id y p_rol_id permanecen NULL
+            -- Si no se encuentra ningún dato, p_credencial_id y p_rol_id permanecen NULL
             p_credencial_id := NULL;
             p_rol_id := NULL;
         WHEN OTHERS THEN
