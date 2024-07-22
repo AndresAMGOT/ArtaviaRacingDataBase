@@ -976,7 +976,6 @@ SELECT
     ,NOMBRE       
     ,CODIGOPAIS    
 FROM ESTADO;
-
 /****************************************************************************************************************************************************************  
 Creacion de la vista: DiagnosticosDetalle
 Autor: José Andrés Alvarado Matamoros
@@ -1121,17 +1120,65 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE  USP_SeleccionarEstados (
-     CodigoPais     IN  NUMBER
-    ,RespuestaEstados OUT SYS_REFCURSOR
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarEstados (
+    CodigoPais IN NUMBER,
+    RespuestaEstados OUT SYS_REFCURSOR
 ) AS
 BEGIN
-  OPEN RespuestaEstados FOR
+    OPEN RespuestaEstados FOR
     SELECT 
-         CODIGOESTADO
-        ,NOMBRE
-    FROM vw_ObtenerEstado
+        CODIGOESTADO,
+        NOMBRE
+    FROM Estado
     WHERE CODIGOPAIS = CodigoPais;
-END;
+END USP_SeleccionarEstados;
+ 
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado encargado de obtener los condados de los estados desde base de datos
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE  USP_SeleccionarCondado (
+     CodigoEstado     IN  NUMBER
+    ,RespuestaCondado OUT SYS_REFCURSOR
+) AS
+BEGIN
+  OPEN RespuestaCondado FOR
+    SELECT 
+         CODIGOCONDADO
+        ,NOMBRE
+    FROM vw_ObtenerCondado
+    WHERE CODIGOESTADO = CodigoEstado;
+END USP_SeleccionarCondado;
+
+
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado encargado de obtener los condados de los estados desde base de datos
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE  USP_SeleccionarDistritos (
+     CodigoCondado     IN  NUMBER
+    ,RespuestaDistritos OUT SYS_REFCURSOR
+) AS
+BEGIN
+  OPEN RespuestaDistritos FOR
+    SELECT 
+         CODIGODISTRITO
+        ,NOMBRE
+    FROM vw_ObtenerDistritos
+    WHERE CODIGOCONDADO = CodigoCondado;
+END USP_SeleccionarDistritos;
  
