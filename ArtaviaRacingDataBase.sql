@@ -1611,6 +1611,91 @@ BEGIN
     END;
 END USP_VerificarUsuario;
 
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga Solorzano
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement:  Este procedimiento es el encargado de desabilitar y por ende eliminar las citas
+*************************************************************************************************************************/
 
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_EliminarCita (
+    -- Parámetro para identificar la cita
+    p_CITAID IN NUMBER
+) AS
+BEGIN
+    -- Inicia una transacción
+    BEGIN
+        -- Actualiza la tabla CITA para deshabilitar la cita
+        UPDATE CITAS
+        SET HABILITADO = '0'
+        WHERE CITAID = p_CITAID;
+
+        -- Confirma la transacción si la actualización es exitosa
+        COMMIT;
+    EXCEPTION
+        -- Captura cualquier error y realiza rollback
+        WHEN OTHERS THEN
+            ROLLBACK;
+            -- Muestra un mensaje genérico
+            DBMS_OUTPUT.PUT_LINE('Se ha producido un error al intentar desactivar la cita.');
+            RAISE;
+    END;
+END USP_EliminarCita;
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga Solorzano
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement:  Este procedimiento se encarga de actualizar cualquier cambio en la tabla cita
+*************************************************************************************************************************/
+CREATE OR REPLACE PROCEDURE USP_ACTUALIZAR_CITA (
+    p_CITAID IN NUMBER,
+    p_CREDENCIALID IN NUMBER,
+    p_PLACAVEHICULOID IN NUMBER,
+    p_VIN IN VARCHAR2,
+    p_SERVICIOID IN NUMBER,
+    p_ESTADOCITAID IN NUMBER,
+    p_FECHAAGENDADA IN DATE,
+    p_HORAAGENDADA IN VARCHAR2,
+    p_EDITADOPOR IN VARCHAR2,
+    p_HABILITADO IN CHAR
+) AS
+BEGIN
+    UPDATE CITAS
+    SET CREDENCIALID = p_CREDENCIALID,
+        PLACAVEHICULOID = p_PLACAVEHICULOID,
+        VIN = p_VIN,
+        SERVICIOID = p_SERVICIOID,
+        ESTADOCITAID = p_ESTADOCITAID,
+        FECHAAGENDADA = p_FECHAAGENDADA,
+        HORAAGENDADA = p_HORAAGENDADA,
+        EDITADOPOR = p_EDITADOPOR,
+        HABILITADO = p_HABILITADO,
+        FECHACREACION = SYSDATE
+    WHERE CITAID = p_CITAID;
+END USP_ACTUALIZAR_CITA;
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga Solorzano
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement:  Este procedimiento se encarga de agregar informacion en la tabla cita
+*************************************************************************************************************************/
+
+CREATE OR REPLACE PROCEDURE USP_AGREGAR_CITA (
+    p_CITAID IN NUMBER,
+    p_CREDENCIALID IN NUMBER,
+    p_PLACAVEHICULOID IN NUMBER,
+    p_VIN IN VARCHAR2,
+    p_SERVICIOID IN NUMBER,
+    p_ESTADOCITAID IN NUMBER,
+    p_FECHAAGENDADA IN DATE,
+    p_HORAAGENDADA IN VARCHAR2,
+    p_EDITADOPOR IN VARCHAR2,
+    p_HABILITADO IN CHAR
+) AS
+BEGIN
+    INSERT INTO CITAS (CITAID, CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, HORAAGENDADA, EDITADOPOR, HABILITADO, FECHACREACION)
+    VALUES (p_CITAID, p_CREDENCIALID, p_PLACAVEHICULOID, p_VIN, p_SERVICIOID, p_ESTADOCITAID, p_FECHAAGENDADA, p_HORAAGENDADA, p_EDITADOPOR, p_HABILITADO, SYSDATE);
+END USP_AGREGAR_CITA;
 
  
