@@ -1,0 +1,346 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=Cp1252" />
+<script src="USP_REGISTRARCLIENTE/report.js" type="text/javascript"></script>
+<link href="USP_REGISTRARCLIENTE/report.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<div class="banner">
+<table width="98%"><tr>
+<td><h2 class="banner">USP_REGISTRARCLIENTE</h2></td>
+</tr></table></div>
+<div id="maintabs">
+<div class="currentmaintab" onclick="onSelectMainTab(this, 0)">
+<div>
+<p>Doc</p>
+</div>
+</div>
+<div class="maintab" onclick="onSelectMainTab(this, 1)">
+<div>
+<p>Details</p>
+</div>
+</div>
+<div class="maintab" onclick="onSelectMainTab(this, 2)">
+<div>
+<p>Grants</p>
+</div>
+</div>
+<div class="maintab" onclick="onSelectMainTab(this, 3)">
+<div>
+<p>References</p>
+</div>
+</div>
+<div class="maintab" onclick="onSelectMainTab(this, 4)">
+<div>
+<p>Dependencies</p>
+</div>
+</div>
+<div class="maintab" onclick="onSelectMainTab(this, 5)">
+<div>
+<p>Code</p>
+</div>
+</div>
+</div>
+<br/>
+<div id="masterreports">
+<div id="Master.0">
+<div class="currentmasterreport">
+<TABLE CELLSPACING="0" CELLPADDING="1" WIDTH="100%" BORDER="0">
+<TR><TD CLASS="NavBarRow3" VALIGN="top"><FONT SIZE="-2">      SUMMARY:  <A HREF="#field_summary">FIELD</A> | <A HREF="#type_summary">TYPE</A> | <A HREF="#method_summary">METHOD</A></FONT></TD><TD CLASS="NavBarRow3" VALIGN="top"><FONT SIZE="-2"></TR></TABLE><HR><P></P><HR><P></P><A NAME="method_summary"></A><TABLE WIDTH="100%" CELLSPACING="0" CELLPADDING="3" BORDER="1"><TR CLASS="TableHeadingColor"><TD COLSPAN="2"><FONT SIZE="+2"><B>Method Summary</B></FONT></TD><TR CLASS="TableRowColor"><TD WIDTH="1%" VALIGN="top" ALIGN="right"><FONT SIZE="-1"><CODE>&nbsp;</CODE></FONT></TD><TD><CODE><B><A HREF="#USP_RegistrarCliente">USP_RegistrarCliente</A></B>( p_credencial_id IN VARCHAR2 , p_rol_id IN NUMBER , p_nombre IN VARCHAR2 , p_primer_apellido IN VARCHAR2 , p_segundo_apellido IN VARCHAR2 , p_fecha_nacimiento IN DATE , p_editado_por IN VARCHAR2 DEFAULT '000000001' , p_habilitado IN NUMBER DEFAULT 1 , p_fecha_creacion IN DATE DEFAULT SYSDATE , p_numero_telefono IN VARCHAR2 , p_categoria_telefono_id IN NUMBER , p_numero_extension IN NUMBER DEFAULT NULL , p_descripcion IN VARCHAR2 DEFAULT NULL , p_codigo_pais IN NUMBER , p_codigo_estado IN NUMBER , p_codigo_condado IN NUMBER , p_codigo_distrito IN NUMBER , p_descripcion_direccion IN VARCHAR2 , p_correo_electronico IN VARCHAR2 , p_contrasena IN VARCHAR2 , p_es_contrasena_temporal IN NUMBER DEFAULT 0 ) </CODE><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parámetros para CREDENCIALESPORUSUARIO</TD></TR>
+</TABLE>
+<P></P><A NAME="method_detail"></A><TABLE WIDTH="100%" CELLSPACING="0" CELLPADDING="3" BORDER="1"><TR CLASS="TableHeadingColor"><TD COLSPAN="2"><FONT SIZE="+2"><B>Method Detail</B></FONT></TD></TABLE><A NAME="USP_RegistrarCliente"></A>
+<H3>USP_RegistrarCliente</H3><PRE>          <B>USP_RegistrarCliente</B>( p_credencial_id IN VARCHAR2 , p_rol_id IN NUMBER , p_nombre IN VARCHAR2 , p_primer_apellido IN VARCHAR2 , p_segundo_apellido IN VARCHAR2 , p_fecha_nacimiento IN DATE , p_editado_por IN VARCHAR2 DEFAULT '000000001' , p_habilitado IN NUMBER DEFAULT 1 , p_fecha_creacion IN DATE DEFAULT SYSDATE , p_numero_telefono IN VARCHAR2 , p_categoria_telefono_id IN NUMBER , p_numero_extension IN NUMBER DEFAULT NULL , p_descripcion IN VARCHAR2 DEFAULT NULL , p_codigo_pais IN NUMBER , p_codigo_estado IN NUMBER , p_codigo_condado IN NUMBER , p_codigo_distrito IN NUMBER , p_descripcion_direccion IN VARCHAR2 , p_correo_electronico IN VARCHAR2 , p_contrasena IN VARCHAR2 , p_es_contrasena_temporal IN NUMBER DEFAULT 0 ) </PRE><DL>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parámetros para CREDENCIALESPORUSUARIO<DD><DL></DL></DD></DL><HR><TABLE CELLSPACING="0" CELLPADDING="1" WIDTH="100%" BORDER="0">
+<TR><TD CLASS="NavBarRow3" VALIGN="top"><FONT SIZE="-2">      SUMMARY:  <A HREF="#field_summary">FIELD</A> | <A HREF="#type_summary">TYPE</A> | <A HREF="#method_summary">METHOD</A></FONT></TD><TD CLASS="NavBarRow3" VALIGN="top"><FONT SIZE="-2"></TR></TABLE></div>
+</div>
+<div id="Master.1">
+<div class="masterreport">
+<table id="Table.0" cellpadding="0" cellspacing="0" summary="">
+<th>NAME</th>
+<th>VALUE</th>
+</tr>
+<tr>
+<td>OWNER</td>
+<td>PRUEBA</td>
+</tr>
+<tr>
+<td>OBJECT_NAME</td>
+<td>USP_REGISTRARCLIENTE</td>
+</tr>
+<tr>
+<td>SUBOBJECT_NAME</td>
+<td>null</td>
+</tr>
+<tr>
+<td>OBJECT_ID</td>
+<td>73894</td>
+</tr>
+<tr>
+<td>DATA_OBJECT_ID</td>
+<td>null</td>
+</tr>
+<tr>
+<td>OBJECT_TYPE</td>
+<td>PROCEDURE</td>
+</tr>
+<tr>
+<td>CREATED</td>
+<td>21-JUL-24</td>
+</tr>
+<tr>
+<td>LAST_DDL_TIME</td>
+<td>21-JUL-24</td>
+</tr>
+<tr>
+<td>TIMESTAMP</td>
+<td>2024-07-21:19:58:51</td>
+</tr>
+<tr>
+<td>STATUS</td>
+<td>VALID</td>
+</tr>
+<tr>
+<td>TEMPORARY</td>
+<td>N</td>
+</tr>
+<tr>
+<td>GENERATED</td>
+<td>N</td>
+</tr>
+<tr>
+<td>SECONDARY</td>
+<td>N</td>
+</tr>
+<tr>
+<td>NAMESPACE</td>
+<td>1</td>
+</tr>
+<tr>
+<td>EDITION_NAME</td>
+<td>null</td>
+</tr>
+<tr>
+<td>SHARING</td>
+<td>NONE</td>
+</tr>
+<tr>
+<td>EDITIONABLE</td>
+<td>N</td>
+</tr>
+<tr>
+<td>ORACLE_MAINTAINED</td>
+<td>N</td>
+</tr>
+<tr>
+<td>APPLICATION</td>
+<td>N</td>
+</tr>
+<tr>
+<td>DEFAULT_COLLATION</td>
+<td>USING_NLS_COMP</td>
+</tr>
+<tr>
+<td>DUPLICATED</td>
+<td>N</td>
+</tr>
+<tr>
+<td>SHARDED</td>
+<td>N</td>
+</tr>
+<tr>
+<td>CREATED_APPID</td>
+<td>null</td>
+</tr>
+<tr>
+<td>CREATED_VSNID</td>
+<td>null</td>
+</tr>
+<tr>
+<td>MODIFIED_APPID</td>
+<td>null</td>
+</tr>
+<tr>
+<td>MODIFIED_VSNID</td>
+<td>null</td>
+</tr>
+</table>
+</div>
+</div>
+<div id="Master.2">
+<div class="masterreport">
+<table id="Table.1" cellpadding="0" cellspacing="0" summary="">
+<tr>
+<th>PRIVILEGE</th>
+<th>GRANTEE</th>
+<th>GRANTABLE</th>
+<th>GRANTOR</th>
+<th>OBJECT_NAME</th>
+</tr>
+</table>
+</div>
+</div>
+<div id="Master.3">
+<div class="masterreport">
+<table id="Table.2" cellpadding="0" cellspacing="0" summary="">
+<tr>
+<th>NAME</th>
+<th>OWNER</th>
+<th>TYPE</th>
+<th>OBJECT_ID</th>
+<th>STATUS</th>
+<th>TYPE_LINK</th>
+</tr>
+</table>
+</div>
+</div>
+<div id="Master.4">
+<div class="masterreport">
+<table id="Table.3" cellpadding="0" cellspacing="0" summary="">
+<tr>
+<th>NAME</th>
+<th>OWNER</th>
+<th>TYPE</th>
+<th>OBJECT_ID</th>
+<th>STATUS</th>
+<th>TYPE_LINK</th>
+</tr>
+</table>
+</div>
+</div>
+<div id="Master.5">
+<div class="masterreport">
+<pre>
+PROCEDURE USP_RegistrarCliente (
+    -- Parámetros para CLIENTE
+    p_credencial_id       IN VARCHAR2,
+    p_rol_id              IN NUMBER,
+    p_nombre              IN VARCHAR2,
+    p_primer_apellido     IN VARCHAR2,
+    p_segundo_apellido    IN VARCHAR2,
+    p_fecha_nacimiento    IN DATE,
+    p_editado_por         IN VARCHAR2 DEFAULT '000000001', -- Usuario administrador del sistema
+    p_habilitado          IN NUMBER DEFAULT 1,
+    p_fecha_creacion      IN DATE DEFAULT SYSDATE,
+
+    -- Parámetros para TELEFONOPORUSUARIO
+    p_numero_telefono     IN VARCHAR2,
+    p_categoria_telefono_id IN NUMBER,
+    p_numero_extension    IN NUMBER DEFAULT NULL,
+    p_descripcion         IN VARCHAR2 DEFAULT NULL,
+
+    -- Parámetros para DIRECCIONPORUSUARIO
+    p_codigo_pais         IN NUMBER,
+    p_codigo_estado       IN NUMBER,
+    p_codigo_condado      IN NUMBER,
+    p_codigo_distrito     IN NUMBER,
+    p_descripcion_direccion IN VARCHAR2,
+
+    -- Parámetros para CREDENCIALESPORUSUARIO
+    p_correo_electronico  IN VARCHAR2,
+    p_contrasena          IN VARCHAR2,
+    p_es_contrasena_temporal IN NUMBER DEFAULT 0
+) AS
+BEGIN
+    -- Inicia una transacción
+    BEGIN
+        -- Inserta en CLIENTE
+        INSERT INTO CLIENTE (
+            CREDENCIALID,
+            ROLID,
+            NOMBRE,
+            PRIMERAPELLIDO,
+            SEGUNDOAPELLIDO,
+            FECHANACIMIENTO,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION
+        ) VALUES (
+            p_credencial_id,
+            p_rol_id,
+            p_nombre,
+            p_primer_apellido,
+            p_segundo_apellido,
+            p_fecha_nacimiento,
+            p_editado_por,
+            p_habilitado,
+            p_fecha_creacion
+        );
+
+        -- Inserta en TELEFONOPORUSUARIO
+        INSERT INTO TELEFONOPORUSUARIO (
+            NUMEROTELEFONO,
+            CREDENCIALID,
+            CATEGORIATELEFONOID,
+            NUMEROEXTENSION,
+            DESCRIPCION,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION
+        ) VALUES (
+            p_numero_telefono,
+            p_credencial_id,
+            p_categoria_telefono_id,
+            p_numero_extension,
+            p_descripcion,
+            p_editado_por,
+            p_habilitado,
+            p_fecha_creacion
+        );
+
+        -- Inserta en DIRECCIONPORUSUARIO
+        INSERT INTO DIRECCIONPORUSUARIO (
+            CREDENCIALID,
+            CODIGOPAIS,
+            CODIGOESTADO,
+            CODIGOCONDADO,
+            CODIGODISTRITO,
+            DESCRIPCION,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION
+        ) VALUES (
+            p_credencial_id,
+            p_codigo_pais,
+            p_codigo_estado,
+            p_codigo_condado,
+            p_codigo_distrito,
+            p_descripcion_direccion,
+            p_editado_por,
+            p_habilitado,
+            p_fecha_creacion
+        );
+
+        -- Inserta en CREDENCIALESPORUSUARIO
+        INSERT INTO CREDENCIALESPORUSUARIO (
+            CREDENCIALID,
+            CORREOELECTRONICO,
+            CONTRASEÑA,
+            ESCONTRASEÑATEMPORAL,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION
+        ) VALUES (
+            p_credencial_id,
+            p_correo_electronico,
+            p_contrasena,
+            p_es_contrasena_temporal,
+            p_editado_por,
+            p_habilitado,
+            p_fecha_creacion
+        );
+
+        -- Confirma la transacción si todos los inserts son exitosos
+        COMMIT;
+    EXCEPTION
+        -- Captura cualquier error y realiza rollback
+        WHEN OTHERS THEN
+            ROLLBACK;
+            -- Muestra un mensaje genérico
+            DBMS_OUTPUT.PUT_LINE('Se ha producido un error al intentar registrar los datos.');
+            RAISE;
+    END;
+END USP_RegistrarCliente;</pre>
+</div>
+</div>
+</div>
+</body>
+</html>
