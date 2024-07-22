@@ -566,14 +566,50 @@ VALUES ('Administrador', 'Dueño del Sistema', '00000001', 1, SYSDATE);
 INSERT INTO "ARTAVIARACING"."ROL" (NOMBRE, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES ('Cliente', 'Cliente que adquiere nuestros servicios', '00000001', 1, SYSDATE);
 -- SELECT * FROM  "ARTAVIARACING"."ROL" -- 1= Administrador , 2 = Cliente
-/*INSERT INTO "ARTAVIARACING"."PUESTOTRABAJO"()
-VALUES ();
-
---Insert Tabla Personal como administrador
-INSERT INTO "ARTAVIARACING"."PERSONAL"(CREDENCIALID,ROLID,NOMBRE, PRIMERAPELLIDO, SEGUNDOAPELLIDO,FECHANACIMIENTO, CODTRABAJADOR, FECHACONTRATACION, PUESTOTRABAJOID, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUE ('000000001',1,'Admin','N/A','N/A',SYSDATE,'N/A',SYSDATE,1,'00000001', 1, SYSDATE);
--- SELECT * FROM  "ARTAVIARACING"."PERSONAL"*/
-
+--Insert PUESTO 
+INSERT INTO ARTAVIARACING.PUESTOTRABAJO (
+    PUESTO,
+    DESCRIPCION,
+    EDITADOPOR,
+    HABILITADO,
+    FECHACREACION
+) VALUES (
+    'Admin',                -- Valor para PUESTO
+    'N/A', -- Valor para DESCRIPCION
+    '00000001',                        -- Valor para EDITADOPOR
+    1,                             -- Valor para HABILITADO
+    SYSDATE                         -- Valor para FECHACREACION
+);
+--SELECT * FROM  "ARTAVIARACING"."PUESTOTRABAJO" 
+--Insert Tabla Personal como administrador 
+INSERT INTO ARTAVIARACING.PERSONAL (
+        CREDENCIALID,
+        ROLID,
+        NOMBRE,
+        PRIMERAPELLIDO,
+        SEGUNDOAPELLIDO,
+        FECHANACIMIENTO,
+        CODTRABAJADOR,
+        FECHACONTRATACION,
+        PUESTOTRABAJOID,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        '000000001',                      -- Valor para CREDENCIALID
+        1,                             -- Valor para ROLID
+        'Admin',                         -- Valor para NOMBRE
+        'N/A',                        -- Valor para PRIMERAPELLIDO
+        'N/A',                        -- Valor para SEGUNDOAPELLIDO
+        SYSDATE, -- Valor para FECHANACIMIENTO
+        'N/A',                      -- Valor para CODTRABAJADOR
+        SYSDATE,                        -- Valor para FECHACONTRATACION
+        1,                             -- Valor para PUESTOTRABAJOID
+        '00000001',                        -- Valor para EDITADOPOR (opcional)
+        1,                             -- Valor para HABILITADO
+        SYSDATE                         -- Valor para FECHACREACION
+    );
+--SELECT * FROM  "ARTAVIARACING"."PERSONAL" 
 --Insert Tabla Pais
 INSERT INTO "ARTAVIARACING"."PAIS" (CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (1, 'COSTA RICA', '00000001', 1, SYSDATE);
@@ -1181,4 +1217,353 @@ BEGIN
     FROM vw_ObtenerDistritos
     WHERE CODIGOCONDADO = CodigoCondado;
 END USP_SeleccionarDistritos;
+ 
+ 
+ /****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement:  Procedimiento encargado de almacenar la informacion de los clientes
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_RegistrarCliente (
+    -- Parámetros para CLIENTE
+    p_credencial_id       IN VARCHAR2,
+    p_rol_id              IN NUMBER,
+    p_nombre              IN VARCHAR2,
+    p_primer_apellido     IN VARCHAR2,
+    p_segundo_apellido    IN VARCHAR2,
+    p_fecha_nacimiento    IN DATE,
+    p_editado_por         IN VARCHAR2 DEFAULT '000000001', -- Usuario administrador del sistema
+    p_habilitado          IN NUMBER DEFAULT 1,
+    p_fecha_creacion      IN DATE DEFAULT SYSDATE,
+
+    -- Parámetros para TELEFONOPORUSUARIO
+    p_numero_telefono     IN VARCHAR2,
+    p_categoria_telefono_id IN NUMBER,
+    p_numero_extension    IN NUMBER DEFAULT NULL,
+    p_descripcion         IN VARCHAR2 DEFAULT NULL,
+
+    -- Parámetros para DIRECCIONPORUSUARIO
+    p_codigo_pais         IN NUMBER,
+    p_codigo_estado       IN NUMBER,
+    p_codigo_condado      IN NUMBER,
+    p_codigo_distrito     IN NUMBER,
+    p_descripcion_direccion IN VARCHAR2,
+
+    -- Parámetros para CREDENCIALESPORUSUARIO
+    p_correo_electronico  IN VARCHAR2,
+    p_contrasena          IN VARCHAR2,
+    p_es_contrasena_temporal IN NUMBER DEFAULT 0
+) AS
+BEGIN
+    -- Inicia una transacción
+    BEGIN
+        -- Inserta en CLIENTE
+        INSERT INTO ARTAVIARACING.CLIENTE (
+            CREDENCIALID,
+            ROLID,
+            NOMBRE,
+            PRIMERAPELLIDO,
+            SEGUNDOAPELLIDO,
+            FECHANACIMIENTO,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION
+        ) VALUES (
+            p_credencial_id,
+            p_rol_id,
+            p_nombre,
+            p_primer_apellido,
+            p_segundo_apellido,
+            p_fecha_nacimiento,
+            p_editado_por,
+            p_habilitado,
+            p_fecha_creacion
+        );
+
+        -- Inserta en TELEFONOPORUSUARIO
+        INSERT INTO ARTAVIARACING.TELEFONOPORUSUARIO (
+            NUMEROTELEFONO,
+            CREDENCIALID,
+            CATEGORIATELEFONOID,
+            NUMEROEXTENSION,
+            DESCRIPCION,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION
+        ) VALUES (
+            p_numero_telefono,
+            p_credencial_id,
+            p_categoria_telefono_id,
+            p_numero_extension,
+            p_descripcion,
+            p_editado_por,
+            p_habilitado,
+            p_fecha_creacion
+        );
+
+        -- Inserta en DIRECCIONPORUSUARIO
+        INSERT INTO ARTAVIARACING.DIRECCIONPORUSUARIO (
+            CREDENCIALID,
+            CODIGOPAIS,
+            CODIGOESTADO,
+            CODIGOCONDADO,
+            CODIGODISTRITO,
+            DESCRIPCION,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION
+        ) VALUES (
+            p_credencial_id,
+            p_codigo_pais,
+            p_codigo_estado,
+            p_codigo_condado,
+            p_codigo_distrito,
+            p_descripcion_direccion,
+            p_editado_por,
+            p_habilitado,
+            p_fecha_creacion
+        );
+
+        -- Inserta en CREDENCIALESPORUSUARIO
+        INSERT INTO ARTAVIARACING.CREDENCIALESPORUSUARIO (
+            CREDENCIALID,
+            CORREOELECTRONICO,
+            CONTRASEÑA,
+            ESCONTRASEÑATEMPORAL,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION
+        ) VALUES (
+            p_credencial_id,
+            p_correo_electronico,
+            p_contrasena,
+            p_es_contrasena_temporal,
+            p_editado_por,
+            p_habilitado,
+            p_fecha_creacion
+        );
+
+        -- Confirma la transacción si todos los inserts son exitosos
+        COMMIT;
+    EXCEPTION
+        -- Captura cualquier error y realiza rollback
+        WHEN OTHERS THEN
+            ROLLBACK;
+            -- Muestra un mensaje genérico
+            DBMS_OUTPUT.PUT_LINE('Se ha producido un error al intentar registrar los datos.');
+            RAISE;
+    END;
+END USP_RegistrarCliente;
+
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement:  Procedimiento encargado de actualizar la informacion de los clientes
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_ActualizarCliente (
+    -- Parámetros para CLIENTE
+    p_credencial_id       IN VARCHAR2,
+    p_rol_id              IN NUMBER DEFAULT NULL,
+    p_nombre              IN VARCHAR2 DEFAULT NULL,
+    p_primer_apellido     IN VARCHAR2 DEFAULT NULL,
+    p_segundo_apellido    IN VARCHAR2 DEFAULT NULL,
+    p_fecha_nacimiento    IN DATE DEFAULT NULL,
+    p_editado_por         IN VARCHAR2 DEFAULT '000000001', -- Usuario administrador del sistema
+    p_habilitado          IN NUMBER DEFAULT 1,
+    p_fecha_creacion      IN DATE DEFAULT SYSDATE,
+
+    -- Parámetros para TELEFONOPORUSUARIO
+    p_numero_telefono     IN VARCHAR2 DEFAULT NULL,
+    p_categoria_telefono_id IN NUMBER DEFAULT NULL,
+    p_numero_extension    IN NUMBER DEFAULT NULL,
+    p_descripcion         IN VARCHAR2 DEFAULT NULL,
+
+    -- Parámetros para DIRECCIONPORUSUARIO
+    p_codigo_pais         IN NUMBER DEFAULT NULL,
+    p_codigo_estado       IN NUMBER DEFAULT NULL,
+    p_codigo_condado      IN NUMBER DEFAULT NULL,
+    p_codigo_distrito     IN NUMBER DEFAULT NULL,
+    p_descripcion_direccion IN VARCHAR2 DEFAULT NULL,
+
+    -- Parámetros para CREDENCIALESPORUSUARIO
+    p_correo_electronico  IN VARCHAR2 DEFAULT NULL,
+    p_contrasena          IN VARCHAR2 DEFAULT NULL,
+    p_es_contrasena_temporal IN NUMBER DEFAULT NULL
+) AS
+BEGIN
+    -- Inicia una transacción
+    BEGIN
+        -- Actualiza CLIENTE
+        UPDATE ARTAVIARACING.CLIENTE
+        SET
+            ROLID = NVL(p_rol_id, ROLID),
+            NOMBRE = NVL(p_nombre, NOMBRE),
+            PRIMERAPELLIDO = NVL(p_primer_apellido, PRIMERAPELLIDO),
+            SEGUNDOAPELLIDO = NVL(p_segundo_apellido, SEGUNDOAPELLIDO),
+            FECHANACIMIENTO = NVL(p_fecha_nacimiento, FECHANACIMIENTO),
+            EDITADOPOR = p_editado_por,
+            HABILITADO = NVL(p_habilitado, HABILITADO),
+            FECHACREACION = NVL(p_fecha_creacion, FECHACREACION)
+        WHERE CREDENCIALID = p_credencial_id;
+
+        -- Actualiza TELEFONOPORUSUARIO
+        UPDATE ARTAVIARACING.TELEFONOPORUSUARIO
+        SET
+            NUMEROTELEFONO = NVL(p_numero_telefono, NUMEROTELEFONO),
+            CATEGORIATELEFONOID = NVL(p_categoria_telefono_id, CATEGORIATELEFONOID),
+            NUMEROEXTENSION = NVL(p_numero_extension, NUMEROEXTENSION),
+            DESCRIPCION = NVL(p_descripcion, DESCRIPCION),
+            EDITADOPOR = p_editado_por,
+            HABILITADO = NVL(p_habilitado, HABILITADO),
+            FECHACREACION = NVL(p_fecha_creacion, FECHACREACION)
+        WHERE CREDENCIALID = p_credencial_id;
+
+        -- Actualiza DIRECCIONPORUSUARIO
+        UPDATE ARTAVIARACING.DIRECCIONPORUSUARIO
+        SET
+            CODIGOPAIS = NVL(p_codigo_pais, CODIGOPAIS),
+            CODIGOESTADO = NVL(p_codigo_estado, CODIGOESTADO),
+            CODIGOCONDADO = NVL(p_codigo_condado, CODIGOCONDADO),
+            CODIGODISTRITO = NVL(p_codigo_distrito, CODIGODISTRITO),
+            DESCRIPCION = NVL(p_descripcion_direccion, DESCRIPCION),
+            EDITADOPOR = p_editado_por,
+            HABILITADO = NVL(p_habilitado, HABILITADO),
+            FECHACREACION = NVL(p_fecha_creacion, FECHACREACION)
+        WHERE CREDENCIALID = p_credencial_id;
+
+        -- Actualiza CREDENCIALESPORUSUARIO
+        UPDATE ARTAVIARACING.CREDENCIALESPORUSUARIO
+        SET
+            CORREOELECTRONICO = NVL(p_correo_electronico, CORREOELECTRONICO),
+            CONTRASEÑA = NVL(p_contrasena, CONTRASEÑA),
+            ESCONTRASEÑATEMPORAL = NVL(p_es_contrasena_temporal, ESCONTRASEÑATEMPORAL),
+            EDITADOPOR = p_editado_por,
+            HABILITADO = NVL(p_habilitado, HABILITADO),
+            FECHACREACION = NVL(p_fecha_creacion, FECHACREACION)
+        WHERE CREDENCIALID = p_credencial_id;
+
+        -- Confirma la transacción si todas las actualizaciones son exitosas
+        COMMIT;
+    EXCEPTION
+        -- Captura cualquier error y realiza rollback
+        WHEN OTHERS THEN
+            ROLLBACK;
+            -- Muestra un mensaje genérico
+            DBMS_OUTPUT.PUT_LINE('Se ha producido un error al intentar actualizar los datos.');
+            RAISE;
+    END;
+END USP_ActualizarCliente;
+
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement:  Procedimiento encargado de realizar un eliminado logico de la informacion de los clientes, es decir la informacion
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_EliminarCliente (
+    -- Parámetro para identificar al cliente
+    p_credencial_id IN VARCHAR2
+) AS
+BEGIN
+    -- Inicia una transacción
+    BEGIN
+        -- Actualiza en CLIENTE
+        UPDATE ARTAVIARACING.CLIENTE
+        SET HABILITADO = 0
+        WHERE CREDENCIALID = p_credencial_id;
+
+        -- Actualiza en TELEFONOPORUSUARIO
+        UPDATE ARTAVIARACING.TELEFONOPORUSUARIO
+        SET HABILITADO = 0
+        WHERE CREDENCIALID = p_credencial_id;
+
+        -- Actualiza en DIRECCIONPORUSUARIO
+        UPDATE ARTAVIARACING.DIRECCIONPORUSUARIO
+        SET HABILITADO = 0
+        WHERE CREDENCIALID = p_credencial_id;
+
+        -- Actualiza en CREDENCIALESPORUSUARIO
+        UPDATE ARTAVIARACING.CREDENCIALESPORUSUARIO
+        SET HABILITADO = 0
+        WHERE CREDENCIALID = p_credencial_id;
+
+        -- Confirma la transacción si todas las actualizaciones son exitosas
+        COMMIT;
+    EXCEPTION
+        -- Captura cualquier error y realiza rollback
+        WHEN OTHERS THEN
+            ROLLBACK;
+            -- Muestra un mensaje genérico
+            DBMS_OUTPUT.PUT_LINE('Se ha producido un error al intentar desactivar el cliente.');
+            RAISE;
+    END;
+END USP_EliminarCliente;
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement:  Procedimiento encargado de obtener la informacion de los clientes por su identificador.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarClientePorCredencial (
+    p_credencial_id IN VARCHAR2,
+    RespuestaCliente OUT SYS_REFCURSOR
+) AS
+BEGIN
+    -- Abre el cursor con una sola consulta unificada usando INNER JOIN
+    OPEN RespuestaCliente FOR
+    SELECT
+        c.CREDENCIALID,
+        c.ROLID,
+        c.NOMBRE,
+        c.PRIMERAPELLIDO,
+        c.SEGUNDOAPELLIDO,
+        c.FECHANACIMIENTO,
+        t.NUMEROTELEFONO,
+        t.CATEGORIATELEFONOID,
+        t.NUMEROEXTENSION,
+        t.DESCRIPCION AS TELEFONO_DESCRIPCION,
+        d.CODIGOPAIS,
+        d.CODIGOESTADO,
+        d.CODIGOCONDADO,
+        d.CODIGODISTRITO,
+        d.DESCRIPCION AS DIRECCION_DESCRIPCION,
+        cr.CORREOELECTRONICO,
+        cr.CONTRASEÑA
+    FROM ARTAVIARACING.CLIENTE c
+    INNER JOIN ARTAVIARACING.TELEFONOPORUSUARIO t
+        ON c.CREDENCIALID = t.CREDENCIALID
+    INNER JOIN ARTAVIARACING.DIRECCIONPORUSUARIO d
+        ON c.CREDENCIALID = d.CREDENCIALID
+    INNER JOIN ARTAVIARACING.CREDENCIALESPORUSUARIO cr
+        ON c.CREDENCIALID = cr.CREDENCIALID
+    WHERE c.CREDENCIALID = p_credencial_id;
+END USP_SeleccionarClientePorCredencial;
+
+
+
+
+
+
  
