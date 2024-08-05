@@ -891,14 +891,48 @@ VALUES (80, 7, 'GUÁCIMO', '00000001', 1, SYSDATE);
 select * from "CONDADO";
 -- Inserts para los distritos del cant?n Para?so
 INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES  (1, 37, 'Para?so', '00000001', 1, SYSDATE);
+VALUES  (1, 37, 'Paraiso', '00000001', 1, SYSDATE);
 INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES    (2, 37, 'Santiago', '00000001', 1, SYSDATE);
 INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES   (3, 37, 'Orosi', '00000001', 1, SYSDATE);
 INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES   (4, 37, 'Cach?', '00000001', 1, SYSDATE);
+VALUES   (4, 37, 'Cachi', '00000001', 1, SYSDATE);
 select * from "DISTRITO";
+
+--  Insert de la categoria del telefono. 
+INSERT INTO "ARTAVIARACING"."CATEGORIATELEFONO" 
+(
+    "TIPOTELEFONO",
+    "DESCRIPCION",
+    "EDITADOPOR",
+    "HABILITADO",
+    "FECHACREACION"
+) 
+VALUES 
+(
+    'Móvil',                  -- Tipo de teléfono
+    'Teléfono móvil personal', -- Descripción
+    '00000001',                  -- Usuario que edita
+    1,                        -- Habilitado (1 para habilitado, 0 para deshabilitado)
+    SYSDATE                   -- Fecha de creación (actual)
+);
+INSERT INTO "ARTAVIARACING"."CATEGORIATELEFONO" 
+(
+    "TIPOTELEFONO",
+    "DESCRIPCION",
+    "EDITADOPOR",
+    "HABILITADO",
+    "FECHACREACION"
+) 
+VALUES 
+(
+    'Casa',                  -- Tipo de teléfono
+    'Teléfono casa', -- Descripción
+    '00000001',                  -- Usuario que edita
+    1,                        -- Habilitado (1 para habilitado, 0 para deshabilitado)
+    SYSDATE                   -- Fecha de creación (actual)
+);
 /****************************************************************************************************************************************************************  
 Creacion de las vistas: Apartir de aqui estaran todas las vistas de la DB
 Autor: Jason zuñiga solorzano
@@ -1778,5 +1812,26 @@ BEGIN
     END;
 END USP_VerificarExistenciaUsuario;
 
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado encargado de obtener los tipos de teléfono desde base de datos.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarTipoTelefono (
+    RespuestaTipoTelefono OUT SYS_REFCURSOR
+) AS
+BEGIN
+  OPEN RespuestaTipoTelefono FOR
+    SELECT 
+        CATEGORIATELEFONOID,
+        TIPOTELEFONO
+    FROM CATEGORIATELEFONO;   
+END USP_SeleccionarTipoTelefono;
 
 
