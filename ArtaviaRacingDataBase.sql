@@ -1173,7 +1173,6 @@ BEGIN
     FROM Estado
     WHERE CODIGOPAIS = CodigoPais;
 END USP_SeleccionarEstados;
- 
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -1737,3 +1736,47 @@ BEGIN
         COMMIT;
     END;
 END USP_EnviarConfirmacionCancelacion;
+
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Id Requirement: AR-001 
+Creation Date: 08/04/2024   (MM/dd/YYYY)
+Requirement:  Procedimiento encargado de verificar si existe el usuario al momento de registrar un usuario.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_VerificarExistenciaUsuario (
+    p_credencialId       IN VARCHAR2,    
+    p_credencial_id      OUT VARCHAR2 -- CREDENCIALID del usuario si existe
+    
+) AS
+BEGIN
+    -- Inicializa los parámetros de salida
+    p_credencial_id := NULL;    
+    
+    -- Verifica si el usuario existe con el correo electrónico y la contraseña proporcionados
+    BEGIN
+        SELECT 
+              c.CREDENCIALID
+        INTO p_credencial_id
+        FROM CLIENTE c            
+        WHERE   c.CREDENCIALID = p_credencialId;
+        
+        -- Si no se encuentra ningún registro, p_credencial_id y p_rol_id serán NULL
+    EXCEPTION
+        -- Captura cualquier error y muestra un mensaje
+        WHEN NO_DATA_FOUND THEN
+            -- Si no se encuentra ningún dato, p_credencial_id y p_rol_id permanecen NULL
+            p_credencial_id := NULL;            
+        WHEN OTHERS THEN
+            -- Muestra el mensaje de error y asigna NULL
+            DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+            p_credencial_id := NULL;            
+    END;
+END USP_VerificarExistenciaUsuario;
+
+
+
