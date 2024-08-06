@@ -1252,34 +1252,27 @@ Updated By                                  (MM/dd/YYYY)                        
 
 ****************************************************************************************************************************************************************/
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_RegistrarCliente (
-    -- Parámetros para CLIENTE
     p_credencial_id       IN VARCHAR2,
     p_rol_id              IN NUMBER,
     p_nombre              IN VARCHAR2,
     p_primer_apellido     IN VARCHAR2,
     p_segundo_apellido    IN VARCHAR2,
     p_fecha_nacimiento    IN DATE,
-    p_editado_por         IN VARCHAR2 DEFAULT '000000001', -- Usuario administrador del sistema
-    p_habilitado          IN NUMBER DEFAULT 1,
-    p_fecha_creacion      IN DATE DEFAULT SYSDATE,
-
-    -- Parámetros para TELEFONOPORUSUARIO
     p_numero_telefono     IN VARCHAR2,
     p_categoria_telefono_id IN NUMBER,
     p_numero_extension    IN NUMBER DEFAULT NULL,
     p_descripcion         IN VARCHAR2 DEFAULT NULL,
-
-    -- Parámetros para DIRECCIONPORUSUARIO
     p_codigo_pais         IN NUMBER,
     p_codigo_estado       IN NUMBER,
     p_codigo_condado      IN NUMBER,
     p_codigo_distrito     IN NUMBER,
     p_descripcion_direccion IN VARCHAR2,
-
-    -- Parámetros para CREDENCIALESPORUSUARIO
     p_correo_electronico  IN VARCHAR2,
     p_contrasena          IN VARCHAR2,
-    p_es_contrasena_temporal IN NUMBER DEFAULT 0
+    p_es_contrasena_temporal IN NUMBER DEFAULT 0,
+    p_editado_por         IN VARCHAR2 DEFAULT '000000001', 
+    p_habilitado          IN NUMBER DEFAULT 1,
+    p_fecha_creacion      IN DATE DEFAULT SYSDATE
 ) AS
 BEGIN
     -- Inicia una transacción
