@@ -1810,4 +1810,181 @@ BEGIN
     FROM CATEGORIATELEFONO;   
 END USP_SeleccionarTipoTelefono;
 
+-- Categorías para menús y submenús
+INSERT INTO "ARTAVIARACING"."CATEGORIAMENU" (CATEGORIAMENUID, TIPOMENU, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 'MENU', 'Menú Principal', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIAMENU" (CATEGORIAMENUID, TIPOMENU, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 'SUBMENU', 'Sub menú', '000000001', 1, SYSDATE);
+
+
+-- Menús principales
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 1, NULL, 'Home', '/home', 1, 'fa fa-home', 'Página principal', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 1, NULL, 'Gestión Administradora', '/adminmanager', 1, 'fa fa-box-open', 'Gestión de administración', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(3, 1, NULL, 'Gestión de Citas', '/shedulemanager', 1, 'fa fa-calendar-check', 'Gestión de citas', '000000001', 1, SYSDATE);
+
+-- Submenús
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(4, 2, 2, 'Inventario', '/inventario', 2, 'fa fa-warehouse', 'Gestión de inventario', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(5, 2, 3, 'Agendar', '/agendar', 2, 'fa fa-calendar-plus', 'Agendar citas', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(6, 2, 3, 'Mis Citas', '/miscitas', 2, 'fa fa-calendar-day', 'Mis citas', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(7, 2, 3, 'Citas', '/citas', 2, 'fa fa-calendar-alt', 'Todas las citas', '000000001', 1, SYSDATE);
+
+
+-- Supongamos que el rol con ID 1 es 'Administrador'
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 2, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 3, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 3, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 4, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 5, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 6, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 7, '000000001', 1, SYSDATE);
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Id Requirement: AR-001 
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado encargado de obtener el menú correspondiente a un rol específico y generar la estructura HTML para su representación.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE PROCEDURE USP_ObtenerMenuPorRol (
+    p_rolid IN NUMBER,
+    p_html OUT CLOB
+) AS
+    v_html CLOB := '<ul class="menu">';
+    v_project_name VARCHAR2(50) := 'Artavia_Racing'; -- Nombre del proyecto
+    v_has_submenus NUMBER;
+    v_menu_url VARCHAR2(255);
+    v_submenu_url VARCHAR2(255);
+BEGIN
+    -- Inicializa DBMS_OUTPUT para depuración
+    DBMS_OUTPUT.PUT_LINE('Rol ID: ' || p_rolid);
+
+    -- Agregar el ítem "Home" al principio del menú
+    FOR v_home IN (
+        SELECT M.MENUID, M.NOMBRE, M.URL, M.ICONO
+        FROM MENU M
+        INNER JOIN CATEGORIAMENU C ON M.CATEGORIAMENUID = C.CATEGORIAMENUID
+        WHERE C.TIPOMENU = 'MENU'
+          AND M.NOMBRE = 'Home'
+          AND M.MENUID IN (SELECT MENUID FROM MENUPORROL WHERE ROLID = p_rolid AND HABILITADO = 1)
+          AND M.HABILITADO = 1
+    ) LOOP
+        v_html := v_html || '<li><a href="/' || v_project_name || '/home.jsp"><i class="' || v_home.ICONO || '"></i> ' || v_home.NOMBRE || '</a></li>';
+        -- Diagnóstico
+        DBMS_OUTPUT.PUT_LINE('Home: ' || v_home.NOMBRE);
+    END LOOP;
+
+    -- Iterar sobre los menús principales (categoría TIPOMENU = 'MENU') excluyendo el "Home"
+    FOR v_menu IN (
+        SELECT M.MENUID, M.NOMBRE, M.URL, M.ICONO, M.NIVEL 
+        FROM MENU M
+        INNER JOIN CATEGORIAMENU C ON M.CATEGORIAMENUID = C.CATEGORIAMENUID
+        WHERE C.TIPOMENU = 'MENU'
+          AND M.NOMBRE <> 'Home'
+          AND M.MENUID IN (SELECT MENUID FROM MENUPORROL WHERE ROLID = p_rolid AND HABILITADO = 1)
+          AND M.HABILITADO = 1
+        ORDER BY M.NIVEL, M.MENUPADREID NULLS FIRST
+    ) LOOP
+        -- Verificar si el menú tiene submenús
+        SELECT COUNT(*)
+        INTO v_has_submenus
+        FROM MENU M2
+        INNER JOIN CATEGORIAMENU C2 ON M2.CATEGORIAMENUID = C2.CATEGORIAMENUID
+        WHERE M2.MENUPADREID = v_menu.MENUID
+          AND C2.TIPOMENU = 'SUBMENU'
+          AND M2.MENUID IN (SELECT MENUID FROM MENUPORROL WHERE ROLID = p_rolid AND HABILITADO = 1)
+          AND M2.HABILITADO = 1;
+
+        -- Construir la URL del menú principal, asegurando que no haya doble '/'
+        v_menu_url := v_menu.URL;
+        IF v_menu_url IS NOT NULL AND v_menu_url LIKE '/%' THEN
+            v_menu_url := SUBSTR(v_menu_url, 2); -- Eliminar el '/' inicial si existe
+        END IF;
+        v_menu_url := '/' || v_project_name || '/' || v_menu_url || '.jsp';
+
+        -- Crear el menú principal
+        v_html := v_html || '<li';
+        -- Solo añadir id al span si el menú principal tiene submenús
+        IF v_has_submenus > 0 THEN
+            v_html := v_html || '><span id="idSpan"><i class="' || v_menu.ICONO || '"></i> ' || v_menu.NOMBRE || '</span>';
+        ELSE
+            v_html := v_html || '><a href="' || v_menu_url || '"><i class="' || v_menu.ICONO || '"></i> ' || v_menu.NOMBRE || '</a>';
+        END IF;
+
+        -- Diagnóstico
+        DBMS_OUTPUT.PUT_LINE('Menú: ' || v_menu.NOMBRE);
+
+        -- Buscar submenús asociados (categoría TIPOMENU = 'SUBMENU')
+        FOR v_submenu IN (
+            SELECT M2.MENUID, M2.NOMBRE, M2.URL, M2.ICONO
+            FROM MENU M2
+            INNER JOIN CATEGORIAMENU C2 ON M2.CATEGORIAMENUID = C2.CATEGORIAMENUID
+            WHERE C2.TIPOMENU = 'SUBMENU'
+              AND M2.MENUPADREID = v_menu.MENUID
+              AND M2.MENUID IN (SELECT MENUID FROM MENUPORROL WHERE ROLID = p_rolid AND HABILITADO = 1)
+              AND M2.HABILITADO = 1
+        ) LOOP
+            -- Construir la URL del submenú, asegurando que no haya doble '/'
+            v_submenu_url := v_submenu.URL;
+            IF v_submenu_url IS NOT NULL AND v_submenu_url LIKE '/%' THEN
+                v_submenu_url := SUBSTR(v_submenu_url, 2); -- Eliminar el '/' inicial si existe
+            END IF;
+            v_submenu_url := '/' || v_project_name || '/' || v_submenu_url || '.jsp';
+
+            -- Si hay submenús, añadirlos dentro de un <ul class="submenu">
+            v_html := v_html || '<ul class="submenu">';
+            v_html := v_html || '<li><a href="' || v_submenu_url || '"><i class="' || v_submenu.ICONO || '"></i> ' || v_submenu.NOMBRE || '</a></li>';
+            v_html := v_html || '</ul>';
+        END LOOP;
+
+        -- Cerrar el elemento <li> del menú principal
+        v_html := v_html || '</li>';
+    END LOOP;
+
+    -- Cerrar el elemento <ul class="menu">
+    v_html := v_html || '</ul>';
+
+    -- Diagnóstico
+    IF LENGTH(v_html) = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('No se generó contenido HTML.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Contenido HTML generado.');
+    END IF;
+
+    p_html := v_html;
+END;
 
