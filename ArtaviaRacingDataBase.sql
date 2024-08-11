@@ -513,17 +513,21 @@ Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena los datos del producto
 ****************************************************************************************************************************************************************/  
 CREATE TABLE PRODUCTO (
-    PRODUCTOID           NUMBER          PRIMARY KEY NOT NULL,
-    CATEGORIAPRODUCTOID  NUMBER          NOT NULL,
-    NOMBRE               VARCHAR2(80)    NOT NULL,
-    DESCRIPCION          VARCHAR2(250)   NULL,
-    PRECIOUNITARIO       NUMBER          NOT NULL,
-    CANTIDAD             NUMBER          NOT NULL,
-    EDITADOPOR           VARCHAR2(10)    NOT NULL,
-    HABILITADO           NUMBER(1)       NOT NULL,
-    FECHACREACION        DATE            NOT NULL,
-    FOREIGN KEY (CATEGORIAPRODUCTOID) REFERENCES CATEGORIAPRODUCTO(CATEGORIAPRODUCTOID)
+    PRODUCTOID NUMBER GENERATED ALWAYS AS IDENTITY
+    (START WITH 1 INCREMENT BY 1) NOT NULL,
+    CATEGORIAPRODUCTOID NUMBER NOT NULL,
+    NOMBRE VARCHAR2(80 BYTE) NOT NULL,
+    DESCRIPCION VARCHAR2(250 BYTE),
+    PRECIOUNITARIO NUMBER NOT NULL,
+    CANTIDAD NUMBER NOT NULL,
+    EDITADOPOR VARCHAR2(10 BYTE) NOT NULL,
+    HABILITADO NUMBER(1,0) NOT NULL,
+    FECHACREACION DATE NOT NULL,
+    IMAGEN BLOB,
+    PRIMARY KEY (PRODUCTOID),
+    FOREIGN KEY (CATEGORIAPRODUCTOID) REFERENCES CATEGORIAPRODUCTO (CATEGORIAPRODUCTOID)
 );
+
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: ProductoPorDiagnostico
 Autor: Jason zuñiga solorzano
@@ -1987,4 +1991,232 @@ BEGIN
 
     p_html := v_html;
 END;
+
+
+/****************************************************************************************************************************************************************
+Autor: Andrés Alvarado Matamoros
+Id Requirement: AR-001
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para insertar un nuevo producto en la tabla PRODUCTO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PROCEDURE USP_InsertarProducto (    
+    p_categoriaProductoId IN NUMBER,
+    p_nombre             IN VARCHAR2,
+    p_descripcion        IN VARCHAR2,
+    p_precioUnitario     IN NUMBER,
+    p_cantidad           IN NUMBER,
+    p_editadoPor         IN VARCHAR2,
+    p_habilitado         IN NUMBER,
+    p_fechaCreacion      IN DATE,
+    p_imagen             IN BLOB
+)
+AS
+BEGIN
+    INSERT INTO ARTAVIARACING.PRODUCTO (        
+        CATEGORIAPRODUCTOID,
+        NOMBRE,
+        DESCRIPCION,
+        PRECIOUNITARIO,
+        CANTIDAD,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION,
+        IMAGEN
+    ) VALUES (        
+        p_categoriaProductoId,
+        p_nombre,
+        p_descripcion,
+        p_precioUnitario,
+        p_cantidad,
+        p_editadoPor,
+        p_habilitado,
+        p_fechaCreacion,
+        p_imagen
+    );
+END USP_InsertarProducto;
+/
+
+
+ /****************************************************************************************************************************************************************
+Autor: Andrés Alvarado Matamoros
+Id Requirement: AR-002
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para actualizar un producto existente en la tabla PRODUCTO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PROCEDURE USP_ActualizarProducto (
+    p_productoId         IN NUMBER,
+    p_categoriaProductoId IN NUMBER,
+    p_nombre             IN VARCHAR2,
+    p_descripcion        IN VARCHAR2,
+    p_precioUnitario     IN NUMBER,
+    p_cantidad           IN NUMBER,
+    p_editadoPor         IN VARCHAR2,
+    p_habilitado         IN NUMBER,
+    p_fechaCreacion      IN DATE,
+    p_imagen             IN BLOB
+)
+AS
+BEGIN
+    UPDATE ARTAVIARACING.PRODUCTO
+    SET
+        CATEGORIAPRODUCTOID = p_categoriaProductoId,
+        NOMBRE = p_nombre,
+        DESCRIPCION = p_descripcion,
+        PRECIOUNITARIO = p_precioUnitario,
+        CANTIDAD = p_cantidad,
+        EDITADOPOR = p_editadoPor,
+        HABILITADO = p_habilitado,
+        FECHACREACION = p_fechaCreacion,
+        IMAGEN = p_imagen
+    WHERE PRODUCTOID = p_productoId;
+END USP_ActualizarProducto;
+/
+select * from ARTAVIARACING.PRODUCTO
+/****************************************************************************************************************************************************************
+Autor: Andrés Alvarado Matamoros
+Id Requirement: AR-003
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para obtener un producto específico desde la tabla PRODUCTO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PROCEDURE USP_ObtenerProducto (
+    p_productoId         IN NUMBER,
+    p_cursor             OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+    OPEN p_cursor FOR
+    SELECT
+        PRODUCTOID,
+        CATEGORIAPRODUCTOID,
+        NOMBRE,
+        DESCRIPCION,
+        PRECIOUNITARIO,
+        CANTIDAD,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION,
+        IMAGEN
+    FROM ARTAVIARACING.PRODUCTO
+    WHERE PRODUCTOID = p_productoId;
+END USP_ObtenerProducto;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Andrés Alvarado Matamoros
+Id Requirement: AR-004
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para obtener todos los productos desde la tabla PRODUCTO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PROCEDURE USP_ObtenerTodosProductos (
+    p_cursor             OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+    OPEN p_cursor FOR
+    SELECT
+        PRODUCTOID,
+        CATEGORIAPRODUCTOID,
+        NOMBRE,
+        DESCRIPCION,
+        PRECIOUNITARIO,
+        CANTIDAD,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION,
+        IMAGEN
+    FROM ARTAVIARACING.PRODUCTO;
+END USP_ObtenerTodosProductos;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Andrés Alvarado Matamoros
+Id Requirement: AR-005
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para eliminar un producto específico desde la tabla PRODUCTO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PROCEDURE USP_EliminarProducto (
+    p_productoId         IN NUMBER
+)
+AS
+BEGIN
+    DELETE FROM ARTAVIARACING.PRODUCTO
+    WHERE PRODUCTOID = p_productoId;
+END USP_EliminarProducto;
+/
+
+INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
+("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (1, 'Aceites y Lubricantes', 'Aceites y lubricantes para motores y transmisión.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
+("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (2, 'Filtros', 'Filtros de aceite, aire, combustible y aire de cabina.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
+("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (3, 'Componentes de Frenos', 'Pastillas de freno, discos, tambores y cilindros de freno.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
+("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (4, 'Sistemas de Escape', 'Silenciadores, tubos de escape, catalizadores y juntas.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
+("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (5, 'Partes de Suspensión', 'Amortiguadores, resortes, bieletas y brazos de control.', '000000001', 1, SYSDATE);
+
+
+/****************************************************************************************************************************************************************
+Autor: Andrés Alvarado Matamoros
+Id Requirement: AR-005
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para obtener el ID y el nombre de todas las categorías de producto desde la tabla CATEGORIAPRODUCTO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE  USP_ObtenerCategoriaProducto (
+    RespuestaCategoria OUT SYS_REFCURSOR
+) AS
+BEGIN
+  OPEN RespuestaCategoria FOR
+    
+     SELECT 
+        CATEGORIAPRODUCTOID,
+        NOMBRE
+    FROM CATEGORIAPRODUCTO;
+END;
+
+
 
