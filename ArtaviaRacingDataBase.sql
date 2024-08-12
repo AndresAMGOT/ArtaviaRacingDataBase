@@ -433,18 +433,23 @@ Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena las citas
+
+*Modificaciones*
+Autor: Horacio Porras Marín
+Id Requirement: AR-003 
+Creation Date: 11/08/2024   (MM/dd/YYYY)
+Information: Cambio de Type en HORAAGENDADA y HORAFINALIZACION. CITAID ahora es auto-incrementable.
 ****************************************************************************************************************************************************************/  
 CREATE TABLE CITAS (
-    CITAID              NUMBER          PRIMARY KEY NOT NULL,
+    CITAID              NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY NOT NULL,
     CREDENCIALID        VARCHAR2(20)    NOT NULL,
     PLACAVEHICULOID     VARCHAR2(20)    NOT NULL,
     VIN                 VARCHAR2(50)    NOT NULL,
-    SERVICIOID          NUMBER          NOT NULL,
     ESTADOCITAID        NUMBER(10)      NOT NULL,
     FECHAAGENDADA       DATE            NOT NULL,
     DESCRIPCION         VARCHAR2(250)   NULL,
-    HORAAGENDADA        TIMESTAMP       NOT NULL,
-    HORAFINALIZACION    TIMESTAMP       NULL,
+    HORAAGENDADA        VARCHAR2(20)    NOT NULL,
+    HORAFINALIZACION    VARCHAR2(20)    NOT NULL,
     EDITADOPOR          VARCHAR2(10)    NOT NULL,
     HABILITADO          NUMBER(1)       NOT NULL,
     FECHACREACION       DATE            NOT NULL,
@@ -453,6 +458,22 @@ CREATE TABLE CITAS (
     FOREIGN KEY (SERVICIOID)      REFERENCES SERVICIO(SERVICIOID),
     FOREIGN KEY (ESTADOCITAID)    REFERENCES ESTADOCITA(ESTADOCITAID)
 );
+
+/*Comandos para corregir la tabla CITAS
+
+SELECT CONSTRAINT_NAME, TABLE_NAME
+FROM USER_CONSTRAINTS
+WHERE R_CONSTRAINT_NAME IN (
+    SELECT CONSTRAINT_NAME
+    FROM USER_CONSTRAINTS
+    WHERE TABLE_NAME = 'CITAS' AND CONSTRAINT_TYPE = 'P'
+) AND CONSTRAINT_TYPE = 'R';
+
+ALTER TABLE DIAGNOSTICO DROP CONSTRAINT SYS_C0013056;
+
+DROP TABLE CITAS;
+*/
+
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: VehiculoPorCliente
 Autor: Jason zuñiga solorzano
@@ -1635,53 +1656,55 @@ Autor: Luis Solorzano Campos
 Id Requirement: AR-001
 Creation Date: [22/07/2024]   (MM/dd/YYYY)
 Requirement: Procedimiento encargado de cancelar una cita previamente agendada.
+
+*Modificaciones*
+Autor: Horacio Porras Marín
+Id Requirement: AR-003 
+Creation Date: 11/08/2024   (MM/dd/YYYY)
+Information: Recreación del SP para el CRUD de Citas.
 ****************************************************************************************************************************************************************/
-
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_CancelarCita (
-    p_cita_id       IN NUMBER,    -- ID de la cita a cancelar
-    p_credencial_id IN VARCHAR2,  -- ID de la credencial del cliente
-    p_editado_por   IN VARCHAR2 DEFAULT '000000001'  -- Usuario que realiza la edición
-) AS
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_CANCELAR_CITA (
+    p_citaId NUMBER,
+    p_editadoPor VARCHAR2
+)
+AS
 BEGIN
-    -- Inicia una transacción
-    BEGIN
-        -- Actualiza el estado de la cita a 'Cancelada' en la tabla CITAS
-        UPDATE ARTAVIARACING.CITAS
-        SET ESTADO = 'Cancelada',
-            EDITADOPOR = p_editado_por,
-            FECHAMODIFICACION = SYSDATE
-        WHERE CITAID = p_cita_id
-          AND CREDENCIALID = p_credencial_id;
+    UPDATE CITAS
+    SET HABILITADO = 0,
+        EDITADOPOR = p_editadoPor,
+        HORAFINALIZACION = TO_CHAR(SYSDATE, 'HH24:MI')
+    WHERE CITAID = p_citaId AND HABILITADO != 0; --Solo actualiza si la cita no está cancelada.
 
-        -- Confirma la transacción si la actualización es exitosa
-        COMMIT;
-    EXCEPTION
-        -- Captura cualquier error 
-        WHEN OTHERS THEN
-            ROLLBACK;
-            -- Muestra un mensaje
-            DBMS_OUTPUT.PUT_LINE('Se ha producido un error al intentar cancelar la cita.');
-            RAISE;
-    END;
-END USP_CancelarCita;
+    IF SQL%ROWCOUNT = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('No se encontró la cita o ya estaba cancelada.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Cita cancelada correctamente.');
+    END IF;
+END;
 
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga Solorzano
 Id Requirement: AR-001 
 Creation Date: 21/07/2024   (MM/dd/YYYY)
 Requirement:  Este procedimiento se encarga de actualizar cualquier cambio en la tabla cita
+
+*Modificaciones*
+Autor: Horacio Porras Marín
+Id Requirement: AR-003 
+Creation Date: 11/08/2024   (MM/dd/YYYY)
+Information: Cambio de Type en varias columnas.
 *************************************************************************************************************************/
 CREATE OR REPLACE PROCEDURE USP_ACTUALIZAR_CITA (
     p_CITAID IN NUMBER,
-    p_CREDENCIALID IN NUMBER,
-    p_PLACAVEHICULOID IN NUMBER,
+    p_CREDENCIALID IN VARCHAR2,
+    p_PLACAVEHICULOID IN VARCHAR2,
     p_VIN IN VARCHAR2,
     p_SERVICIOID IN NUMBER,
     p_ESTADOCITAID IN NUMBER,
     p_FECHAAGENDADA IN DATE,
     p_HORAAGENDADA IN VARCHAR2,
     p_EDITADOPOR IN VARCHAR2,
-    p_HABILITADO IN CHAR
+    p_HABILITADO IN NUMBER
 ) AS
 BEGIN
     UPDATE CITAS
@@ -1697,24 +1720,31 @@ BEGIN
         FECHACREACION = SYSDATE
     WHERE CITAID = p_CITAID;
 END USP_ACTUALIZAR_CITA;
+
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga Solorzano
 Id Requirement: AR-001 
 Creation Date: 21/07/2024   (MM/dd/YYYY)
 Requirement:  Este procedimiento se encarga de agregar informacion en la tabla cita
+
+*Modificaciones*
+Autor: Horacio Porras Marín
+Id Requirement: AR-003 
+Creation Date: 11/08/2024   (MM/dd/YYYY)
+Information: Cambio de Type en varias columnas.
 *************************************************************************************************************************/
 
 CREATE OR REPLACE PROCEDURE USP_AGREGAR_CITA (
     p_CITAID IN NUMBER,
-    p_CREDENCIALID IN NUMBER,
-    p_PLACAVEHICULOID IN NUMBER,
+    p_CREDENCIALID IN VARCHAR2,
+    p_PLACAVEHICULOID IN VARCHAR2,
     p_VIN IN VARCHAR2,
     p_SERVICIOID IN NUMBER,
     p_ESTADOCITAID IN NUMBER,
     p_FECHAAGENDADA IN DATE,
     p_HORAAGENDADA IN VARCHAR2,
     p_EDITADOPOR IN VARCHAR2,
-    p_HABILITADO IN CHAR
+    p_HABILITADO IN NUMBER
 ) AS
 BEGIN
     INSERT INTO CITAS (CITAID, CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, HORAAGENDADA, EDITADOPOR, HABILITADO, FECHACREACION)
@@ -1728,7 +1758,7 @@ Creation Date: [22/07/2024]   (MM/dd/YYYY)
 Requirement: Procedimiento encargado de enviar una confirmación de cancelación de cita al cliente.
 ****************************************************************************************************************************************************************/
 
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_EnviarConfirmacionCancelacion (
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_CONFIRMACION_CANCELACION_CITA (
     p_cita_id       IN NUMBER,    -- ID de la cita cancelada
     p_credencial_id IN VARCHAR2   -- ID de la credencial del cliente
 ) AS
