@@ -18,7 +18,8 @@ CREATE TABLE "PUESTOTRABAJO"
 ) SEGMENT CREATION DEFERRED 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
-  TABLESPACE "USERS" ;
+  TABLESPACE "USERS";
+  
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
@@ -445,6 +446,7 @@ CREATE TABLE CITAS (
     CREDENCIALID        VARCHAR2(20)    NOT NULL,
     PLACAVEHICULOID     VARCHAR2(20)    NOT NULL,
     VIN                 VARCHAR2(50)    NOT NULL,
+    SERVICIOID          NUMBER(10)      NOT NULL,
     ESTADOCITAID        NUMBER(10)      NOT NULL,
     FECHAAGENDADA       DATE            NOT NULL,
     DESCRIPCION         VARCHAR2(250)   NULL,
@@ -548,6 +550,20 @@ CREATE TABLE PRODUCTO (
     PRIMARY KEY (PRODUCTOID),
     FOREIGN KEY (CATEGORIAPRODUCTOID) REFERENCES CATEGORIAPRODUCTO (CATEGORIAPRODUCTOID)
 );
+
+/*
+SELECT CONSTRAINT_NAME, TABLE_NAME
+FROM USER_CONSTRAINTS
+WHERE R_CONSTRAINT_NAME IN (
+    SELECT CONSTRAINT_NAME
+    FROM USER_CONSTRAINTS
+    WHERE TABLE_NAME = 'PRODUCTO' AND CONSTRAINT_TYPE = 'P'
+) AND CONSTRAINT_TYPE = 'R';
+
+ALTER TABLE PRODUCTOPORDIAGNOSTICO DROP CONSTRAINT SYS_C0013083;
+
+DROP TABLE PRODUCTO;
+*/
 
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: ProductoPorDiagnostico
@@ -896,7 +912,7 @@ VALUES (79, 7, 'MATINA', '00000001', 1, SYSDATE);
 INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (80, 7, 'GUÁCIMO', '00000001', 1, SYSDATE);
 
-select * from "CONDADO";
+--select * from "CONDADO";
 -- Inserts para los distritos del cant?n Para?so
 INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES  (1, 37, 'Paraiso', '00000001', 1, SYSDATE);
@@ -2113,7 +2129,7 @@ BEGIN
     WHERE PRODUCTOID = p_productoId;
 END USP_ActualizarProducto;
 /
-select * from ARTAVIARACING.PRODUCTO
+--select * from ARTAVIARACING.PRODUCTO
 /****************************************************************************************************************************************************************
 Autor: Andrés Alvarado Matamoros
 Id Requirement: AR-003
@@ -2247,6 +2263,6 @@ BEGIN
         NOMBRE
     FROM CATEGORIAPRODUCTO;
 END;
+/
 
-
-
+COMMIT;
