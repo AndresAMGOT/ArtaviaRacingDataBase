@@ -1075,6 +1075,7 @@ SELECT
     ,NOMBRE       
     ,CODIGOPAIS    
 FROM ESTADO;
+
 /****************************************************************************************************************************************************************  
 Creacion de la vista: DiagnosticosDetalle
 Autor: José Andrés Alvarado Matamoros
@@ -1207,7 +1208,7 @@ BEGIN
         ,NOMBRE
     FROM vw_ObtenerPais;   
 END;
-
+/
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -1231,6 +1232,7 @@ BEGIN
     FROM Estado
     WHERE CODIGOPAIS = CodigoPais;
 END USP_SeleccionarEstados;
+/
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -1254,7 +1256,7 @@ BEGIN
     FROM vw_ObtenerCondado
     WHERE CODIGOESTADO = CodigoEstado;
 END USP_SeleccionarCondado;
-
+/
 
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
@@ -1279,7 +1281,7 @@ BEGIN
     FROM vw_ObtenerDistritos
     WHERE CODIGOCONDADO = CodigoCondado;
 END USP_SeleccionarDistritos;
- 
+/
  
  /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
@@ -1415,7 +1417,7 @@ BEGIN
             RAISE;
     END;
 END USP_RegistrarCliente;
-
+/
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -1520,7 +1522,7 @@ BEGIN
             RAISE;
     END;
 END USP_ActualizarCliente;
-
+/
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -1615,7 +1617,7 @@ BEGIN
         ON c.CREDENCIALID = cr.CREDENCIALID
     WHERE c.CREDENCIALID = p_credencial_id;
 END USP_SeleccionarClientePorCredencial;
-
+/
 
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
@@ -1665,7 +1667,7 @@ BEGIN
             p_rol_id := NULL;
     END;
 END USP_VerificarUsuario;
-
+/
 
 /****************************************************************************************************************************************************************
 Autor: Luis Solorzano Campos
@@ -1697,7 +1699,7 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('Cita cancelada correctamente.');
     END IF;
 END;
-
+/
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga Solorzano
 Id Requirement: AR-001 
@@ -1736,7 +1738,7 @@ BEGIN
         FECHACREACION = SYSDATE
     WHERE CITAID = p_CITAID;
 END USP_ACTUALIZAR_CITA;
-
+/
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga Solorzano
 Id Requirement: AR-001 
@@ -1766,7 +1768,7 @@ BEGIN
     INSERT INTO CITAS (CITAID, CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, HORAAGENDADA, EDITADOPOR, HABILITADO, FECHACREACION)
     VALUES (p_CITAID, p_CREDENCIALID, p_PLACAVEHICULOID, p_VIN, p_SERVICIOID, p_ESTADOCITAID, p_FECHAAGENDADA, p_HORAAGENDADA, p_EDITADOPOR, p_HABILITADO, SYSDATE);
 END USP_AGREGAR_CITA;
-
+/
  /****************************************************************************************************************************************************************
 Autor: Luis Solorzano Campos
 Id Requirement: AR-001 
@@ -1796,7 +1798,7 @@ BEGIN
         COMMIT;
     END;
 END USP_EnviarConfirmacionCancelacion;
-
+/
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -1837,7 +1839,7 @@ BEGIN
             p_credencial_id := NULL;            
     END;
 END USP_VerificarExistenciaUsuario;
-
+/
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -1859,6 +1861,7 @@ BEGIN
         TIPOTELEFONO
     FROM CATEGORIATELEFONO;   
 END USP_SeleccionarTipoTelefono;
+/
 
 -- Categorías para menús y submenús
 INSERT INTO "ARTAVIARACING"."CATEGORIAMENU" (CATEGORIAMENUID, TIPOMENU, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
@@ -2037,7 +2040,7 @@ BEGIN
 
     p_html := v_html;
 END;
-
+/
 
 /****************************************************************************************************************************************************************
 Autor: Andrés Alvarado Matamoros
