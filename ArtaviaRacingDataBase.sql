@@ -1893,6 +1893,8 @@ INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE
 
 INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
 (7, 2, 3, 'Citas', '/citas', 2, 'fa fa-calendar-alt', 'Todas las citas', '000000001', 1, SYSDATE);
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(8, 1, NULL, 'Repuestos', '/UsuarioInventario', 1, 'fa fa-cogs', 'Gesti n de Repuestos', '000000001', 1, SYSDATE);
 
 
 -- Supongamos que el rol con ID 1 es 'Administrador'
@@ -1922,6 +1924,8 @@ INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO,
 
 INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
 (2, 7, '000000001', 1, SYSDATE);
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 8, '000000001', 1, SYSDATE);
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -2268,4 +2272,98 @@ BEGIN
 END;
 /
 
-COMMIT;
+/****************************************************************************************************************************************************************
+Autor: Andrés Alvarado Matamoros
+Id Requirement: AR-001
+Creation Date: 08/11/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para obtener un listado de todos los productos activos, generando un contenedor HTML con los datos de cada producto y botones de filtrado por categor a.
+Incluye un bot n para mostrar todos los productos.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE PROCEDURE SP_Obtener_Productos_HTML(
+    OUT_HTML OUT CLOB
+) AS 
+BEGIN
+    -- Inicializar OUT_HTML
+    OUT_HTML := '<div class="container">';
+    OUT_HTML := OUT_HTML || '<div class="btn-group" role="group" aria-label="Categor as">';
+
+    -- Bot n para mostrar todos los productos
+    OUT_HTML := OUT_HTML || '<button type="button" class="btn btn-primary filter-button" data-category="all">Todo</button>';
+
+    -- Botones para cada categor a
+    FOR CATEGORIA IN (
+        SELECT CATEGORIAPRODUCTOID, NOMBRE 
+        FROM CATEGORIAPRODUCTO 
+        WHERE HABILITADO = 1
+    ) LOOP
+        OUT_HTML := OUT_HTML || '<button type="button" class="btn btn-primary filter-button" data-category="' || CATEGORIA.CATEGORIAPRODUCTOID || '">' || CATEGORIA.NOMBRE || '</button>';
+    END LOOP;
+
+    OUT_HTML := OUT_HTML || '</div>';
+    OUT_HTML := OUT_HTML || '<div class="row" id="product-container">';
+
+    -- Productos activos
+    FOR PRODUCTO IN (
+        SELECT P.PRODUCTOID, P.NOMBRE, P.DESCRIPCION, P.CANTIDAD, P.PRECIOUNITARIO, P.IMAGEN, C.CATEGORIAPRODUCTOID
+        FROM PRODUCTO P
+        JOIN CATEGORIAPRODUCTO C ON P.CATEGORIAPRODUCTOID = C.CATEGORIAPRODUCTOID
+        WHERE P.HABILITADO = 1
+    ) LOOP
+        -- Generar el placeholder para la imagen
+        DECLARE
+            img_placeholder VARCHAR2(50);
+        BEGIN
+            img_placeholder := '[ImagenProducto' || PRODUCTO.PRODUCTOID || ']';
+
+            OUT_HTML := OUT_HTML || '<div class="col-md-4 product-card" data-category="' || PRODUCTO.CATEGORIAPRODUCTOID || '">';
+            OUT_HTML := OUT_HTML || '<div class="card">';
+
+            -- Colocar el placeholder en el formato "data:image/jpeg;base64,${data}"
+            OUT_HTML := OUT_HTML || '<img src="data:image/jpeg;base64,' || img_placeholder || '" class="card-img-top" alt="' || PRODUCTO.NOMBRE || '" width="50">';
+
+            OUT_HTML := OUT_HTML || '<div class="card-body">';
+            OUT_HTML := OUT_HTML || '<h5 class="card-title">' || PRODUCTO.NOMBRE || '</h5>';
+            OUT_HTML := OUT_HTML || '<p class="card-text">' || PRODUCTO.DESCRIPCION || '</p>';
+            OUT_HTML := OUT_HTML || '<p class="card-text">Cantidad: ' || PRODUCTO.CANTIDAD || '</p>';
+            OUT_HTML := OUT_HTML || '<p class="card-text">Precio: ' || TO_CHAR(PRODUCTO.PRECIOUNITARIO, 'FM999G999D00') || '</p>';
+            OUT_HTML := OUT_HTML || '</div></div></div>';
+        END;
+    END LOOP;
+
+    OUT_HTML := OUT_HTML || '</div></div>';
+     
+END SP_Obtener_Productos_HTML;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Andrés Alvarado Matamoros
+Id Requirement: AR-001
+Creation Date: 08/11/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para obtener un listado de todos los productos activos, generando un contenedor HTML con los datos de cada producto y botones de filtrado por categoría.
+Incluye un botón para mostrar todos los productos.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PROCEDURE SP_Obtener_Imagenes_Activas(
+    OUT_CURSOR OUT SYS_REFCURSOR
+) AS 
+BEGIN
+    OPEN OUT_CURSOR FOR
+    SELECT 
+        IMAGEN, 
+        '[ImagenProducto' || PRODUCTOID || ']' AS PlaceHolderName
+    FROM 
+        PRODUCTO
+    WHERE 
+        HABILITADO = 1;  -- Filtrar solo los productos activos
+END SP_Obtener_Imagenes_Activas;
+
