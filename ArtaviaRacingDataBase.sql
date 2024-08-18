@@ -2684,3 +2684,5 @@ VALUES (2, 'Completada', 'La cita ha sido completada.', '000000001', 1, SYSDATE)
 INSERT INTO "ARTAVIARACING"."ESTADOCITA" 
 ("ESTADOCITAID", "ESTADO", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
 VALUES (3, 'Cancelada', 'La cita ha sido cancelada.', '000000001', 1, SYSDATE);
+
+COMMIT;
