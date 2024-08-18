@@ -417,7 +417,7 @@ Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena los vehiculos
 ****************************************************************************************************************************************************************/  
 CREATE TABLE VEHICULO (
-    PLACAVEHICULOID   VARCHAR2(20) PRIMARY KEY NOT NULL,
+    PLACAVEHICULOID  VARCHAR2(20) PRIMARY KEY NOT NULL,
     VIN              VARCHAR2(50) NOT NULL,
     MARCA            VARCHAR2(80) NOT NULL,
     MODELO           VARCHAR2(80) NOT NULL,
@@ -2384,4 +2384,95 @@ BEGIN
     WHERE 
         HABILITADO = 1;  -- Filtrar solo los productos activos
 END SP_Obtener_Imagenes_Activas;
+/
 
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marín
+Id Requirement: AR-003
+Creation Date: 08/18/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para obtener los datos de los vehiculos desde la tabla VEHICULO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarVehiculo (
+    RespuestaVehiculo OUT SYS_REFCURSOR
+) AS
+BEGIN
+    OPEN RespuestaVehiculo FOR
+    SELECT 
+        PLACAVEHICULOID,
+        VIN,
+        MARCA,
+        MODELO,
+        AÑO,
+        COLOR,
+        ALDIA,
+        TITULOPROPIEDAD,
+        HABILITADO,
+        FECHACREACION
+    FROM ARTAVIARACING.VEHICULO;
+END USP_SeleccionarVehiculo;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marín
+Id Requirement: AR-003
+Creation Date: 08/18/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para obtener los datos de los servicios desde la tabla VEHICULO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarServicio (
+    RespuestaServicio OUT SYS_REFCURSOR
+) AS
+BEGIN
+    OPEN RespuestaServicio FOR
+    SELECT 
+        SERVICIOID,
+        CATEGORIASERVICIOID,
+        NOMBRE,
+        DESCRIPCION,
+        PRECIO,
+        TIEMPOSERVICIO,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    FROM ARTAVIARACING.SERVICIO;
+END USP_SeleccionarServicio;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marín
+Id Requirement: AR-003
+Creation Date: 08/18/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para obtener los estados de cita desde la tabla ESTADOCITA.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarEstadoCita (
+    RespuestaEstadoCita OUT SYS_REFCURSOR
+) AS
+BEGIN
+    OPEN RespuestaEstadoCita FOR
+    SELECT 
+        ESTADOCITAID,
+        ESTADO,
+        DESCRIPCION,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    FROM ARTAVIARACING.ESTADOCITA;
+END USP_SeleccionarEstadoCita;
+/
