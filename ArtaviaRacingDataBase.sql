@@ -445,13 +445,13 @@ CREATE TABLE CITAS (
     CITAID              NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY NOT NULL,
     CREDENCIALID        VARCHAR2(20)    NOT NULL,
     PLACAVEHICULOID     VARCHAR2(20)    NOT NULL,
-    VIN                 VARCHAR2(50)    NOT NULL,
+    VIN                 VARCHAR2(50)    NULL,
     SERVICIOID          NUMBER(10)      NOT NULL,
     ESTADOCITAID        NUMBER(10)      NOT NULL,
     FECHAAGENDADA       DATE            NOT NULL,
     DESCRIPCION         VARCHAR2(250)   NULL,
     HORAAGENDADA        VARCHAR2(20)    NOT NULL,
-    HORAFINALIZACION    VARCHAR2(20)    NOT NULL,
+    HORAFINALIZACION    VARCHAR2(20)    NULL,
     EDITADOPOR          VARCHAR2(10)    NOT NULL,
     HABILITADO          NUMBER(1)       NOT NULL,
     FECHACREACION       DATE            NOT NULL,
@@ -461,7 +461,8 @@ CREATE TABLE CITAS (
     FOREIGN KEY (ESTADOCITAID)    REFERENCES ESTADOCITA(ESTADOCITAID)
 );
 
-/*Comandos para corregir la tabla CITAS
+/*
+Comandos para corregir la tabla CITAS
 
 SELECT CONSTRAINT_NAME, TABLE_NAME
 FROM USER_CONSTRAINTS
@@ -471,7 +472,7 @@ WHERE R_CONSTRAINT_NAME IN (
     WHERE TABLE_NAME = 'CITAS' AND CONSTRAINT_TYPE = 'P'
 ) AND CONSTRAINT_TYPE = 'R';
 
-ALTER TABLE DIAGNOSTICO DROP CONSTRAINT SYS_C0013056;
+ALTER TABLE DIAGNOSTICO DROP CONSTRAINT SYS_C007623;
 
 DROP TABLE CITAS;
 */
@@ -1015,7 +1016,7 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: Esta vista muestra informacion del cliente y sus citas
 ****************************************************************************************************************************************************************/  
-CREATE VIEW vw_citas_detalle AS 
+CREATE OR REPLACE VIEW vw_citas_detalle AS 
 SELECT 
     c.CITAID,
     c.FechaAgendada,
@@ -1036,7 +1037,7 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: Esta vista muestra todo el diagnostico
 ****************************************************************************************************************************************************************/  
-CREATE VIEW vw_diagnosticos_detalle AS 
+CREATE OR REPLACE VIEW vw_diagnosticos_detalle AS 
 SELECT 
     d.DIAGNOSTICOID,
     d.DESCRIPCION AS DIAGNOSTICO_DESCRIPCION,
