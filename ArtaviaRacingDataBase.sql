@@ -424,10 +424,27 @@ CREATE TABLE VEHICULO (
     AÑO              NUMBER NOT NULL,
     COLOR            VARCHAR2(80) NOT NULL,
     ALDIA            NUMBER(1) NULL,
-    TITULOPROPIEDAD  BLOB NOT NULL,
+    TITULOPROPIEDAD  BLOB NULL,
     HABILITADO       NUMBER(1) NOT NULL,
     FECHACREACION    DATE NOT NULL
 );
+
+/*
+SELECT CONSTRAINT_NAME, TABLE_NAME
+FROM USER_CONSTRAINTS
+WHERE R_CONSTRAINT_NAME IN (
+    SELECT CONSTRAINT_NAME
+    FROM USER_CONSTRAINTS
+    WHERE TABLE_NAME = 'VEHICULO' AND CONSTRAINT_TYPE = 'P'
+) AND CONSTRAINT_TYPE = 'R';
+
+ALTER TABLE CITAS DROP CONSTRAINT SYS_C007663;
+
+ALTER TABLE VEHICULOPORCLIENTE DROP CONSTRAINT SYS_C007615;
+
+DROP TABLE VEHICULO;
+*/
+
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Citas
 Autor: Jason zuñiga solorzano
