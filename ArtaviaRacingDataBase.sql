@@ -2484,6 +2484,7 @@ Updated By                                  (MM/dd/YYYY)                        
 ****************************************************************************************************************************************************************/
 
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarServicio (
+    CodigoCategoriaServicio IN NUMBER,
     RespuestaServicio OUT SYS_REFCURSOR
 ) AS
 BEGIN
@@ -2498,7 +2499,8 @@ BEGIN
         EDITADOPOR,
         HABILITADO,
         FECHACREACION
-    FROM ARTAVIARACING.SERVICIO;
+    FROM ARTAVIARACING.SERVICIO
+    WHERE CATEGORIASERVICIOID = CodigoCategoriaServicio;
 END USP_SeleccionarServicio;
 /
 
