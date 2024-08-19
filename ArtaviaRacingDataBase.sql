@@ -2491,14 +2491,9 @@ BEGIN
     OPEN RespuestaServicio FOR
     SELECT 
         SERVICIOID,
-        CATEGORIASERVICIOID,
         NOMBRE,
-        DESCRIPCION,
         PRECIO,
-        TIEMPOSERVICIO,
-        EDITADOPOR,
-        HABILITADO,
-        FECHACREACION
+        TIEMPOSERVICIO
     FROM ARTAVIARACING.SERVICIO
     WHERE CATEGORIASERVICIOID = CodigoCategoriaServicio;
 END USP_SeleccionarServicio;
