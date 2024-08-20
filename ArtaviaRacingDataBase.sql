@@ -2682,8 +2682,6 @@ INSERT INTO "ARTAVIARACING"."ESTADOCITA"
 ("ESTADOCITAID", "ESTADO", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
 VALUES (3, 'Cancelada', 'La cita ha sido cancelada.', '000000001', 1, SYSDATE);
 
-COMMIT;
-
 /****************************************************************************************************************************************************************
 Autor: [Tu Nombre]
 Id Requirement: AR-001
@@ -2862,7 +2860,69 @@ BEGIN
 END;
 /
 
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin 
+Id Requirement: AR-009
+Creation Date: 08/19/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para obtener los vehículos y sus detalles por PLACAVEHICULOID desde las tablas VEHICULO y VEHICULOPORCLIENTE.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+****************************************************************************************************************************************************************/
 
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE  USP_VehiculoPorCliente (
+     CedulaId          VARCHAR2
+    ,RespuestaVehiculo OUT SYS_REFCURSOR
+) AS
+BEGIN
+  OPEN RespuestaVehiculo FOR
+    SELECT 
+        V.PLACAVEHICULOID,
+        V.MARCA || ' ' || V.MODELO || ' ' || V.AÑO VEHICULO
+    FROM VEHICULO V
+    INNER JOIN VEHICULOPORCLIENTE VPC
+        ON V.PLACAVEHICULOID = VPC.PLACAVEHICULO
+        AND V.VIN = VPC.VIN
+    WHERE VPC.CREDENCIALID = CedulaId;
+END USP_VehiculoPorCliente;
+/
 
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin 
+Id Requirement: AR-009
+Creation Date: 08/19/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para obtener los vehículos y sus detalles por PLACAVEHICULOID desde las tablas VEHICULO y VEHICULOPORCLIENTE.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE  USP_Listar_Citas (
+     CedulaId          VARCHAR2
+    ,RespuestaCitas OUT SYS_REFCURSOR
+) AS
+BEGIN
+  OPEN RespuestaCitas FOR
+SELECT 
+    C.PLACAVEHICULOID,
+    V.MARCA || ' ' || V.MODELO || ' ' || V.AÑO VEHICULO,
+    CS.NOMBRE  CATEGORIA,
+    S.NOMBRE SERVICIO,
+    C.FECHAAGENDADA,
+    C.HORAAGENDADA
+FROM CITAS C
+JOIN SERVICIO S
+    ON S.SERVICIOID = C.SERVICIOID
+JOIN CATEGORIASERVICIO CS
+    ON CS.CATEGORIASERVICIOID = S.CATEGORIASERVICIOID
+JOIN VEHICULO V
+    ON V.PLACAVEHICULOID = C.PLACAVEHICULOID
+WHERE C.CREDENCIALID = '117580634';
+END USP_Listar_Citas;
+/
+
+COMMIT;
