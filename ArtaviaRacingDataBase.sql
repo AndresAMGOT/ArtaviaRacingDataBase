@@ -2683,3 +2683,186 @@ INSERT INTO "ARTAVIARACING"."ESTADOCITA"
 VALUES (3, 'Cancelada', 'La cita ha sido cancelada.', '000000001', 1, SYSDATE);
 
 COMMIT;
+
+/****************************************************************************************************************************************************************
+Autor: [Tu Nombre]
+Id Requirement: AR-001
+Creation Date: 08/19/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para guardar un registro en las tablas VEHICULO y VEHICULOPORCLIENTE.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PROCEDURE USP_SaveVehicleAndClient(
+    p_placaVehiculoID IN VARCHAR2,
+    p_vin IN VARCHAR2,
+    p_marca IN VARCHAR2,
+    p_modelo IN VARCHAR2,
+    p_año IN NUMBER,
+    p_color IN VARCHAR2,
+    p_aldia IN NUMBER,
+    p_tituloPropiedad IN BLOB,
+    p_habilitadoVehiculo IN NUMBER,
+    p_credencialID IN VARCHAR2,
+    p_editadoPor IN VARCHAR2,
+    p_habilitadoCliente IN NUMBER
+) AS
+BEGIN
+    INSERT INTO VEHICULO (
+        PLACAVEHICULOID, VIN, MARCA, MODELO, AÑO, COLOR, ALDIA, TITULOPROPIEDAD, HABILITADO, FECHACREACION
+    ) VALUES (
+        p_placaVehiculoID, p_vin, p_marca, p_modelo, p_año, p_color, p_aldia, p_tituloPropiedad, p_habilitadoVehiculo, SYSDATE
+    );
+
+    INSERT INTO VEHICULOPORCLIENTE (
+        CREDENCIALID, PLACAVEHICULO, VIN, EDITADOPOR, HABILITADO, FECHACREACION
+    ) VALUES (
+        p_credencialID, p_placaVehiculoID, p_vin, p_editadoPor, p_habilitadoCliente, SYSDATE
+    );
+END;
+/
+
+
+/****************************************************************************************************************************************************************
+Autor: [Tu Nombre]
+Id Requirement: AR-002
+Creation Date: 08/19/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para actualizar un registro en las tablas VEHICULO y VEHICULOPORCLIENTE.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PROCEDURE USP_UpdateVehicleAndClient(
+    p_placaVehiculoID IN VARCHAR2,
+    p_vin IN VARCHAR2,
+    p_marca IN VARCHAR2,
+    p_modelo IN VARCHAR2,
+    p_año IN NUMBER,
+    p_color IN VARCHAR2,
+    p_aldia IN NUMBER,
+    p_tituloPropiedad IN BLOB
+) AS
+BEGIN
+    UPDATE VEHICULO
+    SET 
+        VIN = p_vin,
+        MARCA = p_marca,
+        MODELO = p_modelo,
+        AÑO = p_año,
+        COLOR = p_color,
+        ALDIA = p_aldia,
+        TITULOPROPIEDAD = p_tituloPropiedad
+    WHERE PLACAVEHICULOID = p_placaVehiculoID;   
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: [Tu Nombre]
+Id Requirement: AR-003
+Creation Date: 08/19/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para eliminar un registro en las tablas VEHICULO y VEHICULOPORCLIENTE.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PROCEDURE USP_DeleteVehicleAndClient(
+    p_placaVehiculoID IN VARCHAR2    
+) AS
+BEGIN
+    DELETE FROM VEHICULOPORCLIENTE
+    WHERE PLACAVEHICULO = p_placaVehiculoID;
+
+    DELETE FROM VEHICULO
+    WHERE PLACAVEHICULOID = p_placaVehiculoID;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: [Tu Nombre]
+Id Requirement: AR-004
+Creation Date: 08/19/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para obtener todos los registros de las tablas VEHICULO y VEHICULOPORCLIENTE con un INNER JOIN.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE PROCEDURE USP_GetAllVehiclesAndClientsByCredentialID(
+    p_credencialID IN VARCHAR2,
+    p_cursor OUT SYS_REFCURSOR
+) AS
+BEGIN
+    -- Realizar un INNER JOIN y filtrar por CREDENCIALID
+    OPEN p_cursor FOR
+    SELECT 
+        V.PLACAVEHICULOID,
+        V.VIN,
+        V.MARCA,
+        V.MODELO,
+        V.AÑO,
+        V.COLOR,
+        V.ALDIA,
+        V.TITULOPROPIEDAD
+    FROM 
+        VEHICULO V
+    INNER JOIN 
+        VEHICULOPORCLIENTE VC
+    ON 
+        V.PLACAVEHICULOID = VC.PLACAVEHICULO
+    WHERE 
+        VC.CREDENCIALID = p_credencialID;
+END;
+/
+/****************************************************************************************************************************************************************
+Autor: Andrés Alvarado 
+Id Requirement: AR-002
+Creation Date: 08/19/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para obtener los vehículos y sus detalles por PLACAVEHICULOID desde las tablas VEHICULO y VEHICULOPORCLIENTE.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PROCEDURE USP_GetVehiclesByPlaca(
+      p_Placa IN VARCHAR2,
+      p_cursor OUT SYS_REFCURSOR
+) AS
+BEGIN
+    -- Realizar un INNER JOIN entre VEHICULO y VEHICULOPORCLIENTE
+    OPEN p_cursor FOR
+    SELECT 
+        V.PLACAVEHICULOID,
+        V.VIN,
+        V.MARCA,
+        V.MODELO,
+        V.AÑO,
+        V.COLOR,
+        V.ALDIA,
+        V.TITULOPROPIEDAD        
+    FROM 
+        VEHICULO V
+    INNER JOIN 
+        VEHICULOPORCLIENTE VC
+    ON 
+        V.PLACAVEHICULOID = VC.PLACAVEHICULO
+    WHERE  
+        V.PLACAVEHICULOID = p_Placa;
+END;
+/
+
+
+
+
+
