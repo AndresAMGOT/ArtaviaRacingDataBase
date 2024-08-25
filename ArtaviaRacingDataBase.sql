@@ -1211,6 +1211,77 @@ BEGIN
 END USP_SeleccionarEstadoCita;
 /
 
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga Solorzano
+Id Requirement: AR-001 
+Creation Date: 24/08/2024   (MM/dd/YYYY)
+Requirement: Paquete encargado de trabajar con el CITAS
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PACKAGE pkg_Citas AS
+    -- Declaración de la función que obtendrá las citas
+    FUNCTION FP_ObtenerCitas RETURN SYS_REFCURSOR;
+END pkg_Citas;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_Citas AS
+
+    FUNCTION FP_ObtenerCitas RETURN SYS_REFCURSOR IS
+        cursor_citas SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_citas FOR
+            SELECT * FROM CITAS;
+        RETURN cursor_citas;
+    END FP_ObtenerCitas;
+
+END pkg_Citas;
+/
+
+--USP ACTUALIZACION
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_LISTAR_CITAS_ADMIN (
+    p_cursor OUT SYS_REFCURSOR
+)
+IS
+BEGIN
+    -- Utilizar la función ObtenerCitas del paquete
+    p_cursor := pkg_Citas.FP_ObtenerCitas;
+END USP_LISTAR_CITAS_ADMIN;
+/
+
+
+CREATE OR REPLACE PACKAGE pkg_Estados AS
+    -- Declaración de la función que obtendrá los estados filtrados por país
+    FUNCTION FP_ObtenerEstados(CodigoPais IN NUMBER) RETURN SYS_REFCURSOR;
+END pkg_Estados;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_Estados AS
+
+    FUNCTION FP_ObtenerEstados(CodigoPais IN NUMBER) RETURN SYS_REFCURSOR IS
+        cursor_estados SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_estados FOR
+            SELECT 
+                CODIGOESTADO,
+                NOMBRE
+            FROM Estado
+            WHERE CODIGOPAIS = CodigoPais;
+        RETURN cursor_estados;
+    END FP_ObtenerEstados;
+
+END pkg_Estados;
+/
+
+--Usp actualizados
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarEstados (
+    CodigoPais IN NUMBER,
+    RespuestaEstados OUT SYS_REFCURSOR
+) AS
+BEGIN
+    -- Utilizar la función ObtenerEstados del paquete
+    RespuestaEstados := pkg_Estados.FP_ObtenerEstados(CodigoPais);
+END USP_SeleccionarEstados;
+/
 
 /****************************************************************************************************************************************************************
 ***                                 PROCEDIMIENTOS ALMACENADOS A PARTIR DE AQUI             --ENCABESADOS                                                        ***
