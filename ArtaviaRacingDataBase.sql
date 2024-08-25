@@ -1236,16 +1236,37 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE  USP_SeleccionarPaises (
+--Paquete
+CREATE OR REPLACE PACKAGE pkg_Pais AS
+    -- Declaración de la función que obtendrá los países
+    FUNCTION ObtenerPaises RETURN SYS_REFCURSOR;
+END pkg_Pais;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_Pais AS
+    
+    FUNCTION ObtenerPaises RETURN SYS_REFCURSOR IS
+        cursor_paises SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_paises FOR
+            SELECT 
+                CODIGOPAIS,
+                NOMBRE
+            FROM vw_ObtenerPais;
+        RETURN cursor_paises;
+    END ObtenerPaises;
+
+END pkg_Pais;
+/
+
+--USP
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarPaises (
     RespuestaPaises OUT SYS_REFCURSOR
 ) AS
 BEGIN
-  OPEN RespuestaPaises FOR
-    SELECT 
-         CODIGOPAIS
-        ,NOMBRE
-    FROM vw_ObtenerPais;   
-END;
+    -- Utilizar la función ObtenerPaises del paquete
+    RespuestaPaises := pkg_Pais.ObtenerPaises;
+END USP_SeleccionarPaises;
 /
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
@@ -1282,17 +1303,38 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE  USP_SeleccionarCondado (
-     CodigoEstado     IN  NUMBER
-    ,RespuestaCondado OUT SYS_REFCURSOR
+--Paquete
+CREATE OR REPLACE PACKAGE pkg_Condado AS
+    -- Declaración de la función que obtendrá los condados por estado
+    FUNCTION ObtenerCondadoPorEstado(CodigoEstado IN NUMBER) RETURN SYS_REFCURSOR;
+END pkg_Condado;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_Condado AS
+
+    FUNCTION ObtenerCondadoPorEstado(CodigoEstado IN NUMBER) RETURN SYS_REFCURSOR IS
+        cursor_condados SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_condados FOR
+            SELECT 
+                CODIGOCONDADO,
+                NOMBRE
+            FROM vw_ObtenerCondado
+            WHERE CODIGOESTADO = CodigoEstado;
+        RETURN cursor_condados;
+    END ObtenerCondadoPorEstado;
+
+END pkg_Condado;
+/
+
+--USP
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarCondado (
+     CodigoEstado     IN  NUMBER,
+     RespuestaCondado OUT SYS_REFCURSOR
 ) AS
 BEGIN
-  OPEN RespuestaCondado FOR
-    SELECT 
-         CODIGOCONDADO
-        ,NOMBRE
-    FROM vw_ObtenerCondado
-    WHERE CODIGOESTADO = CodigoEstado;
+    -- Utilizar la función ObtenerCondadoPorEstado del paquete
+    RespuestaCondado := pkg_Condado.ObtenerCondadoPorEstado(CodigoEstado);
 END USP_SeleccionarCondado;
 /
 
@@ -1307,20 +1349,40 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE  USP_SeleccionarDistritos (
-     CodigoCondado     IN  NUMBER
-    ,RespuestaDistritos OUT SYS_REFCURSOR
+--Paquete
+CREATE OR REPLACE PACKAGE pkg_Distrito AS
+    -- Declaración de la función que obtendrá los distritos por condado
+    FUNCTION ObtenerDistritosPorCondado(CodigoCondado IN NUMBER) RETURN SYS_REFCURSOR;
+END pkg_Distrito;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_Distrito AS
+
+    FUNCTION ObtenerDistritosPorCondado(CodigoCondado IN NUMBER) RETURN SYS_REFCURSOR IS
+        cursor_distritos SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_distritos FOR
+            SELECT 
+                CODIGODISTRITO,
+                NOMBRE
+            FROM vw_ObtenerDistritos
+            WHERE CODIGOCONDADO = CodigoCondado;
+        RETURN cursor_distritos;
+    END ObtenerDistritosPorCondado;
+
+END pkg_Distrito;
+/
+
+CREATE OR REPLACE PROCEDURE USP_SeleccionarDistritos (
+     CodigoCondado     IN  NUMBER,
+     RespuestaDistritos OUT SYS_REFCURSOR
 ) AS
 BEGIN
-  OPEN RespuestaDistritos FOR
-    SELECT 
-         CODIGODISTRITO
-        ,NOMBRE
-    FROM vw_ObtenerDistritos
-    WHERE CODIGOCONDADO = CodigoCondado;
+    -- Utilizar la función ObtenerDistritosPorCondado del paquete
+    RespuestaDistritos := pkg_Distrito.ObtenerDistritosPorCondado(CodigoCondado);
 END USP_SeleccionarDistritos;
 /
- 
+
  /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -1358,18 +1420,7 @@ CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_RegistrarCliente (
 BEGIN
     -- Inicia una transacción
     BEGIN
-        -- Inserta en CLIENTE
-        INSERT INTO CLIENTE (
-            CREDENCIALID,
-            ROLID,
-            NOMBRE,
-            PRIMERAPELLIDO,
-            SEGUNDOAPELLIDO,
-            FECHANACIMIENTO,
-            EDITADOPOR,
-            HABILITADO,
-            FECHACREACION
-        ) VALUES (
+        IF NOT FN_InsertarCliente(
             p_credencial_id,
             p_rol_id,
             p_nombre,
@@ -1379,19 +1430,11 @@ BEGIN
             p_editado_por,
             p_habilitado,
             p_fecha_creacion
-        );
+        ) THEN
+            RAISE_APPLICATION_ERROR(-20001, 'Error al insertar en CLIENTE');
+        END IF;
 
-        -- Inserta en TELEFONOPORUSUARIO
-        INSERT INTO TELEFONOPORUSUARIO (
-            NUMEROTELEFONO,
-            CREDENCIALID,
-            CATEGORIATELEFONOID,
-            NUMEROEXTENSION,
-            DESCRIPCION,
-            EDITADOPOR,
-            HABILITADO,
-            FECHACREACION
-        ) VALUES (
+        IF NOT FN_InsertarTelefono(
             p_numero_telefono,
             p_credencial_id,
             p_categoria_telefono_id,
@@ -1400,20 +1443,11 @@ BEGIN
             p_editado_por,
             p_habilitado,
             p_fecha_creacion
-        );
+        ) THEN
+            RAISE_APPLICATION_ERROR(-20002, 'Error al insertar en TELEFONOPORUSUARIO');
+        END IF;
 
-        -- Inserta en DIRECCIONPORUSUARIO
-        INSERT INTO DIRECCIONPORUSUARIO (
-            CREDENCIALID,
-            CODIGOPAIS,
-            CODIGOESTADO,
-            CODIGOCONDADO,
-            CODIGODISTRITO,
-            DESCRIPCION,
-            EDITADOPOR,
-            HABILITADO,
-            FECHACREACION
-        ) VALUES (
+        IF NOT FN_InsertarDireccion(
             p_credencial_id,
             p_codigo_pais,
             p_codigo_estado,
@@ -1423,18 +1457,11 @@ BEGIN
             p_editado_por,
             p_habilitado,
             p_fecha_creacion
-        );
+        ) THEN
+            RAISE_APPLICATION_ERROR(-20003, 'Error al insertar en DIRECCIONPORUSUARIO');
+        END IF;
 
-        -- Inserta en CREDENCIALESPORUSUARIO
-        INSERT INTO CREDENCIALESPORUSUARIO (
-            CREDENCIALID,
-            CORREOELECTRONICO,
-            CONTRASEÑA,
-            ESCONTRASEÑATEMPORAL,
-            EDITADOPOR,
-            HABILITADO,
-            FECHACREACION
-        ) VALUES (
+        IF NOT FN_InsertarCredenciales(
             p_credencial_id,
             p_correo_electronico,
             p_contrasena,
@@ -1442,7 +1469,9 @@ BEGIN
             p_editado_por,
             p_habilitado,
             p_fecha_creacion
-        );
+        ) THEN
+            RAISE_APPLICATION_ERROR(-20004, 'Error al insertar en CREDENCIALESPORUSUARIO');
+        END IF;
 
         -- Confirma la transacción si todos los inserts son exitosos
         COMMIT;
@@ -1450,11 +1479,163 @@ BEGIN
         -- Captura cualquier error y realiza rollback
         WHEN OTHERS THEN
             ROLLBACK;
-            -- Muestra un mensaje genérico
-            DBMS_OUTPUT.PUT_LINE('Se ha producido un error al intentar registrar los datos.');
+            -- Re-lanza el error capturado
             RAISE;
     END;
 END USP_RegistrarCliente;
+/
+
+--222333
+
+CREATE OR REPLACE FUNCTION FN_InsertarCliente (
+    p_credencial_id       VARCHAR2,
+    p_rol_id              NUMBER,
+    p_nombre              VARCHAR2,
+    p_primer_apellido     VARCHAR2,
+    p_segundo_apellido    VARCHAR2,
+    p_fecha_nacimiento    DATE,
+    p_editado_por         VARCHAR2,
+    p_habilitado          NUMBER,
+    p_fecha_creacion      DATE
+) RETURN BOOLEAN IS
+BEGIN
+    INSERT INTO CLIENTE (
+        CREDENCIALID,
+        ROLID,
+        NOMBRE,
+        PRIMERAPELLIDO,
+        SEGUNDOAPELLIDO,
+        FECHANACIMIENTO,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        p_credencial_id,
+        p_rol_id,
+        p_nombre,
+        p_primer_apellido,
+        p_segundo_apellido,
+        p_fecha_nacimiento,
+        p_editado_por,
+        p_habilitado,
+        p_fecha_creacion
+    );
+    RETURN TRUE;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN FALSE;
+END FN_InsertarCliente;
+/
+
+CREATE OR REPLACE FUNCTION FN_InsertarTelefono (
+    p_numero_telefono      VARCHAR2,
+    p_credencial_id        VARCHAR2,
+    p_categoria_telefono_id NUMBER,
+    p_numero_extension     NUMBER,
+    p_descripcion          VARCHAR2,
+    p_editado_por          VARCHAR2,
+    p_habilitado           NUMBER,
+    p_fecha_creacion       DATE
+) RETURN BOOLEAN IS
+BEGIN
+    INSERT INTO TELEFONOPORUSUARIO (
+        NUMEROTELEFONO,
+        CREDENCIALID,
+        CATEGORIATELEFONOID,
+        NUMEROEXTENSION,
+        DESCRIPCION,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        p_numero_telefono,
+        p_credencial_id,
+        p_categoria_telefono_id,
+        p_numero_extension,
+        p_descripcion,
+        p_editado_por,
+        p_habilitado,
+        p_fecha_creacion
+    );
+    RETURN TRUE;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN FALSE;
+END FN_InsertarTelefono;
+/
+
+CREATE OR REPLACE FUNCTION FN_InsertarDireccion (
+    p_credencial_id       VARCHAR2,
+    p_codigo_pais         NUMBER,
+    p_codigo_estado       NUMBER,
+    p_codigo_condado      NUMBER,
+    p_codigo_distrito     NUMBER,
+    p_descripcion_direccion VARCHAR2,
+    p_editado_por         VARCHAR2,
+    p_habilitado          NUMBER,
+    p_fecha_creacion      DATE
+) RETURN BOOLEAN IS
+BEGIN
+    INSERT INTO DIRECCIONPORUSUARIO (
+        CREDENCIALID,
+        CODIGOPAIS,
+        CODIGOESTADO,
+        CODIGOCONDADO,
+        CODIGODISTRITO,
+        DESCRIPCION,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        p_credencial_id,
+        p_codigo_pais,
+        p_codigo_estado,
+        p_codigo_condado,
+        p_codigo_distrito,
+        p_descripcion_direccion,
+        p_editado_por,
+        p_habilitado,
+        p_fecha_creacion
+    );
+    RETURN TRUE;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN FALSE;
+END FN_InsertarDireccion;
+/
+
+CREATE OR REPLACE FUNCTION FN_InsertarCredenciales (
+    p_credencial_id       VARCHAR2,
+    p_correo_electronico  VARCHAR2,
+    p_contrasena          VARCHAR2,
+    p_es_contrasena_temporal NUMBER,
+    p_editado_por         VARCHAR2,
+    p_habilitado          NUMBER,
+    p_fecha_creacion      DATE
+) RETURN BOOLEAN IS
+BEGIN
+    INSERT INTO CREDENCIALESPORUSUARIO (
+        CREDENCIALID,
+        CORREOELECTRONICO,
+        CONTRASEÑA,
+        ESCONTRASEÑATEMPORAL,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        p_credencial_id,
+        p_correo_electronico,
+        p_contrasena,
+        p_es_contrasena_temporal,
+        p_editado_por,
+        p_habilitado,
+        p_fecha_creacion
+    );
+    RETURN TRUE;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN FALSE;
+END FN_InsertarCredenciales;
 /
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
@@ -1724,19 +1905,42 @@ CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_CANCELAR_CITA (
     p_editadoPor VARCHAR2
 )
 AS
+    v_cancelado BOOLEAN;
+BEGIN
+    v_cancelado := FN_CancelarCita(p_citaId, p_editadoPor);
+
+    IF v_cancelado THEN
+        DBMS_OUTPUT.PUT_LINE('Cita cancelada correctamente.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('No se encontró la cita o ya estaba cancelada.');
+    END IF;
+END;
+/
+
+--222333
+
+CREATE OR REPLACE FUNCTION FN_CancelarCita (
+    p_citaId NUMBER,
+    p_editadoPor VARCHAR2
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
 BEGIN
     UPDATE CITAS
     SET HABILITADO = 0,
         EDITADOPOR = p_editadoPor,
         HORAFINALIZACION = TO_CHAR(SYSDATE, 'HH24:MI')
-    WHERE CITAID = p_citaId AND HABILITADO != 0; --Solo actualiza si la cita no está cancelada.
+    WHERE CITAID = p_citaId AND HABILITADO != 0; -- Solo actualiza si la cita no está cancelada.
 
-    IF SQL%ROWCOUNT = 0 THEN
-        DBMS_OUTPUT.PUT_LINE('No se encontró la cita o ya estaba cancelada.');
+    -- Si se actualizó algún registro, cambiamos el valor a TRUE
+    IF SQL%ROWCOUNT > 0 THEN
+        v_result := TRUE;
     ELSE
-        DBMS_OUTPUT.PUT_LINE('Cita cancelada correctamente.');
+        v_result := FALSE;
     END IF;
-END;
+
+    RETURN v_result;
+END FN_CancelarCita;
 /
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga Solorzano
@@ -1762,20 +1966,75 @@ CREATE OR REPLACE PROCEDURE USP_ACTUALIZAR_CITA (
     p_EDITADOPOR IN VARCHAR2,
     p_HABILITADO IN NUMBER
 ) AS
+    v_actualizado BOOLEAN;
 BEGIN
-    UPDATE CITAS
-    SET CREDENCIALID = p_CREDENCIALID,
-        PLACAVEHICULOID = p_PLACAVEHICULOID,
-        VIN = p_VIN,
-        SERVICIOID = p_SERVICIOID,
-        ESTADOCITAID = p_ESTADOCITAID,
-        FECHAAGENDADA = p_FECHAAGENDADA,
-        HORAAGENDADA = p_HORAAGENDADA,
-        EDITADOPOR = p_EDITADOPOR,
-        HABILITADO = p_HABILITADO,
-        FECHACREACION = SYSDATE
-    WHERE CITAID = p_CITAID;
+    v_actualizado := FN_ActualizarCita(
+        p_CITAID,
+        p_CREDENCIALID,
+        p_PLACAVEHICULOID,
+        p_VIN,
+        p_SERVICIOID,
+        p_ESTADOCITAID,
+        p_FECHAAGENDADA,
+        p_HORAAGENDADA,
+        p_EDITADOPOR,
+        p_HABILITADO
+    );
+
+    IF v_actualizado THEN
+        DBMS_OUTPUT.PUT_LINE('La cita fue actualizada exitosamente.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Ocurrió un error al actualizar la cita o no se encontró la cita.');
+    END IF;
 END USP_ACTUALIZAR_CITA;
+/
+
+--222333
+
+CREATE OR REPLACE FUNCTION FN_ActualizarCita (
+    p_CITAID IN NUMBER,
+    p_CREDENCIALID IN VARCHAR2,
+    p_PLACAVEHICULOID IN VARCHAR2,
+    p_VIN IN VARCHAR2,
+    p_SERVICIOID IN NUMBER,
+    p_ESTADOCITAID IN NUMBER,
+    p_FECHAAGENDADA IN DATE,
+    p_HORAAGENDADA IN VARCHAR2,
+    p_EDITADOPOR IN VARCHAR2,
+    p_HABILITADO IN NUMBER
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        UPDATE CITAS
+        SET CREDENCIALID = p_CREDENCIALID,
+            PLACAVEHICULOID = p_PLACAVEHICULOID,
+            VIN = p_VIN,
+            SERVICIOID = p_SERVICIOID,
+            ESTADOCITAID = p_ESTADOCITAID,
+            FECHAAGENDADA = p_FECHAAGENDADA,
+            HORAAGENDADA = p_HORAAGENDADA,
+            EDITADOPOR = p_EDITADOPOR,
+            HABILITADO = p_HABILITADO,
+            FECHACREACION = SYSDATE
+        WHERE CITAID = p_CITAID;
+
+        -- Si la actualización fue exitosa, se cambia el valor a TRUE
+        IF SQL%ROWCOUNT > 0 THEN
+            v_result := TRUE;
+        ELSE
+            v_result := FALSE;
+        END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre un error durante la actualización, se mantiene el valor FALSE
+            v_result := FALSE;
+    END;
+
+    RETURN v_result;
+END FN_ActualizarCita;
 /
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga Solorzano
@@ -1802,41 +2061,85 @@ CREATE OR REPLACE PROCEDURE USP_AGREGAR_CITA (
     p_EDITADOPOR IN VARCHAR2,
     p_HABILITADO IN NUMBER
 ) AS
+    v_agregado BOOLEAN;
 BEGIN
-    INSERT INTO CITAS (CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, DESCRIPCION, HORAAGENDADA, EDITADOPOR, HABILITADO, FECHACREACION)
-    VALUES (p_CREDENCIALID, p_PLACAVEHICULOID, p_VIN, p_SERVICIOID, p_ESTADOCITAID, p_FECHAAGENDADA, p_DESCRIPCION, p_HORAAGENDADA, p_EDITADOPOR, p_HABILITADO, SYSDATE);
+    v_agregado := FN_AgregarCita(
+        p_CREDENCIALID,
+        p_PLACAVEHICULOID,
+        p_VIN,
+        p_SERVICIOID,
+        p_ESTADOCITAID,
+        p_FECHAAGENDADA,
+        p_DESCRIPCION,
+        p_HORAAGENDADA,
+        p_EDITADOPOR,
+        p_HABILITADO
+    );
+
+    IF v_agregado THEN
+        DBMS_OUTPUT.PUT_LINE('La cita fue agregada exitosamente.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Ocurrió un error al agregar la cita.');
+    END IF;
 END USP_AGREGAR_CITA;
 /
- /****************************************************************************************************************************************************************
-Autor: Luis Solorzano Campos
-Id Requirement: AR-001 
-Creation Date: [22/07/2024]   (MM/dd/YYYY)
-Requirement: Procedimiento encargado de enviar una confirmación de cancelación de cita al cliente.
-****************************************************************************************************************************************************************/
 
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_CONFIRMACION_CANCELACION_CITA (
-    p_cita_id       IN NUMBER,    -- ID de la cita cancelada
-    p_credencial_id IN VARCHAR2   -- ID de la credencial del cliente
-) AS
-    p_correo_electronico VARCHAR2(100);
+--222333
+
+CREATE OR REPLACE FUNCTION FN_AgregarCita (
+    p_CREDENCIALID IN VARCHAR2,
+    p_PLACAVEHICULOID IN VARCHAR2,
+    p_VIN IN VARCHAR2,
+    p_SERVICIOID IN NUMBER,
+    p_ESTADOCITAID IN NUMBER,
+    p_FECHAAGENDADA IN DATE,
+    p_DESCRIPCION IN VARCHAR2,
+    p_HORAAGENDADA IN VARCHAR2,
+    p_EDITADOPOR IN VARCHAR2,
+    p_HABILITADO IN NUMBER
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
 BEGIN
-    -- Obtiene el correo electrónico del cliente
-    SELECT CORREOELECTRONICO
-    INTO p_correo_electronico
-    FROM ARTAVIARACING.CREDENCIALESPORUSUARIO
-    WHERE CREDENCIALID = p_credencial_id;
-
-    -- Enviar correo electrónico de confirmación
     BEGIN
-        SEND_EMAIL(p_correo_electronico, 
-                   'Confirmación de Cancelación de Cita', 
-                   'Su cita con ID ' || p_cita_id || ' ha sido cancelada exitosamente.');
-       
-        -- Confirma la transacción si el envío es exitoso
-        COMMIT;
+        INSERT INTO CITAS (
+            CREDENCIALID,
+            PLACAVEHICULOID,
+            VIN,
+            SERVICIOID,
+            ESTADOCITAID,
+            FECHAAGENDADA,
+            DESCRIPCION,
+            HORAAGENDADA,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION
+        ) VALUES (
+            p_CREDENCIALID,
+            p_PLACAVEHICULOID,
+            p_VIN,
+            p_SERVICIOID,
+            p_ESTADOCITAID,
+            p_FECHAAGENDADA,
+            p_DESCRIPCION,
+            p_HORAAGENDADA,
+            p_EDITADOPOR,
+            p_HABILITADO,
+            SYSDATE
+        );
+
+        -- Si la inserción fue exitosa, se cambia el valor a TRUE
+        v_result := TRUE;
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre un error durante la inserción, se mantiene el valor FALSE
+            v_result := FALSE;
     END;
-END USP_EnviarConfirmacionCancelacion;
+
+    RETURN v_result;
+END FN_AgregarCita;
 /
+
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -1849,34 +2152,38 @@ Updated By                                  (MM/dd/YYYY)                        
 
 ****************************************************************************************************************************************************************/
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_VerificarExistenciaUsuario (
-    p_credencialId       IN VARCHAR2,    
-    p_credencial_id      OUT VARCHAR2 -- CREDENCIALID del usuario si existe
-    
+    p_credencialId IN VARCHAR2,    
+    p_credencial_id OUT VARCHAR2
 ) AS
 BEGIN
-    -- Inicializa los parámetros de salida
-    p_credencial_id := NULL;    
-    
-    -- Verifica si el usuario existe con el correo electrónico y la contraseña proporcionados
-    BEGIN
-        SELECT 
-              c.CREDENCIALID
-        INTO p_credencial_id
-        FROM CLIENTE c            
-        WHERE   c.CREDENCIALID = p_credencialId;
-        
-        -- Si no se encuentra ningún registro, p_credencial_id y p_rol_id serán NULL
-    EXCEPTION
-        -- Captura cualquier error y muestra un mensaje
-        WHEN NO_DATA_FOUND THEN
-            -- Si no se encuentra ningún dato, p_credencial_id y p_rol_id permanecen NULL
-            p_credencial_id := NULL;            
-        WHEN OTHERS THEN
-            -- Muestra el mensaje de error y asigna NULL
-            DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
-            p_credencial_id := NULL;            
-    END;
+    -- Llama a la función y asigna el resultado al parámetro de salida
+    p_credencial_id := FN_VerificarExistenciaUsuario(p_credencialId);
 END USP_VerificarExistenciaUsuario;
+/
+
+--222333
+
+CREATE OR REPLACE FUNCTION FN_VerificarExistenciaUsuario (
+    p_credencialId IN VARCHAR2
+) RETURN VARCHAR2
+IS
+    v_credencialId VARCHAR2(100); -- Ajusta el tamaño según el esquema de tu base de datos
+BEGIN
+    SELECT c.CREDENCIALID INTO v_credencialId
+    FROM CLIENTE c
+    WHERE c.CREDENCIALID = p_credencialId;
+
+    RETURN v_credencialId; -- Devuelve el CREDENCIALID si se encuentra
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        -- Si no se encuentra ningún dato, devuelve NULL
+        RETURN NULL;
+    WHEN OTHERS THEN
+        -- Muestra el mensaje de error y devuelve NULL
+        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+        RETURN NULL;
+END FN_VerificarExistenciaUsuario;
 /
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
@@ -1943,6 +2250,8 @@ INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE
 INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
 (7, 2, 3, 'Citas', '/citas', 2, 'fa fa-calendar-alt', 'Todas las citas', '000000001', 1, SYSDATE);
 
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(10, 2, NULL, 'Repuestos', '/UsuarioInventario', 1, 'fa fa-cogs', 'Gestión de Repuestos', '000000001', 1, SYSDATE);
 
 -- Supongamos que el rol con ID 1 es 'Administrador'
 INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
@@ -1980,8 +2289,10 @@ INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO,
 
 INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
 (2, 11, '000000001', 1, SYSDATE);
+
 INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
 (2, 9, '000000001', 1, SYSDATE);
+
 INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
 (2, 10, '000000001', 1, SYSDATE);
 
@@ -2117,7 +2428,7 @@ Updated By                                  (MM/dd/YYYY)                        
 
 ****************************************************************************************************************************************************************/
 
-CREATE OR REPLACE PROCEDURE USP_InsertarProducto (    
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_InsertarProducto (    
     p_categoriaProductoId IN NUMBER,
     p_nombre             IN VARCHAR2,
     p_descripcion        IN VARCHAR2,
@@ -2129,18 +2440,10 @@ CREATE OR REPLACE PROCEDURE USP_InsertarProducto (
     p_imagen             IN BLOB
 )
 AS
+    v_insertado BOOLEAN;
 BEGIN
-    INSERT INTO ARTAVIARACING.PRODUCTO (        
-        CATEGORIAPRODUCTOID,
-        NOMBRE,
-        DESCRIPCION,
-        PRECIOUNITARIO,
-        CANTIDAD,
-        EDITADOPOR,
-        HABILITADO,
-        FECHACREACION,
-        IMAGEN
-    ) VALUES (        
+    -- Llamada a la función
+    v_insertado := FN_InsertarProducto(
         p_categoriaProductoId,
         p_nombre,
         p_descripcion,
@@ -2151,15 +2454,72 @@ BEGIN
         p_fechaCreacion,
         p_imagen
     );
+
+    -- Puedes usar el valor de v_insertado para realizar más acciones o manejar la lógica
+    IF v_insertado THEN
+        DBMS_OUTPUT.PUT_LINE('El producto se insertó correctamente.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Ocurrió un error al insertar el producto.');
+    END IF;
 END USP_InsertarProducto;
 /
 
+---222333
+
+CREATE OR REPLACE FUNCTION FN_InsertarProducto (
+    p_categoriaProductoId IN NUMBER,
+    p_nombre             IN VARCHAR2,
+    p_descripcion        IN VARCHAR2,
+    p_precioUnitario     IN NUMBER,
+    p_cantidad           IN NUMBER,
+    p_editadoPor         IN VARCHAR2,
+    p_habilitado         IN NUMBER,
+    p_fechaCreacion      IN DATE,
+    p_imagen             IN BLOB
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        INSERT INTO ARTAVIARACING.PRODUCTO (        
+            CATEGORIAPRODUCTOID,
+            NOMBRE,
+            DESCRIPCION,
+            PRECIOUNITARIO,
+            CANTIDAD,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION,
+            IMAGEN
+        ) VALUES (        
+            p_categoriaProductoId,
+            p_nombre,
+            p_descripcion,
+            p_precioUnitario,
+            p_cantidad,
+            p_editadoPor,
+            p_habilitado,
+            p_fechaCreacion,
+            p_imagen
+        );
+        
+        -- Si no hubo error, se cambia el valor a TRUE
+        v_result := TRUE;
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Aquí se maneja cualquier error que ocurra
+            v_result := FALSE;
+    END;
+    
+    RETURN v_result;
+END FN_InsertarProducto;
+/
 
  /****************************************************************************************************************************************************************
 Autor: Andrés Alvarado Matamoros
 Id Requirement: AR-002
 Creation Date: 10/08/2024   (MM/dd/YYYY)
-Requirement: Procedimiento Almacenado para actualizar un producto existente en la tabla PRODUCTO.
+Requirement: Procedimiento Almacenado que consume una función para actualizar un producto existente en la tabla PRODUCTO.
 ****************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************
 Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
@@ -2180,22 +2540,89 @@ CREATE OR REPLACE PROCEDURE USP_ActualizarProducto (
     p_imagen             IN BLOB
 )
 AS
+    v_actualizado BOOLEAN;
 BEGIN
-    UPDATE ARTAVIARACING.PRODUCTO
-    SET
-        CATEGORIAPRODUCTOID = p_categoriaProductoId,
-        NOMBRE = p_nombre,
-        DESCRIPCION = p_descripcion,
-        PRECIOUNITARIO = p_precioUnitario,
-        CANTIDAD = p_cantidad,
-        EDITADOPOR = p_editadoPor,
-        HABILITADO = p_habilitado,
-        FECHACREACION = p_fechaCreacion,
-        IMAGEN = p_imagen
-    WHERE PRODUCTOID = p_productoId;
+    -- Llamada a la función
+    v_actualizado := FN_ActualizarProducto(
+        p_productoId,
+        p_categoriaProductoId,
+        p_nombre,
+        p_descripcion,
+        p_precioUnitario,
+        p_cantidad,
+        p_editadoPor,
+        p_habilitado,
+        p_fechaCreacion,
+        p_imagen
+    );
+
+    -- Puedes usar el valor de v_actualizado para realizar más acciones o manejar la lógica
+    IF v_actualizado THEN
+        DBMS_OUTPUT.PUT_LINE('El producto se actualizó correctamente.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Ocurrió un error al actualizar el producto o no se encontró el producto.');
+    END IF;
 END USP_ActualizarProducto;
 /
---select * from ARTAVIARACING.PRODUCTO
+
+ /****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para actualizar un producto existente en la tabla PRODUCTO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE FUNCTION FN_ActualizarProducto (
+    p_productoId         IN NUMBER,
+    p_categoriaProductoId IN NUMBER,
+    p_nombre             IN VARCHAR2,
+    p_descripcion        IN VARCHAR2,
+    p_precioUnitario     IN NUMBER,
+    p_cantidad           IN NUMBER,
+    p_editadoPor         IN VARCHAR2,
+    p_habilitado         IN NUMBER,
+    p_fechaCreacion      IN DATE,
+    p_imagen             IN BLOB
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        UPDATE ARTAVIARACING.PRODUCTO
+        SET
+            CATEGORIAPRODUCTOID = p_categoriaProductoId,
+            NOMBRE = p_nombre,
+            DESCRIPCION = p_descripcion,
+            PRECIOUNITARIO = p_precioUnitario,
+            CANTIDAD = p_cantidad,
+            EDITADOPOR = p_editadoPor,
+            HABILITADO = p_habilitado,
+            FECHACREACION = p_fechaCreacion,
+            IMAGEN = p_imagen
+        WHERE PRODUCTOID = p_productoId;
+
+        -- Verificamos si se actualizó algún registro
+        IF SQL%ROWCOUNT > 0 THEN
+            v_result := TRUE;
+        ELSE
+            v_result := FALSE;
+        END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre algún error, retornamos FALSE
+            v_result := FALSE;
+    END;
+
+    RETURN v_result;
+END FN_ActualizarProducto;
+/
+
 /****************************************************************************************************************************************************************
 Autor: Andrés Alvarado Matamoros
 Id Requirement: AR-003
@@ -2214,7 +2641,20 @@ CREATE OR REPLACE PROCEDURE USP_ObtenerProducto (
 )
 AS
 BEGIN
-    OPEN p_cursor FOR
+    -- Llamada a la función y paso del cursor
+    p_cursor := FN_ObtenerProducto(p_productoId);
+END USP_ObtenerProducto;
+/
+
+---222333
+
+CREATE OR REPLACE FUNCTION FN_ObtenerProducto (
+    p_productoId IN NUMBER
+) RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
     SELECT
         PRODUCTOID,
         CATEGORIAPRODUCTOID,
@@ -2228,7 +2668,9 @@ BEGIN
         IMAGEN
     FROM ARTAVIARACING.PRODUCTO
     WHERE PRODUCTOID = p_productoId;
-END USP_ObtenerProducto;
+
+    RETURN v_cursor;
+END FN_ObtenerProducto;
 /
 
 /****************************************************************************************************************************************************************
@@ -2268,7 +2710,7 @@ END USP_ObtenerTodosProductos;
 Autor: Andrés Alvarado Matamoros
 Id Requirement: AR-005
 Creation Date: 10/08/2024   (MM/dd/YYYY)
-Requirement: Procedimiento Almacenado para eliminar un producto específico desde la tabla PRODUCTO.
+Requirement: Procedimiento Almacenado que consume una función  para eliminar un producto específico desde la tabla PRODUCTO.
 ****************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************
 Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
@@ -2277,13 +2719,59 @@ Updated By                                  (MM/dd/YYYY)                        
 ****************************************************************************************************************************************************************/
 
 CREATE OR REPLACE PROCEDURE USP_EliminarProducto (
-    p_productoId         IN NUMBER
+    p_productoId IN NUMBER
 )
 AS
+    v_eliminado BOOLEAN;
 BEGIN
-    DELETE FROM ARTAVIARACING.PRODUCTO
-    WHERE PRODUCTOID = p_productoId;
+    -- Llamada a la función
+    v_eliminado := FN_EliminarProducto(p_productoId);
+
+    -- Puedes usar el valor de v_eliminado para realizar más acciones o manejar la lógica
+    IF v_eliminado THEN
+        DBMS_OUTPUT.PUT_LINE('El producto se eliminó correctamente.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Ocurrió un error al eliminar el producto o no se encontró el producto.');
+    END IF;
 END USP_EliminarProducto;
+
+ /****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para eliminar un producto existente en la tabla PRODUCTO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE FUNCTION FN_EliminarProducto (
+    p_productoId IN NUMBER
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        DELETE FROM ARTAVIARACING.PRODUCTO
+        WHERE PRODUCTOID = p_productoId;
+
+        -- Verificamos si se eliminó algún registro
+        IF SQL%ROWCOUNT > 0 THEN
+            v_result := TRUE;
+        ELSE
+            v_result := FALSE;
+        END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre algún error, retornamos FALSE
+            v_result := FALSE;
+    END;
+
+    RETURN v_result;
+END FN_EliminarProducto;
 /
 
 INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
@@ -2347,24 +2835,34 @@ CREATE OR REPLACE PROCEDURE SP_Obtener_Productos_HTML(
     OUT_HTML OUT CLOB
 ) AS 
 BEGIN
-    -- Inicializar OUT_HTML
-    OUT_HTML := '<div class="container">';
-    OUT_HTML := OUT_HTML || '<div class="btn-group" role="group" aria-label="Categor as">';
+    -- Llama a la función y asigna el resultado al parámetro de salida
+    OUT_HTML := FN_GenerarHTMLProductos();
+END SP_Obtener_Productos_HTML;
+/
 
-    -- Bot n para mostrar todos los productos
-    OUT_HTML := OUT_HTML || '<button type="button" class="btn btn-primary filter-button" data-category="all">Todo</button>';
+--222333
 
-    -- Botones para cada categor a
+CREATE OR REPLACE FUNCTION FN_GenerarHTMLProductos RETURN CLOB IS
+    v_html CLOB;
+BEGIN
+    -- Inicializar HTML
+    v_html := '<div class="container">';
+    v_html := v_html || '<div class="btn-group" role="group" aria-label="Categor as">';
+
+    -- Botón para mostrar todos los productos
+    v_html := v_html || '<button type="button" class="btn btn-primary filter-button" data-category="all">Todo</button>';
+
+    -- Botones para cada categoría
     FOR CATEGORIA IN (
         SELECT CATEGORIAPRODUCTOID, NOMBRE 
         FROM CATEGORIAPRODUCTO 
         WHERE HABILITADO = 1
     ) LOOP
-        OUT_HTML := OUT_HTML || '<button type="button" class="btn btn-primary filter-button" data-category="' || CATEGORIA.CATEGORIAPRODUCTOID || '">' || CATEGORIA.NOMBRE || '</button>';
+        v_html := v_html || '<button type="button" class="btn btn-primary filter-button" data-category="' || CATEGORIA.CATEGORIAPRODUCTOID || '">' || CATEGORIA.NOMBRE || '</button>';
     END LOOP;
 
-    OUT_HTML := OUT_HTML || '</div>';
-    OUT_HTML := OUT_HTML || '<div class="row" id="product-container">';
+    v_html := v_html || '</div>';
+    v_html := v_html || '<div class="row" id="product-container">';
 
     -- Productos activos
     FOR PRODUCTO IN (
@@ -2379,24 +2877,21 @@ BEGIN
         BEGIN
             img_placeholder := '[ImagenProducto' || PRODUCTO.PRODUCTOID || ']';
 
-            OUT_HTML := OUT_HTML || '<div class="col-md-4 product-card" data-category="' || PRODUCTO.CATEGORIAPRODUCTOID || '">';
-            OUT_HTML := OUT_HTML || '<div class="card">';
-
-            -- Colocar el placeholder en el formato "data:image/jpeg;base64,${data}"
-            OUT_HTML := OUT_HTML || '<img src="data:image/jpeg;base64,' || img_placeholder || '" class="card-img-top" alt="' || PRODUCTO.NOMBRE || '" width="50">';
-
-            OUT_HTML := OUT_HTML || '<div class="card-body">';
-            OUT_HTML := OUT_HTML || '<h5 class="card-title">' || PRODUCTO.NOMBRE || '</h5>';
-            OUT_HTML := OUT_HTML || '<p class="card-text">' || PRODUCTO.DESCRIPCION || '</p>';
-            OUT_HTML := OUT_HTML || '<p class="card-text">Cantidad: ' || PRODUCTO.CANTIDAD || '</p>';
-            OUT_HTML := OUT_HTML || '<p class="card-text">Precio: ' || TO_CHAR(PRODUCTO.PRECIOUNITARIO, 'FM999G999D00') || '</p>';
-            OUT_HTML := OUT_HTML || '</div></div></div>';
+            v_html := v_html || '<div class="col-md-4 product-card" data-category="' || PRODUCTO.CATEGORIAPRODUCTOID || '">';
+            v_html := v_html || '<div class="card">';
+            v_html := v_html || '<img src="data:image/jpeg;base64,' || img_placeholder || '" class="card-img-top" alt="' || PRODUCTO.NOMBRE || '" width="50">';
+            v_html := v_html || '<div class="card-body">';
+            v_html := v_html || '<h5 class="card-title">' || PRODUCTO.NOMBRE || '</h5>';
+            v_html := v_html || '<p class="card-text">' || PRODUCTO.DESCRIPCION || '</p>';
+            v_html := v_html || '<p class="card-text">Cantidad: ' || PRODUCTO.CANTIDAD || '</p>';
+            v_html := v_html || '<p class="card-text">Precio: ' || TO_CHAR(PRODUCTO.PRECIOUNITARIO, 'FM999G999D00') || ' Colones' || '</p>';
+            v_html := v_html || '</div></div></div>';
         END;
     END LOOP;
 
-    OUT_HTML := OUT_HTML || '</div></div>';
-     
-END SP_Obtener_Productos_HTML;
+    v_html := v_html || '</div></div>';
+    RETURN v_html;
+END FN_GenerarHTMLProductos;
 /
 
 /****************************************************************************************************************************************************************
@@ -2947,28 +3442,42 @@ Updated By                                  (MM/dd/YYYY)                        
 
 ****************************************************************************************************************************************************************/
 
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE  USP_Listar_Citas (
-     CedulaId          VARCHAR2
-    ,RespuestaCitas OUT SYS_REFCURSOR
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_Listar_Citas (
+     CedulaId VARCHAR2,
+     RespuestaCitas OUT SYS_REFCURSOR
 ) AS
 BEGIN
-  OPEN RespuestaCitas FOR
-SELECT 
-    C.PLACAVEHICULOID,
-    V.MARCA || ' ' || V.MODELO || ' ' || V.AÑO VEHICULO,
-    CS.NOMBRE  CATEGORIA,
-    S.NOMBRE SERVICIO,
-    C.FECHAAGENDADA,
-    C.HORAAGENDADA
-FROM CITAS C
-JOIN SERVICIO S
-    ON S.SERVICIOID = C.SERVICIOID
-JOIN CATEGORIASERVICIO CS
-    ON CS.CATEGORIASERVICIOID = S.CATEGORIASERVICIOID
-JOIN VEHICULO V
-    ON V.PLACAVEHICULOID = C.PLACAVEHICULOID
-WHERE C.CREDENCIALID = CedulaId;
+    RespuestaCitas := FN_ListarCitas(CedulaId);
 END USP_Listar_Citas;
+/
+
+--222333
+
+CREATE OR REPLACE FUNCTION FN_ListarCitas (
+    CedulaId VARCHAR2
+) RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+    SELECT 
+        C.PLACAVEHICULOID,
+        V.MARCA || ' ' || V.MODELO || ' ' || V.AÑO AS VEHICULO,
+        CS.NOMBRE AS CATEGORIA,
+        S.NOMBRE AS SERVICIO,
+        C.FECHAAGENDADA,
+        C.HORAAGENDADA
+    FROM CITAS C
+    JOIN SERVICIO S
+        ON S.SERVICIOID = C.SERVICIOID
+    JOIN CATEGORIASERVICIO CS
+        ON CS.CATEGORIASERVICIOID = S.CATEGORIASERVICIOID
+    JOIN VEHICULO V
+        ON V.PLACAVEHICULOID = C.PLACAVEHICULOID
+    WHERE C.CREDENCIALID = CedulaId;
+
+    RETURN v_cursor;
+END FN_ListarCitas;
 /
 
 INSERT INTO "CITAS" (CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, DESCRIPCION, HORAAGENDADA, HORAFINALIZACION, EDITADOPOR, HABILITADO, FECHACREACION)
@@ -4189,61 +4698,7 @@ END;
 /
 
 
-
-
-
-
-SELECT * FROM CITAS;
-
-
-SELECT * FROM CLIENTE WHERE CREDENCIALID = 'CR12345';
-SELECT * FROM VEHICULO WHERE PLACAVEHICULOID = 'AB123CD';
-SELECT * FROM SERVICIO WHERE SERVICIOID = 1;
-SELECT * FROM ESTADOCITA WHERE ESTADOCITAID = 1;
-
--- estos insert son de prueba, no hay que correrlos.
-
-INSERT INTO CLIENTE (CREDENCIALID, ROLID, NOMBRE, PRIMERAPELLIDO, SEGUNDOAPELLIDO, FECHANACIMIENTO, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES ('CR12345', 1, 'Juan', 'Pérez', 'López', TO_DATE('1990-05-15', 'YYYY-MM-DD'), 'admin1', 1, TO_DATE('2024-08-20', 'YYYY-MM-DD'));
-
-
-INSERT INTO VEHICULO (PLACAVEHICULOID, VIN, MARCA, MODELO, AÑO, COLOR, ALDIA, TITULOPROPIEDAD, HABILITADO, FECHACREACION)
-VALUES ('AB123CD', '1HGCM82633A123456', 'Toyota', 'Corolla', 2020, 'Azul', 1, UTL_RAW.CAST_TO_RAW('titulo de propiedad en texto'), 1, TO_DATE('2024-08-20', 'YYYY-MM-DD'));
-
-
-INSERT INTO SERVICIO (SERVICIOID, CATEGORIASERVICIOID, NOMBRE, DESCRIPCION, PRECIO, TIEMPOSERVICIO, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (1, 1, 'Cambio de Aceite', 'Cambio de aceite completo del motor', 500, 60, 'admin1', 1, TO_DATE('2024-08-20', 'YYYY-MM-DD'));
-
-
-
-INSERT INTO ESTADOCITA (ESTADOCITAID, ESTADO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (1, 'Pendiente', 'Cita pendiente de ser realizada', 'admin1', 1, TO_DATE('2024-08-20', 'YYYY-MM-DD'));
-
-
-INSERT INTO CITAS (CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, DESCRIPCION, HORAAGENDADA, HORAFINALIZACION, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES ('CR12345', 'AB123CD', '1HGCM82633A123456', 1, 1, TO_DATE('2024-08-25', 'YYYY-MM-DD'), 'Revisión general del vehículo', '09:00', '10:30', 'admin1', 1, TO_DATE('2024-08-20', 'YYYY-MM-DD'));
-
-
-INSERT INTO CITAS (CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, DESCRIPCION, HORAAGENDADA, HORAFINALIZACION, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES ('CR12345', 'AB123CD', '1HGCM82633A123456', 1, 1, TO_DATE('2024-08-25', 'YYYY-MM-DD'), 'Revisión general del vehículo', '09:00', '10:35', 'admin1', 1, TO_DATE('2024-08-20', 'YYYY-MM-DD'));
-
-
-
-
-
-
-
-
-
-
-
-INSERT INTO CATEGORIASERVICIO (CATEGORIASERVICIOID, NOMBRE, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (1, 'Mantenimiento', 'Servicios generales de mantenimiento', 'admin1', 1, TO_DATE('2024-08-20', 'YYYY-MM-DD'));
-
-
-
-
-CREATE OR REPLACE PROCEDURE USP_LISTAR_CITAS (
+CREATE OR REPLACE PROCEDURE USP_LISTAR_CITAS_ADMIN (
     p_cursor OUT SYS_REFCURSOR
 )
 IS
@@ -4282,55 +4737,6 @@ BEGIN
 END;
 /
 
-SELECT 
-    C.CREDENCIALID
-    ,C.PLACAVEHICULOID
-    ,V.VIN
-    ,S.NOMBRE AS SERVICIOVEHICULO
-    ,EC.ESTADO
-    ,C.FECHAAGENDADA 
-    ,C.DESCRIPCION
-    ,C.HORAAGENDADA    
-    FROM CITAS C
-    INNER JOIN VEHICULO v
-    ON C.PLACAVEHICULOID = V.PLACAVEHICULOID
-    INNER JOIN SERVICIO S
-    ON S.SERVICIOID = C.SERVICIOID
-    INNER JOIN ESTADOCITA EC
-    ON EC.ESTADOCITAID = C.ESTADOCITAID
-
-
-DECLARE
-    v_cursor SYS_REFCURSOR;
-    v_cita CITAS%ROWTYPE;
-BEGIN
-    USP_LISTAR_CITAS(v_cursor);
-    LOOP
-        FETCH v_cursor INTO v_cita;
-        EXIT WHEN v_cursor%NOTFOUND;
-        DBMS_OUTPUT.PUT_LINE('CITAID: ' || v_cita.CITAID || ', Descripción: ' || v_cita.DESCRIPCION);
-    END LOOP;
-    CLOSE v_cursor;
-END;
-/
-
-
-
-
-DECLARE
-    v_cursor SYS_REFCURSOR;
-    v_cita CITAS%ROWTYPE;
-BEGIN
-    USP_OBTENER_CITA_POR_ID(1, v_cursor); -- Reemplaza 1 con un ID válido
-    LOOP
-        FETCH v_cursor INTO v_cita;
-        EXIT WHEN v_cursor%NOTFOUND;
-        DBMS_OUTPUT.PUT_LINE('CITAID: ' || v_cita.CITAID || ', Descripción: ' || v_cita.DESCRIPCION);
-    END LOOP;
-    CLOSE v_cursor;
-END;
-/
-
 
 CREATE OR REPLACE PROCEDURE USP_INSERTAR_DIAGNOSTICO(
     p_IdCita IN NUMBER,
@@ -4360,6 +4766,9 @@ BEGIN
     COMMIT;
 END USP_INSERTAR_DIAGNOSTICO;
 /
+
+
+
 
 
 
