@@ -1,3 +1,9 @@
+
+/****************************************************************************************************************************************************************
+***                               CREACION DE TABLAS APARTIR DE AQUI              --ENCABESADOS                                                 ***
+****************************************************************************************************************************************************************/
+
+
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga
 Id Requirement: AR-001
@@ -540,7 +546,7 @@ Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena la informacion de los diagnosticos
 ****************************************************************************************************************************************************************/  
 CREATE TABLE DIAGNOSTICO (
-    DIAGNOSTICOID       NUMBER PRIMARY KEY NOT NULL,
+    DIAGNOSTICOID       NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY NOT NULL,
     CITAID              NUMBER NOT NULL,
     DESCRIPCION         VARCHAR2(250) NULL,
     CODTRABAJADOR       VARCHAR2(10) NOT NULL,
@@ -549,6 +555,22 @@ CREATE TABLE DIAGNOSTICO (
     FECHACREACION       DATE NOT NULL,
     FOREIGN KEY (CITAID) REFERENCES CITAS(CITAID)
 );
+/*
+SELECT CONSTRAINT_NAME, TABLE_NAME
+FROM USER_CONSTRAINTS
+WHERE R_CONSTRAINT_NAME IN (
+    SELECT CONSTRAINT_NAME
+    FROM USER_CONSTRAINTS
+    WHERE TABLE_NAME = 'DIAGNOSTICO' AND CONSTRAINT_TYPE = 'P'
+) AND CONSTRAINT_TYPE = 'R';
+
+ALTER TABLE SERVICIOSPORDIAGNOSTICO DROP CONSTRAINT SYS_C008046;
+
+ALTER TABLE PRODUCTOPORDIAGNOSTICO DROP CONSTRAINT SYS_C008065;
+
+DROP TABLE DIAGNOSTICO;
+*/
+
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: ServiciosPorDiagnostico
 Autor: Jason zuñiga solorzano
@@ -621,380 +643,13 @@ CREATE TABLE PRODUCTOPORDIAGNOSTICO (
     FOREIGN KEY (DIAGNOSTICOID) REFERENCES DIAGNOSTICO(DIAGNOSTICOID),
     FOREIGN KEY (PRODUCTOID)    REFERENCES PRODUCTO(PRODUCTOID)
 );
-/****************************************************************************************************************************************************************
-Autor: José Andrés Alvarado Matamoros
-Requerimiento: AR-001
-Fecha Creación: 07/09/2024   (MM/dd/YYYY)
-Enunciado: A partir de este punto se estarán agregando los insert harcodeados para los diferentes catalogos.
-****************************************************************************************************************************************************************/  
---Insert Tabla ROL
-INSERT INTO "ROL" (NOMBRE, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES ('Administrador', 'Dueño del Sistema', '00000001', 1, SYSDATE);
-INSERT INTO "ROL" (NOMBRE, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES ('Cliente', 'Cliente que adquiere nuestros servicios', '00000001', 1, SYSDATE);
--- SELECT * FROM  "ROL" -- 1= Administrador , 2 = Cliente
---Insert PUESTO 
-INSERT INTO PUESTOTRABAJO (
-    PUESTO,
-    DESCRIPCION,
-    EDITADOPOR,
-    HABILITADO,
-    FECHACREACION
-) VALUES (
-    'Admin',                -- Valor para PUESTO
-    'N/A', -- Valor para DESCRIPCION
-    '00000001',                        -- Valor para EDITADOPOR
-    1,                             -- Valor para HABILITADO
-    SYSDATE                         -- Valor para FECHACREACION
-);
---SELECT * FROM  "PUESTOTRABAJO" 
---Insert Tabla Personal como administrador 
-INSERT INTO PERSONAL (
-        CREDENCIALID,
-        ROLID,
-        NOMBRE,
-        PRIMERAPELLIDO,
-        SEGUNDOAPELLIDO,
-        FECHANACIMIENTO,
-        CODTRABAJADOR,
-        FECHACONTRATACION,
-        PUESTOTRABAJOID,
-        EDITADOPOR,
-        HABILITADO,
-        FECHACREACION
-    ) VALUES (
-        '000000001',                      -- Valor para CREDENCIALID
-        1,                             -- Valor para ROLID
-        'Admin',                         -- Valor para NOMBRE
-        'N/A',                        -- Valor para PRIMERAPELLIDO
-        'N/A',                        -- Valor para SEGUNDOAPELLIDO
-        SYSDATE, -- Valor para FECHANACIMIENTO
-        'N/A',                      -- Valor para CODTRABAJADOR
-        SYSDATE,                        -- Valor para FECHACONTRATACION
-        1,                             -- Valor para PUESTOTRABAJOID
-        '00000001',                        -- Valor para EDITADOPOR (opcional)
-        1,                             -- Valor para HABILITADO
-        SYSDATE                         -- Valor para FECHACREACION
-    );
---SELECT * FROM  "PERSONAL" 
---Insert Tabla Pais
-INSERT INTO "PAIS" (CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (1, 'COSTA RICA', '00000001', 1, SYSDATE);
 
---Insert Provincias
-INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (1, 1, 'SAN JOSÉ', '00000001', 1, SYSDATE);
 
-INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (2, 1, 'ALAJUELA', '00000001', 1, SYSDATE);
 
-INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (3, 1, 'CARTAGO', '00000001', 1, SYSDATE);
+/****************************************************************************************************************************************************************  
+                 Apartir de aqui estaran todas las vistas de la DB          --ENCABESADOS
+*****************************************************************************************************************************************************************/ 
 
-INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (4, 1, 'HEREDIA', '00000001', 1, SYSDATE);
-
-INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (5, 1, 'GUANACASTE', '00000001', 1, SYSDATE);
-
-INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (6, 1, 'PUNTARENAS', '00000001', 1, SYSDATE);
-
-INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (7, 1, 'LIMÓN', '00000001', 1, SYSDATE);
-
--- Cantones de la provincia de San José
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (1, 1, 'SAN JOSÉ', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (2, 1, 'ESCAZÚ', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (3, 1, 'DESAMPARADOS', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (4, 1, 'PURISCAL', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (5, 1, 'TARRAZÚ', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (6, 1, 'ASERRÍ', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (7, 1, 'MORA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (8, 1, 'GOICOECHEA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (9, 1, 'SANTA ANA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (10, 1, 'ALAJUELITA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (11, 1, 'VAZQUEZ DE CORONADO', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (12, 1, 'ACOSTA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (13, 1, 'TIBÁS', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (14, 1, 'MORAVIA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (15, 1, 'MONTES DE OCA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (16, 1, 'TURRUBARES', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (17, 1, 'DOTA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (18, 1, 'CURRIDABAT', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (19, 1, 'PÉREZ ZELEDÓN', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (20, 1, 'LEÓN CORTÉS', '00000001', 1, SYSDATE);
-
--- Cantones de la provincia de Alajuela
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (21, 2, 'ALAJUELA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (22, 2, 'SAN RAMÓN', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (23, 2, 'GRECIA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (24, 2, 'SAN MATEO', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (25, 2, 'ATENAS', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (26, 2, 'NARANJO', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (27, 2, 'PALMARES', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (28, 2, 'POÁS', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (29, 2, 'OROTINA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (30, 2, 'SAN CARLOS', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (31, 2, 'ZARCERO', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (32, 2, 'VALVERDE VEGA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (33, 2, 'UPALA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (34, 2, 'LOS CHILES', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (35, 2, 'GUATUSO', '00000001', 1, SYSDATE);
-
--- Cantones de la provincia de Cartago
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (36, 3, 'CARTAGO', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (37, 3, 'PARAÍSO', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (38, 3, 'LA UNIÓN', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (39, 3, 'JIMÉNEZ', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (40, 3, 'TURRIALBA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (41, 3, 'ALVARADO', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (42, 3, 'OREAMUNO', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (43, 3, 'EL GUARCO', '00000001', 1, SYSDATE);
-
--- Cantones de la provincia de Heredia
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (44, 4, 'HEREDIA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (45, 4, 'BARVA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (46, 4, 'SANTO DOMINGO', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (47, 4, 'SANTA BÁRBARA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (48, 4, 'SAN RAFAEL', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (49, 4, 'SAN ISIDRO', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (50, 4, 'BELÉN', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (51, 4, 'FLORES', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (52, 4, 'SAN PABLO', '00000001', 1, SYSDATE);
-
--- Cantones de la provincia de Guanacaste
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (53, 5, 'LIBERIA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (54, 5, 'NICOYA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (55, 5, 'SANTA CRUZ', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (56, 5, 'BAGACES', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (57, 5, 'CARRILLO', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (58, 5, 'CAÑAS', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (59, 5, 'ABANGARES', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (60, 5, 'TILARÁN', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (61, 5, 'NANDAYURE', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (62, 5, 'LA CRUZ', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (63, 5, 'HOJANCHA', '00000001', 1, SYSDATE);
-
--- Cantones de la provincia de Puntarenas
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (64, 6, 'PUNTARENAS', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (65, 6, 'ESPARZA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (66, 6, 'BUENOS AIRES', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (67, 6, 'MONTES DE ORO', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (68, 6, 'OSA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (69, 6, 'QUEPOS', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (70, 6, 'GOLFITO', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (71, 6, 'COTO BRUS', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (72, 6, 'PARRITA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (73, 6, 'CORREDORES', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (74, 6, 'GARABITO', '00000001', 1, SYSDATE);
-
--- Cantones de la provincia de Limón
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (75, 7, 'LIMÓN', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (76, 7, 'POCOCÍ', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (77, 7, 'SIQUIRRES', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (78, 7, 'TALAMANCA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (79, 7, 'MATINA', '00000001', 1, SYSDATE);
-
-INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES (80, 7, 'GUÁCIMO', '00000001', 1, SYSDATE);
-
---select * from "CONDADO";
--- Inserts para los distritos del cant?n Para?so
-INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES  (1, 37, 'Paraiso', '00000001', 1, SYSDATE);
-INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES    (2, 37, 'Santiago', '00000001', 1, SYSDATE);
-INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES   (3, 37, 'Orosi', '00000001', 1, SYSDATE);
-INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES   (4, 37, 'Cachi', '00000001', 1, SYSDATE);
-select * from "DISTRITO";
-
---  Insert de la categoria del telefono. 
-INSERT INTO "ARTAVIARACING"."CATEGORIATELEFONO" 
-(
-    "TIPOTELEFONO",
-    "DESCRIPCION",
-    "EDITADOPOR",
-    "HABILITADO",
-    "FECHACREACION"
-) 
-VALUES 
-(
-    'Móvil',                  -- Tipo de teléfono
-    'Teléfono móvil personal', -- Descripción
-    '00000001',                  -- Usuario que edita
-    1,                        -- Habilitado (1 para habilitado, 0 para deshabilitado)
-    SYSDATE                   -- Fecha de creación (actual)
-);
-INSERT INTO "ARTAVIARACING"."CATEGORIATELEFONO" 
-(
-    "TIPOTELEFONO",
-    "DESCRIPCION",
-    "EDITADOPOR",
-    "HABILITADO",
-    "FECHACREACION"
-) 
-VALUES 
-(
-    'Casa',                  -- Tipo de teléfono
-    'Teléfono casa', -- Descripción
-    '00000001',                  -- Usuario que edita
-    1,                        -- Habilitado (1 para habilitado, 0 para deshabilitado)
-    SYSDATE                   -- Fecha de creación (actual)
-);
 /****************************************************************************************************************************************************************  
 Creacion de las vistas: Apartir de aqui estaran todas las vistas de la DB
 Autor: Jason zuñiga solorzano
@@ -1222,9 +877,347 @@ SELECT
     ,FECHACREACION
 FROM PUESTOTRABAJO;
 
+
 /****************************************************************************************************************************************************************
-***                                                 PROCEDIMIENTOS ALMACENADOS A PARTIR DE AQUI                                                               ***
+***                                                 USP DE PAQUETES A PARTIR DE AQUI                        --ENCABESADOS                                       ***
 ****************************************************************************************************************************************************************/
+
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga Solorzano
+Id Requirement: AR-001 
+Creation Date: 24/08/2024   (MM/dd/YYYY)
+Requirement: Paquete encargado de llamar la vista de paises
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PACKAGE pkg_Pais AS
+    -- Declaración de la función que obtendrá los países
+    FUNCTION FP_ObtenerPaises RETURN SYS_REFCURSOR;
+END pkg_Pais;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_Pais AS
+    
+    FUNCTION FP_ObtenerPaises RETURN SYS_REFCURSOR IS
+        cursor_paises SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_paises FOR
+            SELECT 
+                CODIGOPAIS,
+                NOMBRE
+            FROM vw_ObtenerPais;
+        RETURN cursor_paises;
+    END FP_ObtenerPaises;
+
+END pkg_Pais;
+/
+
+--USP
+CREATE OR REPLACE PROCEDURE USP_SeleccionarPaises (
+    RespuestaPaises OUT SYS_REFCURSOR
+) AS
+BEGIN
+    -- Utilizar la función ObtenerPaises del paquete
+    RespuestaPaises := pkg_Pais.FP_ObtenerPaises;
+END USP_SeleccionarPaises;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga Solorzano
+Id Requirement: AR-001 
+Creation Date: 24/08/2024   (MM/dd/YYYY)
+Requirement: Paquete encargado de llamar la vista de Condado
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PACKAGE pkg_Condado AS
+    -- Declaración de la función que obtendrá los condados por estado
+    FUNCTION FP_ObtenerCondadoPorEstado(CodigoEstado IN NUMBER) RETURN SYS_REFCURSOR;
+END pkg_Condado;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_Condado AS
+
+    FUNCTION FP_ObtenerCondadoPorEstado(CodigoEstado IN NUMBER) RETURN SYS_REFCURSOR IS
+        cursor_condados SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_condados FOR
+            SELECT 
+                CODIGOCONDADO,
+                NOMBRE
+            FROM vw_ObtenerCondado
+            WHERE CODIGOESTADO = CodigoEstado;
+        RETURN cursor_condados;
+    END FP_ObtenerCondadoPorEstado;
+
+END pkg_Condado;
+/
+
+--USP
+CREATE OR REPLACE PROCEDURE USP_SeleccionarCondado (
+     CodigoEstado     IN  NUMBER,
+     RespuestaCondado OUT SYS_REFCURSOR
+) AS
+BEGIN
+    -- Utilizar la función ObtenerCondadoPorEstado del paquete
+    RespuestaCondado := pkg_Condado.FP_ObtenerCondadoPorEstado(CodigoEstado);
+END USP_SeleccionarCondado;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga Solorzano
+Id Requirement: AR-001 
+Creation Date: 24/08/2024   (MM/dd/YYYY)
+Requirement: Paquete encargado de llamar la vista de Distrito
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PACKAGE pkg_Distrito AS
+    -- Declaración de la función que obtendrá los distritos por condado
+    FUNCTION FP_ObtenerDistritosPorCondado(CodigoCondado IN NUMBER) RETURN SYS_REFCURSOR;
+END pkg_Distrito;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_Distrito AS
+
+    FUNCTION FP_ObtenerDistritosPorCondado(CodigoCondado IN NUMBER) RETURN SYS_REFCURSOR IS
+        cursor_distritos SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_distritos FOR
+            SELECT 
+                CODIGODISTRITO,
+                NOMBRE
+            FROM vw_ObtenerDistritos
+            WHERE CODIGOCONDADO = CodigoCondado;
+        RETURN cursor_distritos;
+    END FP_ObtenerDistritosPorCondado;
+
+END pkg_Distrito;
+/
+
+CREATE OR REPLACE PROCEDURE USP_SeleccionarDistritos (
+     CodigoCondado     IN  NUMBER,
+     RespuestaDistritos OUT SYS_REFCURSOR
+) AS
+BEGIN
+    -- Utilizar la función ObtenerDistritosPorCondado del paquete
+    RespuestaDistritos := pkg_Distrito.FP_ObtenerDistritosPorCondado(CodigoCondado);
+END USP_SeleccionarDistritos;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga Solorzano
+Id Requirement: AR-001 
+Creation Date: 24/08/2024   (MM/dd/YYYY)
+Requirement: Paquete encargado de trabajar con el USP_SELECCIONARVEHICULO
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE PACKAGE pkg_Vehiculo AS
+    -- Declaración de la función que obtendrá los vehículos
+    FUNCTION FP_ObtenerVehiculos RETURN SYS_REFCURSOR;
+END pkg_Vehiculo;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_Vehiculo AS
+
+    FUNCTION FP_ObtenerVehiculos RETURN SYS_REFCURSOR IS
+        cursor_vehiculos SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_vehiculos FOR
+            SELECT 
+                PLACAVEHICULOID,
+                VIN,
+                MARCA,
+                MODELO,
+                AÑO,
+                COLOR,
+                ALDIA,
+                TITULOPROPIEDAD,
+                HABILITADO,
+                FECHACREACION
+            FROM ARTAVIARACING.VEHICULO;
+        RETURN cursor_vehiculos;
+    END FP_ObtenerVehiculos;
+
+END pkg_Vehiculo;
+/
+
+CREATE OR REPLACE PROCEDURE USP_SeleccionarVehiculo (
+    RespuestaVehiculo OUT SYS_REFCURSOR
+) AS
+BEGIN
+    -- Utilizar la función ObtenerVehiculos del paquete
+    RespuestaVehiculo := pkg_Vehiculo.FP_ObtenerVehiculos;
+END USP_SeleccionarVehiculo;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga Solorzano
+Id Requirement: AR-001 
+Creation Date: 24/08/2024   (MM/dd/YYYY)
+Requirement: Paquete encargado de trabajar con el USP_OBTENERCATEGORIASERVICIO
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE PACKAGE pkg_CategoriaServicio AS
+    -- Declaración de la función que obtendrá las categorías de servicio
+    FUNCTION FP_ObtenerCategoriasDeServicio RETURN SYS_REFCURSOR;
+END pkg_CategoriaServicio;
+/
+
+
+CREATE OR REPLACE PACKAGE BODY pkg_CategoriaServicio AS
+
+    FUNCTION FP_ObtenerCategoriasDeServicio RETURN SYS_REFCURSOR IS
+        cursor_categorias SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_categorias FOR
+            SELECT 
+                CATEGORIASERVICIOID,
+                NOMBRE
+            FROM CATEGORIASERVICIO;
+        RETURN cursor_categorias;
+    END FP_ObtenerCategoriasDeServicio;
+
+END pkg_CategoriaServicio;
+/
+
+CREATE OR REPLACE  PROCEDURE USP_ObtenerCategoriaServicio (
+    RespuestaCategoria OUT SYS_REFCURSOR
+) AS
+BEGIN
+    -- Utilizar la función ObtenerCategoriasDeServicio del paquete
+    RespuestaCategoria := pkg_CategoriaServicio.FP_ObtenerCategoriasDeServicio;
+END USP_ObtenerCategoriaServicio;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga Solorzano
+Id Requirement: AR-001 
+Creation Date: 24/08/2024   (MM/dd/YYYY)
+Requirement: Paquete encargado de trabajar con el USP_SELECCIONARTIPOTELEFONO
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE PACKAGE pkg_TipoTelefono AS
+    -- Declaración de la función que obtendrá los tipos de teléfono
+    FUNCTION FP_ObtenerTipoTelefono RETURN SYS_REFCURSOR;
+END pkg_TipoTelefono;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_TipoTelefono AS
+
+    FUNCTION FP_ObtenerTipoTelefono RETURN SYS_REFCURSOR IS
+        cursor_tipo_telefono SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_tipo_telefono FOR
+            SELECT 
+                CATEGORIATELEFONOID,
+                TIPOTELEFONO
+            FROM CATEGORIATELEFONO;
+        RETURN cursor_tipo_telefono;
+    END FP_ObtenerTipoTelefono;
+
+END pkg_TipoTelefono;
+/
+
+--USP ACTUALIZADO
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarTipoTelefono (
+    RespuestaTipoTelefono OUT SYS_REFCURSOR
+) AS
+BEGIN
+    -- Utilizar la función ObtenerTipoTelefono del paquete
+    RespuestaTipoTelefono := pkg_TipoTelefono.FP_ObtenerTipoTelefono;
+END USP_SeleccionarTipoTelefono;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga Solorzano
+Id Requirement: AR-001 
+Creation Date: 24/08/2024   (MM/dd/YYYY)
+Requirement: Paquete encargado de trabajar con el USP_OBTENERCATEGORIASERVICIO
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PACKAGE pkg_Servicio AS
+    -- Declaración de la función que obtendrá los servicios por categoría
+    FUNCTION FP_ObtenerServiciosPorCategoria(CodigoCategoriaServicio NUMBER) RETURN SYS_REFCURSOR;
+END pkg_Servicio;
+/
+
+
+CREATE OR REPLACE PACKAGE BODY pkg_Servicio AS
+
+    FUNCTION FP_ObtenerServiciosPorCategoria(CodigoCategoriaServicio NUMBER) RETURN SYS_REFCURSOR IS
+        cursor_servicio SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_servicio FOR
+            SELECT 
+                SERVICIOID,
+                NOMBRE,
+                PRECIO,
+                TIEMPOSERVICIO
+            FROM ARTAVIARACING.SERVICIO
+            WHERE CATEGORIASERVICIOID = CodigoCategoriaServicio;
+        RETURN cursor_servicio;
+    END FP_ObtenerServiciosPorCategoria;
+
+END pkg_Servicio;
+/
+
+--USP ACTUALIZADOS
+
+CREATE OR REPLACE PROCEDURE USP_SeleccionarServicio (
+    CodigoCategoriaServicio IN NUMBER,
+    RespuestaServicio OUT SYS_REFCURSOR
+) AS
+BEGIN
+    -- Utilizar la función ObtenerServiciosPorCategoria del paquete
+    RespuestaServicio := pkg_Servicio.FP_ObtenerServiciosPorCategoria(CodigoCategoriaServicio);
+END USP_SeleccionarServicio;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga Solorzano
+Id Requirement: AR-001 
+Creation Date: 24/08/2024   (MM/dd/YYYY)
+Requirement: Paquete encargado de trabajar con el USP_SeleccionarServicio
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PACKAGE pkg_EstadoCita AS
+    -- Declaración de la función que obtendrá los estados de cita
+    FUNCTION FP_ObtenerEstadosCita RETURN SYS_REFCURSOR;
+END pkg_EstadoCita;
+/
+CREATE OR REPLACE PACKAGE BODY pkg_EstadoCita AS
+
+    FUNCTION FP_ObtenerEstadosCita RETURN SYS_REFCURSOR IS
+        cursor_estado_cita SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_estado_cita FOR
+            SELECT 
+                ESTADOCITAID,
+                ESTADO,
+                DESCRIPCION,
+                EDITADOPOR,
+                HABILITADO,
+                FECHACREACION
+            FROM ARTAVIARACING.ESTADOCITA;
+        RETURN cursor_estado_cita;
+    END FP_ObtenerEstadosCita;
+
+END pkg_EstadoCita;
+/
+
+--USP ACTUALIZADO
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarEstadoCita (
+    RespuestaEstadoCita OUT SYS_REFCURSOR
+) AS
+BEGIN
+    -- Utilizar la función ObtenerEstadosCita del paquete
+    RespuestaEstadoCita := pkg_EstadoCita.FP_ObtenerEstadosCita;
+END USP_SeleccionarEstadoCita;
+/
+
+
+/****************************************************************************************************************************************************************
+***                                 PROCEDIMIENTOS ALMACENADOS A PARTIR DE AQUI             --ENCABESADOS                                                        ***
+****************************************************************************************************************************************************************/
+
+
+
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -1236,38 +1229,7 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
---Paquete
-CREATE OR REPLACE PACKAGE pkg_Pais AS
-    -- Declaración de la función que obtendrá los países
-    FUNCTION ObtenerPaises RETURN SYS_REFCURSOR;
-END pkg_Pais;
-/
 
-CREATE OR REPLACE PACKAGE BODY pkg_Pais AS
-    
-    FUNCTION ObtenerPaises RETURN SYS_REFCURSOR IS
-        cursor_paises SYS_REFCURSOR;
-    BEGIN
-        OPEN cursor_paises FOR
-            SELECT 
-                CODIGOPAIS,
-                NOMBRE
-            FROM vw_ObtenerPais;
-        RETURN cursor_paises;
-    END ObtenerPaises;
-
-END pkg_Pais;
-/
-
---USP
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarPaises (
-    RespuestaPaises OUT SYS_REFCURSOR
-) AS
-BEGIN
-    -- Utilizar la función ObtenerPaises del paquete
-    RespuestaPaises := pkg_Pais.ObtenerPaises;
-END USP_SeleccionarPaises;
-/
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -1303,40 +1265,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
---Paquete
-CREATE OR REPLACE PACKAGE pkg_Condado AS
-    -- Declaración de la función que obtendrá los condados por estado
-    FUNCTION ObtenerCondadoPorEstado(CodigoEstado IN NUMBER) RETURN SYS_REFCURSOR;
-END pkg_Condado;
-/
-
-CREATE OR REPLACE PACKAGE BODY pkg_Condado AS
-
-    FUNCTION ObtenerCondadoPorEstado(CodigoEstado IN NUMBER) RETURN SYS_REFCURSOR IS
-        cursor_condados SYS_REFCURSOR;
-    BEGIN
-        OPEN cursor_condados FOR
-            SELECT 
-                CODIGOCONDADO,
-                NOMBRE
-            FROM vw_ObtenerCondado
-            WHERE CODIGOESTADO = CodigoEstado;
-        RETURN cursor_condados;
-    END ObtenerCondadoPorEstado;
-
-END pkg_Condado;
-/
-
---USP
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarCondado (
-     CodigoEstado     IN  NUMBER,
-     RespuestaCondado OUT SYS_REFCURSOR
-) AS
-BEGIN
-    -- Utilizar la función ObtenerCondadoPorEstado del paquete
-    RespuestaCondado := pkg_Condado.ObtenerCondadoPorEstado(CodigoEstado);
-END USP_SeleccionarCondado;
-/
 
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
@@ -1349,39 +1277,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
---Paquete
-CREATE OR REPLACE PACKAGE pkg_Distrito AS
-    -- Declaración de la función que obtendrá los distritos por condado
-    FUNCTION ObtenerDistritosPorCondado(CodigoCondado IN NUMBER) RETURN SYS_REFCURSOR;
-END pkg_Distrito;
-/
-
-CREATE OR REPLACE PACKAGE BODY pkg_Distrito AS
-
-    FUNCTION ObtenerDistritosPorCondado(CodigoCondado IN NUMBER) RETURN SYS_REFCURSOR IS
-        cursor_distritos SYS_REFCURSOR;
-    BEGIN
-        OPEN cursor_distritos FOR
-            SELECT 
-                CODIGODISTRITO,
-                NOMBRE
-            FROM vw_ObtenerDistritos
-            WHERE CODIGOCONDADO = CodigoCondado;
-        RETURN cursor_distritos;
-    END ObtenerDistritosPorCondado;
-
-END pkg_Distrito;
-/
-
-CREATE OR REPLACE PROCEDURE USP_SeleccionarDistritos (
-     CodigoCondado     IN  NUMBER,
-     RespuestaDistritos OUT SYS_REFCURSOR
-) AS
-BEGIN
-    -- Utilizar la función ObtenerDistritosPorCondado del paquete
-    RespuestaDistritos := pkg_Distrito.ObtenerDistritosPorCondado(CodigoCondado);
-END USP_SeleccionarDistritos;
-/
 
  /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
@@ -1485,158 +1380,7 @@ BEGIN
 END USP_RegistrarCliente;
 /
 
---222333
 
-CREATE OR REPLACE FUNCTION FN_InsertarCliente (
-    p_credencial_id       VARCHAR2,
-    p_rol_id              NUMBER,
-    p_nombre              VARCHAR2,
-    p_primer_apellido     VARCHAR2,
-    p_segundo_apellido    VARCHAR2,
-    p_fecha_nacimiento    DATE,
-    p_editado_por         VARCHAR2,
-    p_habilitado          NUMBER,
-    p_fecha_creacion      DATE
-) RETURN BOOLEAN IS
-BEGIN
-    INSERT INTO CLIENTE (
-        CREDENCIALID,
-        ROLID,
-        NOMBRE,
-        PRIMERAPELLIDO,
-        SEGUNDOAPELLIDO,
-        FECHANACIMIENTO,
-        EDITADOPOR,
-        HABILITADO,
-        FECHACREACION
-    ) VALUES (
-        p_credencial_id,
-        p_rol_id,
-        p_nombre,
-        p_primer_apellido,
-        p_segundo_apellido,
-        p_fecha_nacimiento,
-        p_editado_por,
-        p_habilitado,
-        p_fecha_creacion
-    );
-    RETURN TRUE;
-EXCEPTION
-    WHEN OTHERS THEN
-        RETURN FALSE;
-END FN_InsertarCliente;
-/
-
-CREATE OR REPLACE FUNCTION FN_InsertarTelefono (
-    p_numero_telefono      VARCHAR2,
-    p_credencial_id        VARCHAR2,
-    p_categoria_telefono_id NUMBER,
-    p_numero_extension     NUMBER,
-    p_descripcion          VARCHAR2,
-    p_editado_por          VARCHAR2,
-    p_habilitado           NUMBER,
-    p_fecha_creacion       DATE
-) RETURN BOOLEAN IS
-BEGIN
-    INSERT INTO TELEFONOPORUSUARIO (
-        NUMEROTELEFONO,
-        CREDENCIALID,
-        CATEGORIATELEFONOID,
-        NUMEROEXTENSION,
-        DESCRIPCION,
-        EDITADOPOR,
-        HABILITADO,
-        FECHACREACION
-    ) VALUES (
-        p_numero_telefono,
-        p_credencial_id,
-        p_categoria_telefono_id,
-        p_numero_extension,
-        p_descripcion,
-        p_editado_por,
-        p_habilitado,
-        p_fecha_creacion
-    );
-    RETURN TRUE;
-EXCEPTION
-    WHEN OTHERS THEN
-        RETURN FALSE;
-END FN_InsertarTelefono;
-/
-
-CREATE OR REPLACE FUNCTION FN_InsertarDireccion (
-    p_credencial_id       VARCHAR2,
-    p_codigo_pais         NUMBER,
-    p_codigo_estado       NUMBER,
-    p_codigo_condado      NUMBER,
-    p_codigo_distrito     NUMBER,
-    p_descripcion_direccion VARCHAR2,
-    p_editado_por         VARCHAR2,
-    p_habilitado          NUMBER,
-    p_fecha_creacion      DATE
-) RETURN BOOLEAN IS
-BEGIN
-    INSERT INTO DIRECCIONPORUSUARIO (
-        CREDENCIALID,
-        CODIGOPAIS,
-        CODIGOESTADO,
-        CODIGOCONDADO,
-        CODIGODISTRITO,
-        DESCRIPCION,
-        EDITADOPOR,
-        HABILITADO,
-        FECHACREACION
-    ) VALUES (
-        p_credencial_id,
-        p_codigo_pais,
-        p_codigo_estado,
-        p_codigo_condado,
-        p_codigo_distrito,
-        p_descripcion_direccion,
-        p_editado_por,
-        p_habilitado,
-        p_fecha_creacion
-    );
-    RETURN TRUE;
-EXCEPTION
-    WHEN OTHERS THEN
-        RETURN FALSE;
-END FN_InsertarDireccion;
-/
-
-CREATE OR REPLACE FUNCTION FN_InsertarCredenciales (
-    p_credencial_id       VARCHAR2,
-    p_correo_electronico  VARCHAR2,
-    p_contrasena          VARCHAR2,
-    p_es_contrasena_temporal NUMBER,
-    p_editado_por         VARCHAR2,
-    p_habilitado          NUMBER,
-    p_fecha_creacion      DATE
-) RETURN BOOLEAN IS
-BEGIN
-    INSERT INTO CREDENCIALESPORUSUARIO (
-        CREDENCIALID,
-        CORREOELECTRONICO,
-        CONTRASEÑA,
-        ESCONTRASEÑATEMPORAL,
-        EDITADOPOR,
-        HABILITADO,
-        FECHACREACION
-    ) VALUES (
-        p_credencial_id,
-        p_correo_electronico,
-        p_contrasena,
-        p_es_contrasena_temporal,
-        p_editado_por,
-        p_habilitado,
-        p_fecha_creacion
-    );
-    RETURN TRUE;
-EXCEPTION
-    WHEN OTHERS THEN
-        RETURN FALSE;
-END FN_InsertarCredenciales;
-/
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -1917,31 +1661,6 @@ BEGIN
 END;
 /
 
---222333
-
-CREATE OR REPLACE FUNCTION FN_CancelarCita (
-    p_citaId NUMBER,
-    p_editadoPor VARCHAR2
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    UPDATE CITAS
-    SET HABILITADO = 0,
-        EDITADOPOR = p_editadoPor,
-        HORAFINALIZACION = TO_CHAR(SYSDATE, 'HH24:MI')
-    WHERE CITAID = p_citaId AND HABILITADO != 0; -- Solo actualiza si la cita no está cancelada.
-
-    -- Si se actualizó algún registro, cambiamos el valor a TRUE
-    IF SQL%ROWCOUNT > 0 THEN
-        v_result := TRUE;
-    ELSE
-        v_result := FALSE;
-    END IF;
-
-    RETURN v_result;
-END FN_CancelarCita;
-/
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga Solorzano
 Id Requirement: AR-001 
@@ -1989,53 +1708,6 @@ BEGIN
 END USP_ACTUALIZAR_CITA;
 /
 
---222333
-
-CREATE OR REPLACE FUNCTION FN_ActualizarCita (
-    p_CITAID IN NUMBER,
-    p_CREDENCIALID IN VARCHAR2,
-    p_PLACAVEHICULOID IN VARCHAR2,
-    p_VIN IN VARCHAR2,
-    p_SERVICIOID IN NUMBER,
-    p_ESTADOCITAID IN NUMBER,
-    p_FECHAAGENDADA IN DATE,
-    p_HORAAGENDADA IN VARCHAR2,
-    p_EDITADOPOR IN VARCHAR2,
-    p_HABILITADO IN NUMBER
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    BEGIN
-        UPDATE CITAS
-        SET CREDENCIALID = p_CREDENCIALID,
-            PLACAVEHICULOID = p_PLACAVEHICULOID,
-            VIN = p_VIN,
-            SERVICIOID = p_SERVICIOID,
-            ESTADOCITAID = p_ESTADOCITAID,
-            FECHAAGENDADA = p_FECHAAGENDADA,
-            HORAAGENDADA = p_HORAAGENDADA,
-            EDITADOPOR = p_EDITADOPOR,
-            HABILITADO = p_HABILITADO,
-            FECHACREACION = SYSDATE
-        WHERE CITAID = p_CITAID;
-
-        -- Si la actualización fue exitosa, se cambia el valor a TRUE
-        IF SQL%ROWCOUNT > 0 THEN
-            v_result := TRUE;
-        ELSE
-            v_result := FALSE;
-        END IF;
-
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- Si ocurre un error durante la actualización, se mantiene el valor FALSE
-            v_result := FALSE;
-    END;
-
-    RETURN v_result;
-END FN_ActualizarCita;
-/
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga Solorzano
 Id Requirement: AR-001 
@@ -2161,30 +1833,6 @@ BEGIN
 END USP_VerificarExistenciaUsuario;
 /
 
---222333
-
-CREATE OR REPLACE FUNCTION FN_VerificarExistenciaUsuario (
-    p_credencialId IN VARCHAR2
-) RETURN VARCHAR2
-IS
-    v_credencialId VARCHAR2(100); -- Ajusta el tamaño según el esquema de tu base de datos
-BEGIN
-    SELECT c.CREDENCIALID INTO v_credencialId
-    FROM CLIENTE c
-    WHERE c.CREDENCIALID = p_credencialId;
-
-    RETURN v_credencialId; -- Devuelve el CREDENCIALID si se encuentra
-
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        -- Si no se encuentra ningún dato, devuelve NULL
-        RETURN NULL;
-    WHEN OTHERS THEN
-        -- Muestra el mensaje de error y devuelve NULL
-        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
-        RETURN NULL;
-END FN_VerificarExistenciaUsuario;
-/
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -2466,54 +2114,7 @@ END USP_InsertarProducto;
 
 ---222333
 
-CREATE OR REPLACE FUNCTION FN_InsertarProducto (
-    p_categoriaProductoId IN NUMBER,
-    p_nombre             IN VARCHAR2,
-    p_descripcion        IN VARCHAR2,
-    p_precioUnitario     IN NUMBER,
-    p_cantidad           IN NUMBER,
-    p_editadoPor         IN VARCHAR2,
-    p_habilitado         IN NUMBER,
-    p_fechaCreacion      IN DATE,
-    p_imagen             IN BLOB
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    BEGIN
-        INSERT INTO ARTAVIARACING.PRODUCTO (        
-            CATEGORIAPRODUCTOID,
-            NOMBRE,
-            DESCRIPCION,
-            PRECIOUNITARIO,
-            CANTIDAD,
-            EDITADOPOR,
-            HABILITADO,
-            FECHACREACION,
-            IMAGEN
-        ) VALUES (        
-            p_categoriaProductoId,
-            p_nombre,
-            p_descripcion,
-            p_precioUnitario,
-            p_cantidad,
-            p_editadoPor,
-            p_habilitado,
-            p_fechaCreacion,
-            p_imagen
-        );
-        
-        -- Si no hubo error, se cambia el valor a TRUE
-        v_result := TRUE;
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- Aquí se maneja cualquier error que ocurra
-            v_result := FALSE;
-    END;
-    
-    RETURN v_result;
-END FN_InsertarProducto;
-/
+
 
  /****************************************************************************************************************************************************************
 Autor: Andrés Alvarado Matamoros
@@ -2577,52 +2178,6 @@ Updated By                                  (MM/dd/YYYY)                        
 
 ****************************************************************************************************************************************************************/
 
-CREATE OR REPLACE FUNCTION FN_ActualizarProducto (
-    p_productoId         IN NUMBER,
-    p_categoriaProductoId IN NUMBER,
-    p_nombre             IN VARCHAR2,
-    p_descripcion        IN VARCHAR2,
-    p_precioUnitario     IN NUMBER,
-    p_cantidad           IN NUMBER,
-    p_editadoPor         IN VARCHAR2,
-    p_habilitado         IN NUMBER,
-    p_fechaCreacion      IN DATE,
-    p_imagen             IN BLOB
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    BEGIN
-        UPDATE ARTAVIARACING.PRODUCTO
-        SET
-            CATEGORIAPRODUCTOID = p_categoriaProductoId,
-            NOMBRE = p_nombre,
-            DESCRIPCION = p_descripcion,
-            PRECIOUNITARIO = p_precioUnitario,
-            CANTIDAD = p_cantidad,
-            EDITADOPOR = p_editadoPor,
-            HABILITADO = p_habilitado,
-            FECHACREACION = p_fechaCreacion,
-            IMAGEN = p_imagen
-        WHERE PRODUCTOID = p_productoId;
-
-        -- Verificamos si se actualizó algún registro
-        IF SQL%ROWCOUNT > 0 THEN
-            v_result := TRUE;
-        ELSE
-            v_result := FALSE;
-        END IF;
-
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- Si ocurre algún error, retornamos FALSE
-            v_result := FALSE;
-    END;
-
-    RETURN v_result;
-END FN_ActualizarProducto;
-/
-
 /****************************************************************************************************************************************************************
 Autor: Andrés Alvarado Matamoros
 Id Requirement: AR-003
@@ -2646,7 +2201,6 @@ BEGIN
 END USP_ObtenerProducto;
 /
 
----222333
 
 CREATE OR REPLACE FUNCTION FN_ObtenerProducto (
     p_productoId IN NUMBER
@@ -2840,59 +2394,8 @@ BEGIN
 END SP_Obtener_Productos_HTML;
 /
 
---222333
 
-CREATE OR REPLACE FUNCTION FN_GenerarHTMLProductos RETURN CLOB IS
-    v_html CLOB;
-BEGIN
-    -- Inicializar HTML
-    v_html := '<div class="container">';
-    v_html := v_html || '<div class="btn-group" role="group" aria-label="Categor as">';
 
-    -- Botón para mostrar todos los productos
-    v_html := v_html || '<button type="button" class="btn btn-primary filter-button" data-category="all">Todo</button>';
-
-    -- Botones para cada categoría
-    FOR CATEGORIA IN (
-        SELECT CATEGORIAPRODUCTOID, NOMBRE 
-        FROM CATEGORIAPRODUCTO 
-        WHERE HABILITADO = 1
-    ) LOOP
-        v_html := v_html || '<button type="button" class="btn btn-primary filter-button" data-category="' || CATEGORIA.CATEGORIAPRODUCTOID || '">' || CATEGORIA.NOMBRE || '</button>';
-    END LOOP;
-
-    v_html := v_html || '</div>';
-    v_html := v_html || '<div class="row" id="product-container">';
-
-    -- Productos activos
-    FOR PRODUCTO IN (
-        SELECT P.PRODUCTOID, P.NOMBRE, P.DESCRIPCION, P.CANTIDAD, P.PRECIOUNITARIO, P.IMAGEN, C.CATEGORIAPRODUCTOID
-        FROM PRODUCTO P
-        JOIN CATEGORIAPRODUCTO C ON P.CATEGORIAPRODUCTOID = C.CATEGORIAPRODUCTOID
-        WHERE P.HABILITADO = 1
-    ) LOOP
-        -- Generar el placeholder para la imagen
-        DECLARE
-            img_placeholder VARCHAR2(50);
-        BEGIN
-            img_placeholder := '[ImagenProducto' || PRODUCTO.PRODUCTOID || ']';
-
-            v_html := v_html || '<div class="col-md-4 product-card" data-category="' || PRODUCTO.CATEGORIAPRODUCTOID || '">';
-            v_html := v_html || '<div class="card">';
-            v_html := v_html || '<img src="data:image/jpeg;base64,' || img_placeholder || '" class="card-img-top" alt="' || PRODUCTO.NOMBRE || '" width="50">';
-            v_html := v_html || '<div class="card-body">';
-            v_html := v_html || '<h5 class="card-title">' || PRODUCTO.NOMBRE || '</h5>';
-            v_html := v_html || '<p class="card-text">' || PRODUCTO.DESCRIPCION || '</p>';
-            v_html := v_html || '<p class="card-text">Cantidad: ' || PRODUCTO.CANTIDAD || '</p>';
-            v_html := v_html || '<p class="card-text">Precio: ' || TO_CHAR(PRODUCTO.PRECIOUNITARIO, 'FM999G999D00') || ' Colones' || '</p>';
-            v_html := v_html || '</div></div></div>';
-        END;
-    END LOOP;
-
-    v_html := v_html || '</div></div>';
-    RETURN v_html;
-END FN_GenerarHTMLProductos;
-/
 
 /****************************************************************************************************************************************************************
 Autor: Andrés Alvarado Matamoros
@@ -3451,8 +2954,519 @@ BEGIN
 END USP_Listar_Citas;
 /
 
---222333
 
+
+
+/****************************************************************************************************************************************************************
+Autor: LUIS SOLORZANO
+Id Requirement: AR-001
+Creation Date: 08/25/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado para obtener los vehículos y sus detalles por PLACAVEHICULOID desde las tablas VEHICULO y VEHICULOPORCLIENTE.
+****************************************************************************************************************************************************************/
+/*
+Editado y comentado por jason por cuestiones de orden enla base de datos
+*/
+CREATE OR REPLACE PROCEDURE USP_LISTAR_CITAS_ADMIN (
+    p_cursor OUT SYS_REFCURSOR
+)
+IS
+BEGIN
+    -- Selecciona todas las citas de la tabla CITAS
+    OPEN p_cursor FOR
+    SELECT * FROM CITAS;
+END;
+/
+
+CREATE OR REPLACE PROCEDURE USP_OBTENER_CITA_POR_ID (
+    p_id_cita IN NUMBER,
+    p_cursor OUT SYS_REFCURSOR
+)
+IS
+BEGIN
+    -- Selecciona la cita con el ID proporcionado
+    OPEN p_cursor FOR
+    SELECT 
+    C.CREDENCIALID
+    ,C.PLACAVEHICULOID
+    ,V.VIN
+    ,S.NOMBRE AS SERVICIOVEHICULO
+    ,EC.ESTADO
+    ,C.FECHAAGENDADA 
+    ,C.DESCRIPCION
+    ,C.HORAAGENDADA    
+    FROM CITAS C
+    INNER JOIN VEHICULO v
+    ON C.PLACAVEHICULOID = V.PLACAVEHICULOID
+    INNER JOIN SERVICIO S
+    ON S.SERVICIOID = C.SERVICIOID
+    INNER JOIN ESTADOCITA EC
+    ON EC.ESTADOCITAID = C.ESTADOCITAID
+    WHERE CITAID = p_id_cita;
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE USP_INSERTAR_DIAGNOSTICO(
+    p_IdCita IN NUMBER,
+    p_Diagnostico IN VARCHAR2,
+    p_CodigoTrabajador IN VARCHAR2,
+    p_EditadoPor IN VARCHAR2,
+    p_Habilitado IN NUMBER,
+    p_FechaCreacion IN DATE
+) AS
+BEGIN
+    INSERT INTO DIAGNOSTICO (
+        CITAID,
+        DESCRIPCION,
+        CODTRABAJADOR,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        p_IdCita,
+        p_Diagnostico,
+        p_CodigoTrabajador,
+        p_EditadoPor,
+        p_Habilitado,
+        p_FechaCreacion
+    );
+    
+    COMMIT;
+END USP_INSERTAR_DIAGNOSTICO;
+/
+/****************************************************************************************************************************************************************
+***                                                 FUNCIONES APARTIR DE AQUI              --ENCABESADOS                                                 ***
+****************************************************************************************************************************************************************/
+
+--1
+
+CREATE OR REPLACE FUNCTION FN_ActualizarCita (
+    p_CITAID IN NUMBER,
+    p_CREDENCIALID IN VARCHAR2,
+    p_PLACAVEHICULOID IN VARCHAR2,
+    p_VIN IN VARCHAR2,
+    p_SERVICIOID IN NUMBER,
+    p_ESTADOCITAID IN NUMBER,
+    p_FECHAAGENDADA IN DATE,
+    p_HORAAGENDADA IN VARCHAR2,
+    p_EDITADOPOR IN VARCHAR2,
+    p_HABILITADO IN NUMBER
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        UPDATE CITAS
+        SET CREDENCIALID = p_CREDENCIALID,
+            PLACAVEHICULOID = p_PLACAVEHICULOID,
+            VIN = p_VIN,
+            SERVICIOID = p_SERVICIOID,
+            ESTADOCITAID = p_ESTADOCITAID,
+            FECHAAGENDADA = p_FECHAAGENDADA,
+            HORAAGENDADA = p_HORAAGENDADA,
+            EDITADOPOR = p_EDITADOPOR,
+            HABILITADO = p_HABILITADO,
+            FECHACREACION = SYSDATE
+        WHERE CITAID = p_CITAID;
+
+        -- Si la actualización fue exitosa, se cambia el valor a TRUE
+        IF SQL%ROWCOUNT > 0 THEN
+            v_result := TRUE;
+        ELSE
+            v_result := FALSE;
+        END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre un error durante la actualización, se mantiene el valor FALSE
+            v_result := FALSE;
+    END;
+
+    RETURN v_result;
+END FN_ActualizarCita;
+/
+--2
+
+CREATE OR REPLACE FUNCTION FN_ActualizarProducto (
+    p_productoId         IN NUMBER,
+    p_categoriaProductoId IN NUMBER,
+    p_nombre             IN VARCHAR2,
+    p_descripcion        IN VARCHAR2,
+    p_precioUnitario     IN NUMBER,
+    p_cantidad           IN NUMBER,
+    p_editadoPor         IN VARCHAR2,
+    p_habilitado         IN NUMBER,
+    p_fechaCreacion      IN DATE,
+    p_imagen             IN BLOB
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        UPDATE ARTAVIARACING.PRODUCTO
+        SET
+            CATEGORIAPRODUCTOID = p_categoriaProductoId,
+            NOMBRE = p_nombre,
+            DESCRIPCION = p_descripcion,
+            PRECIOUNITARIO = p_precioUnitario,
+            CANTIDAD = p_cantidad,
+            EDITADOPOR = p_editadoPor,
+            HABILITADO = p_habilitado,
+            FECHACREACION = p_fechaCreacion,
+            IMAGEN = p_imagen
+        WHERE PRODUCTOID = p_productoId;
+
+        -- Verificamos si se actualizó algún registro
+        IF SQL%ROWCOUNT > 0 THEN
+            v_result := TRUE;
+        ELSE
+            v_result := FALSE;
+        END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre algún error, retornamos FALSE
+            v_result := FALSE;
+    END;
+
+    RETURN v_result;
+END FN_ActualizarProducto;
+/
+
+--3
+CREATE OR REPLACE FUNCTION FN_AgregarCita (
+    p_CREDENCIALID IN VARCHAR2,
+    p_PLACAVEHICULOID IN VARCHAR2,
+    p_VIN IN VARCHAR2,
+    p_SERVICIOID IN NUMBER,
+    p_ESTADOCITAID IN NUMBER,
+    p_FECHAAGENDADA IN DATE,
+    p_DESCRIPCION IN VARCHAR2,
+    p_HORAAGENDADA IN VARCHAR2,
+    p_EDITADOPOR IN VARCHAR2,
+    p_HABILITADO IN NUMBER
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        INSERT INTO CITAS (
+            CREDENCIALID,
+            PLACAVEHICULOID,
+            VIN,
+            SERVICIOID,
+            ESTADOCITAID,
+            FECHAAGENDADA,
+            DESCRIPCION,
+            HORAAGENDADA,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION
+        ) VALUES (
+            p_CREDENCIALID,
+            p_PLACAVEHICULOID,
+            p_VIN,
+            p_SERVICIOID,
+            p_ESTADOCITAID,
+            p_FECHAAGENDADA,
+            p_DESCRIPCION,
+            p_HORAAGENDADA,
+            p_EDITADOPOR,
+            p_HABILITADO,
+            SYSDATE
+        );
+
+        -- Si la inserción fue exitosa, se cambia el valor a TRUE
+        v_result := TRUE;
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre un error durante la inserción, se mantiene el valor FALSE
+            v_result := FALSE;
+    END;
+
+    RETURN v_result;
+END FN_AgregarCita;
+/
+
+--4
+CREATE OR REPLACE FUNCTION FN_CancelarCita (
+    p_citaId NUMBER,
+    p_editadoPor VARCHAR2
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    UPDATE CITAS
+    SET HABILITADO = 0,
+        EDITADOPOR = p_editadoPor,
+        HORAFINALIZACION = TO_CHAR(SYSDATE, 'HH24:MI')
+    WHERE CITAID = p_citaId AND HABILITADO != 0; -- Solo actualiza si la cita no está cancelada.
+
+    -- Si se actualizó algún registro, cambiamos el valor a TRUE
+    IF SQL%ROWCOUNT > 0 THEN
+        v_result := TRUE;
+    ELSE
+        v_result := FALSE;
+    END IF;
+
+    RETURN v_result;
+END FN_CancelarCita;
+/
+
+--5
+CREATE OR REPLACE FUNCTION FN_GenerarHTMLProductos RETURN CLOB IS
+    v_html CLOB;
+BEGIN
+    -- Inicializar HTML
+    v_html := '<div class="container">';
+    v_html := v_html || '<div class="btn-group" role="group" aria-label="Categor as">';
+
+    -- Botón para mostrar todos los productos
+    v_html := v_html || '<button type="button" class="btn btn-primary filter-button" data-category="all">Todo</button>';
+
+    -- Botones para cada categoría
+    FOR CATEGORIA IN (
+        SELECT CATEGORIAPRODUCTOID, NOMBRE 
+        FROM CATEGORIAPRODUCTO 
+        WHERE HABILITADO = 1
+    ) LOOP
+        v_html := v_html || '<button type="button" class="btn btn-primary filter-button" data-category="' || CATEGORIA.CATEGORIAPRODUCTOID || '">' || CATEGORIA.NOMBRE || '</button>';
+    END LOOP;
+
+    v_html := v_html || '</div>';
+    v_html := v_html || '<div class="row" id="product-container">';
+
+    -- Productos activos
+    FOR PRODUCTO IN (
+        SELECT P.PRODUCTOID, P.NOMBRE, P.DESCRIPCION, P.CANTIDAD, P.PRECIOUNITARIO, P.IMAGEN, C.CATEGORIAPRODUCTOID
+        FROM PRODUCTO P
+        JOIN CATEGORIAPRODUCTO C ON P.CATEGORIAPRODUCTOID = C.CATEGORIAPRODUCTOID
+        WHERE P.HABILITADO = 1
+    ) LOOP
+        -- Generar el placeholder para la imagen
+        DECLARE
+            img_placeholder VARCHAR2(50);
+        BEGIN
+            img_placeholder := '[ImagenProducto' || PRODUCTO.PRODUCTOID || ']';
+
+            v_html := v_html || '<div class="col-md-4 product-card" data-category="' || PRODUCTO.CATEGORIAPRODUCTOID || '">';
+            v_html := v_html || '<div class="card">';
+            v_html := v_html || '<img src="data:image/jpeg;base64,' || img_placeholder || '" class="card-img-top" alt="' || PRODUCTO.NOMBRE || '" width="50">';
+            v_html := v_html || '<div class="card-body">';
+            v_html := v_html || '<h5 class="card-title">' || PRODUCTO.NOMBRE || '</h5>';
+            v_html := v_html || '<p class="card-text">' || PRODUCTO.DESCRIPCION || '</p>';
+            v_html := v_html || '<p class="card-text">Cantidad: ' || PRODUCTO.CANTIDAD || '</p>';
+            v_html := v_html || '<p class="card-text">Precio: ' || TO_CHAR(PRODUCTO.PRECIOUNITARIO, 'FM999G999D00') || ' Colones' || '</p>';
+            v_html := v_html || '</div></div></div>';
+        END;
+    END LOOP;
+
+    v_html := v_html || '</div></div>';
+    RETURN v_html;
+END FN_GenerarHTMLProductos;
+/
+--6
+CREATE OR REPLACE FUNCTION FN_InsertarCliente (
+    p_credencial_id       VARCHAR2,
+    p_rol_id              NUMBER,
+    p_nombre              VARCHAR2,
+    p_primer_apellido     VARCHAR2,
+    p_segundo_apellido    VARCHAR2,
+    p_fecha_nacimiento    DATE,
+    p_editado_por         VARCHAR2,
+    p_habilitado          NUMBER,
+    p_fecha_creacion      DATE
+) RETURN BOOLEAN IS
+BEGIN
+    INSERT INTO CLIENTE (
+        CREDENCIALID,
+        ROLID,
+        NOMBRE,
+        PRIMERAPELLIDO,
+        SEGUNDOAPELLIDO,
+        FECHANACIMIENTO,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        p_credencial_id,
+        p_rol_id,
+        p_nombre,
+        p_primer_apellido,
+        p_segundo_apellido,
+        p_fecha_nacimiento,
+        p_editado_por,
+        p_habilitado,
+        p_fecha_creacion
+    );
+    RETURN TRUE;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN FALSE;
+END FN_InsertarCliente;
+/
+
+--7
+CREATE OR REPLACE FUNCTION FN_InsertarTelefono (
+    p_numero_telefono      VARCHAR2,
+    p_credencial_id        VARCHAR2,
+    p_categoria_telefono_id NUMBER,
+    p_numero_extension     NUMBER,
+    p_descripcion          VARCHAR2,
+    p_editado_por          VARCHAR2,
+    p_habilitado           NUMBER,
+    p_fecha_creacion       DATE
+) RETURN BOOLEAN IS
+BEGIN
+    INSERT INTO TELEFONOPORUSUARIO (
+        NUMEROTELEFONO,
+        CREDENCIALID,
+        CATEGORIATELEFONOID,
+        NUMEROEXTENSION,
+        DESCRIPCION,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        p_numero_telefono,
+        p_credencial_id,
+        p_categoria_telefono_id,
+        p_numero_extension,
+        p_descripcion,
+        p_editado_por,
+        p_habilitado,
+        p_fecha_creacion
+    );
+    RETURN TRUE;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN FALSE;
+END FN_InsertarTelefono;
+/
+--8
+CREATE OR REPLACE FUNCTION FN_InsertarCredenciales (
+    p_credencial_id       VARCHAR2,
+    p_correo_electronico  VARCHAR2,
+    p_contrasena          VARCHAR2,
+    p_es_contrasena_temporal NUMBER,
+    p_editado_por         VARCHAR2,
+    p_habilitado          NUMBER,
+    p_fecha_creacion      DATE
+) RETURN BOOLEAN IS
+BEGIN
+    INSERT INTO CREDENCIALESPORUSUARIO (
+        CREDENCIALID,
+        CORREOELECTRONICO,
+        CONTRASEÑA,
+        ESCONTRASEÑATEMPORAL,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        p_credencial_id,
+        p_correo_electronico,
+        p_contrasena,
+        p_es_contrasena_temporal,
+        p_editado_por,
+        p_habilitado,
+        p_fecha_creacion
+    );
+    RETURN TRUE;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN FALSE;
+END FN_InsertarCredenciales;
+/
+--9
+CREATE OR REPLACE FUNCTION FN_InsertarDireccion (
+    p_credencial_id       VARCHAR2,
+    p_codigo_pais         NUMBER,
+    p_codigo_estado       NUMBER,
+    p_codigo_condado      NUMBER,
+    p_codigo_distrito     NUMBER,
+    p_descripcion_direccion VARCHAR2,
+    p_editado_por         VARCHAR2,
+    p_habilitado          NUMBER,
+    p_fecha_creacion      DATE
+) RETURN BOOLEAN IS
+BEGIN
+    INSERT INTO DIRECCIONPORUSUARIO (
+        CREDENCIALID,
+        CODIGOPAIS,
+        CODIGOESTADO,
+        CODIGOCONDADO,
+        CODIGODISTRITO,
+        DESCRIPCION,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        p_credencial_id,
+        p_codigo_pais,
+        p_codigo_estado,
+        p_codigo_condado,
+        p_codigo_distrito,
+        p_descripcion_direccion,
+        p_editado_por,
+        p_habilitado,
+        p_fecha_creacion
+    );
+    RETURN TRUE;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN FALSE;
+END FN_InsertarDireccion;
+/
+--10
+CREATE OR REPLACE FUNCTION FN_InsertarProducto (
+    p_categoriaProductoId IN NUMBER,
+    p_nombre             IN VARCHAR2,
+    p_descripcion        IN VARCHAR2,
+    p_precioUnitario     IN NUMBER,
+    p_cantidad           IN NUMBER,
+    p_editadoPor         IN VARCHAR2,
+    p_habilitado         IN NUMBER,
+    p_fechaCreacion      IN DATE,
+    p_imagen             IN BLOB
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        INSERT INTO ARTAVIARACING.PRODUCTO (        
+            CATEGORIAPRODUCTOID,
+            NOMBRE,
+            DESCRIPCION,
+            PRECIOUNITARIO,
+            CANTIDAD,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION,
+            IMAGEN
+        ) VALUES (        
+            p_categoriaProductoId,
+            p_nombre,
+            p_descripcion,
+            p_precioUnitario,
+            p_cantidad,
+            p_editadoPor,
+            p_habilitado,
+            p_fechaCreacion,
+            p_imagen
+        );
+        
+        -- Si no hubo error, se cambia el valor a TRUE
+        v_result := TRUE;
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Aquí se maneja cualquier error que ocurra
+            v_result := FALSE;
+    END;
+    
+    RETURN v_result;
+END FN_InsertarProducto;
+/
+--11
 CREATE OR REPLACE FUNCTION FN_ListarCitas (
     CedulaId VARCHAR2
 ) RETURN SYS_REFCURSOR
@@ -3479,14 +3493,60 @@ BEGIN
     RETURN v_cursor;
 END FN_ListarCitas;
 /
+--12
+CREATE OR REPLACE FUNCTION FN_ObtenerProducto (
+    p_productoId IN NUMBER
+) RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+    SELECT
+        PRODUCTOID,
+        CATEGORIAPRODUCTOID,
+        NOMBRE,
+        DESCRIPCION,
+        PRECIOUNITARIO,
+        CANTIDAD,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION,
+        IMAGEN
+    FROM ARTAVIARACING.PRODUCTO
+    WHERE PRODUCTOID = p_productoId;
 
-INSERT INTO "CITAS" (CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, DESCRIPCION, HORAAGENDADA, HORAFINALIZACION, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES ('117580634', 'ABC123', '1HGBH41JXMN109186', 23, 1, TRUNC(SYSDATE), 'Mi carro necesita...', TO_CHAR(SYSTIMESTAMP, 'HH24:MI'), '21:30', '00000001', 1, SYSDATE);
+    RETURN v_cursor;
+END FN_ObtenerProducto;
+/
+--13
+CREATE OR REPLACE FUNCTION FN_VerificarExistenciaUsuario (
+    p_credencialId IN VARCHAR2
+) RETURN VARCHAR2
+IS
+    v_credencialId VARCHAR2(100); -- Ajusta el tamaño según el esquema de tu base de datos
+BEGIN
+    SELECT c.CREDENCIALID INTO v_credencialId
+    FROM CLIENTE c
+    WHERE c.CREDENCIALID = p_credencialId;
 
-INSERT INTO "CITAS" (CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, DESCRIPCION, HORAAGENDADA, HORAFINALIZACION, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES ('123456789', 'DEF456', '2HGBH31JXMN108184', 14, 1, TRUNC(SYSDATE), 'Estoy teniendo este problema...', TO_CHAR(SYSTIMESTAMP, 'HH24:MI'), '23:00', '00000001', 1, SYSDATE);
+    RETURN v_credencialId; -- Devuelve el CREDENCIALID si se encuentra
 
-COMMIT;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        -- Si no se encuentra ningún dato, devuelve NULL
+        RETURN NULL;
+    WHEN OTHERS THEN
+        -- Muestra el mensaje de error y devuelve NULL
+        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+        RETURN NULL;
+END FN_VerificarExistenciaUsuario;
+/
+
+
+/****************************************************************************************************************************************************************
+***                                                 TRIGGERS APARTIR DE AQUI              --ENCABESADOS                                                 ***
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
 
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga
@@ -4698,77 +4758,482 @@ END;
 /
 
 
-CREATE OR REPLACE PROCEDURE USP_LISTAR_CITAS_ADMIN (
-    p_cursor OUT SYS_REFCURSOR
-)
-IS
-BEGIN
-    -- Selecciona todas las citas de la tabla CITAS
-    OPEN p_cursor FOR
-    SELECT * FROM CITAS;
-END;
-/
 
-CREATE OR REPLACE PROCEDURE USP_OBTENER_CITA_POR_ID (
-    p_id_cita IN NUMBER,
-    p_cursor OUT SYS_REFCURSOR
-)
-IS
-BEGIN
-    -- Selecciona la cita con el ID proporcionado
-    OPEN p_cursor FOR
-    SELECT 
-    C.CREDENCIALID
-    ,C.PLACAVEHICULOID
-    ,V.VIN
-    ,S.NOMBRE AS SERVICIOVEHICULO
-    ,EC.ESTADO
-    ,C.FECHAAGENDADA 
-    ,C.DESCRIPCION
-    ,C.HORAAGENDADA    
-    FROM CITAS C
-    INNER JOIN VEHICULO v
-    ON C.PLACAVEHICULOID = V.PLACAVEHICULOID
-    INNER JOIN SERVICIO S
-    ON S.SERVICIOID = C.SERVICIOID
-    INNER JOIN ESTADOCITA EC
-    ON EC.ESTADOCITAID = C.ESTADOCITAID
-    WHERE CITAID = p_id_cita;
-END;
-/
+/****************************************************************************************************************************************************************
+encabesados/        A partir de este punto se estarán agregando los insert harcodeados para los diferentes catalogos.
+****************************************************************************************************************************************************************/  
 
 
-CREATE OR REPLACE PROCEDURE USP_INSERTAR_DIAGNOSTICO(
-    p_IdCita IN NUMBER,
-    p_Diagnostico IN VARCHAR2,
-    p_CodigoTrabajador IN VARCHAR2,
-    p_EditadoPor IN VARCHAR2,
-    p_Habilitado IN NUMBER,
-    p_FechaCreacion IN DATE
-) AS
-BEGIN
-    INSERT INTO DIAGNOSTICO (
-        CITAID,
-        DESCRIPCION,
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Requerimiento: AR-001
+Fecha Creación: 07/09/2024   (MM/dd/YYYY)
+Enunciado: A partir de este punto se estarán agregando los insert harcodeados para los diferentes catalogos.
+****************************************************************************************************************************************************************/  
+--Insert Tabla ROL
+INSERT INTO "ROL" (NOMBRE, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES ('Administrador', 'Dueño del Sistema', '00000001', 1, SYSDATE);
+INSERT INTO "ROL" (NOMBRE, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES ('Cliente', 'Cliente que adquiere nuestros servicios', '00000001', 1, SYSDATE);
+-- SELECT * FROM  "ROL" -- 1= Administrador , 2 = Cliente
+--Insert PUESTO 
+INSERT INTO PUESTOTRABAJO (
+    PUESTO,
+    DESCRIPCION,
+    EDITADOPOR,
+    HABILITADO,
+    FECHACREACION
+) VALUES (
+    'Admin',                -- Valor para PUESTO
+    'N/A', -- Valor para DESCRIPCION
+    '00000001',                        -- Valor para EDITADOPOR
+    1,                             -- Valor para HABILITADO
+    SYSDATE                         -- Valor para FECHACREACION
+);
+--SELECT * FROM  "PUESTOTRABAJO" 
+--Insert Tabla Personal como administrador 
+INSERT INTO PERSONAL (
+        CREDENCIALID,
+        ROLID,
+        NOMBRE,
+        PRIMERAPELLIDO,
+        SEGUNDOAPELLIDO,
+        FECHANACIMIENTO,
         CODTRABAJADOR,
+        FECHACONTRATACION,
+        PUESTOTRABAJOID,
         EDITADOPOR,
         HABILITADO,
         FECHACREACION
     ) VALUES (
-        p_IdCita,
-        p_Diagnostico,
-        p_CodigoTrabajador,
-        p_EditadoPor,
-        p_Habilitado,
-        p_FechaCreacion
+        '000000001',                      -- Valor para CREDENCIALID
+        1,                             -- Valor para ROLID
+        'Admin',                         -- Valor para NOMBRE
+        'N/A',                        -- Valor para PRIMERAPELLIDO
+        'N/A',                        -- Valor para SEGUNDOAPELLIDO
+        SYSDATE, -- Valor para FECHANACIMIENTO
+        'N/A',                      -- Valor para CODTRABAJADOR
+        SYSDATE,                        -- Valor para FECHACONTRATACION
+        1,                             -- Valor para PUESTOTRABAJOID
+        '00000001',                        -- Valor para EDITADOPOR (opcional)
+        1,                             -- Valor para HABILITADO
+        SYSDATE                         -- Valor para FECHACREACION
     );
-    
-    COMMIT;
-END USP_INSERTAR_DIAGNOSTICO;
-/
+--SELECT * FROM  "PERSONAL" 
+--Insert Tabla Pais
+INSERT INTO "PAIS" (CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (1, 'COSTA RICA', '00000001', 1, SYSDATE);
+
+--Insert Provincias
+INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (1, 1, 'SAN JOSÉ', '00000001', 1, SYSDATE);
+
+INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (2, 1, 'ALAJUELA', '00000001', 1, SYSDATE);
+
+INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (3, 1, 'CARTAGO', '00000001', 1, SYSDATE);
+
+INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (4, 1, 'HEREDIA', '00000001', 1, SYSDATE);
+
+INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (5, 1, 'GUANACASTE', '00000001', 1, SYSDATE);
+
+INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (6, 1, 'PUNTARENAS', '00000001', 1, SYSDATE);
+
+INSERT INTO "ESTADO" (CODIGOESTADO, CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (7, 1, 'LIMÓN', '00000001', 1, SYSDATE);
+
+-- Cantones de la provincia de San José
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (1, 1, 'SAN JOSÉ', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (2, 1, 'ESCAZÚ', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (3, 1, 'DESAMPARADOS', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (4, 1, 'PURISCAL', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (5, 1, 'TARRAZÚ', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (6, 1, 'ASERRÍ', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (7, 1, 'MORA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (8, 1, 'GOICOECHEA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (9, 1, 'SANTA ANA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (10, 1, 'ALAJUELITA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (11, 1, 'VAZQUEZ DE CORONADO', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (12, 1, 'ACOSTA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (13, 1, 'TIBÁS', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (14, 1, 'MORAVIA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (15, 1, 'MONTES DE OCA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (16, 1, 'TURRUBARES', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (17, 1, 'DOTA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (18, 1, 'CURRIDABAT', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (19, 1, 'PÉREZ ZELEDÓN', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (20, 1, 'LEÓN CORTÉS', '00000001', 1, SYSDATE);
+
+-- Cantones de la provincia de Alajuela
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (21, 2, 'ALAJUELA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (22, 2, 'SAN RAMÓN', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (23, 2, 'GRECIA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (24, 2, 'SAN MATEO', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (25, 2, 'ATENAS', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (26, 2, 'NARANJO', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (27, 2, 'PALMARES', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (28, 2, 'POÁS', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (29, 2, 'OROTINA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (30, 2, 'SAN CARLOS', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (31, 2, 'ZARCERO', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (32, 2, 'VALVERDE VEGA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (33, 2, 'UPALA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (34, 2, 'LOS CHILES', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (35, 2, 'GUATUSO', '00000001', 1, SYSDATE);
+
+-- Cantones de la provincia de Cartago
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (36, 3, 'CARTAGO', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (37, 3, 'PARAÍSO', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (38, 3, 'LA UNIÓN', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (39, 3, 'JIMÉNEZ', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (40, 3, 'TURRIALBA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (41, 3, 'ALVARADO', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (42, 3, 'OREAMUNO', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (43, 3, 'EL GUARCO', '00000001', 1, SYSDATE);
+
+-- Cantones de la provincia de Heredia
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (44, 4, 'HEREDIA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (45, 4, 'BARVA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (46, 4, 'SANTO DOMINGO', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (47, 4, 'SANTA BÁRBARA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (48, 4, 'SAN RAFAEL', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (49, 4, 'SAN ISIDRO', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (50, 4, 'BELÉN', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (51, 4, 'FLORES', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (52, 4, 'SAN PABLO', '00000001', 1, SYSDATE);
+
+-- Cantones de la provincia de Guanacaste
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (53, 5, 'LIBERIA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (54, 5, 'NICOYA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (55, 5, 'SANTA CRUZ', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (56, 5, 'BAGACES', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (57, 5, 'CARRILLO', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (58, 5, 'CAÑAS', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (59, 5, 'ABANGARES', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (60, 5, 'TILARÁN', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (61, 5, 'NANDAYURE', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (62, 5, 'LA CRUZ', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (63, 5, 'HOJANCHA', '00000001', 1, SYSDATE);
+
+-- Cantones de la provincia de Puntarenas
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (64, 6, 'PUNTARENAS', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (65, 6, 'ESPARZA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (66, 6, 'BUENOS AIRES', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (67, 6, 'MONTES DE ORO', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (68, 6, 'OSA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (69, 6, 'QUEPOS', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (70, 6, 'GOLFITO', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (71, 6, 'COTO BRUS', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (72, 6, 'PARRITA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (73, 6, 'CORREDORES', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (74, 6, 'GARABITO', '00000001', 1, SYSDATE);
+
+-- Cantones de la provincia de Limón
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (75, 7, 'LIMÓN', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (76, 7, 'POCOCÍ', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (77, 7, 'SIQUIRRES', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (78, 7, 'TALAMANCA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (79, 7, 'MATINA', '00000001', 1, SYSDATE);
+
+INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES (80, 7, 'GUÁCIMO', '00000001', 1, SYSDATE);
+
+--select * from "CONDADO";
+-- Inserts para los distritos del cant?n Para?so
+INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES  (1, 37, 'Paraiso', '00000001', 1, SYSDATE);
+INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES    (2, 37, 'Santiago', '00000001', 1, SYSDATE);
+INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES   (3, 37, 'Orosi', '00000001', 1, SYSDATE);
+INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES   (4, 37, 'Cachi', '00000001', 1, SYSDATE);
+select * from "DISTRITO";
+
+--  Insert de la categoria del telefono. 
+INSERT INTO "ARTAVIARACING"."CATEGORIATELEFONO" 
+(
+    "TIPOTELEFONO",
+    "DESCRIPCION",
+    "EDITADOPOR",
+    "HABILITADO",
+    "FECHACREACION"
+) 
+VALUES 
+(
+    'Móvil',                  -- Tipo de teléfono
+    'Teléfono móvil personal', -- Descripción
+    '00000001',                  -- Usuario que edita
+    1,                        -- Habilitado (1 para habilitado, 0 para deshabilitado)
+    SYSDATE                   -- Fecha de creación (actual)
+);
+INSERT INTO "ARTAVIARACING"."CATEGORIATELEFONO" 
+(
+    "TIPOTELEFONO",
+    "DESCRIPCION",
+    "EDITADOPOR",
+    "HABILITADO",
+    "FECHACREACION"
+) 
+VALUES 
+(
+    'Casa',                  -- Tipo de teléfono
+    'Teléfono casa', -- Descripción
+    '00000001',                  -- Usuario que edita
+    1,                        -- Habilitado (1 para habilitado, 0 para deshabilitado)
+    SYSDATE                   -- Fecha de creación (actual)
+);
+
+--SEGUNDOS
+-- Categorías para menús y submenús
+INSERT INTO "ARTAVIARACING"."CATEGORIAMENU" (CATEGORIAMENUID, TIPOMENU, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 'MENU', 'Menú Principal', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIAMENU" (CATEGORIAMENUID, TIPOMENU, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 'SUBMENU', 'Sub menú', '000000001', 1, SYSDATE);
+
+
+-- Menús principales
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 1, NULL, 'Home', '/home', 1, 'fa fa-home', 'Página principal', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 1, NULL, 'Gestión Administradora', '/adminmanager', 1, 'fa fa-box-open', 'Gestión de administración', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(3, 1, NULL, 'Gestión de Citas', '/shedulemanager', 1, 'fa fa-calendar-check', 'Gestión de citas', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(11, 1, NULL, 'Cerrar Sesión', '/index', 1, 'fa fa-power-off', 'Cerrar Sesión', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(8, 1, NULL, 'Repuestos', '/UsuarioInventario', 1, 'fa fa-cogs', 'Gestión de Repuestos', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(9, 1, NULL, 'Gestión de Vehículos', '/ManageVehicle', 1, 'fa fa-car', 'Gestiona los vehículos del cliente', '000000001', 1, SYSDATE);
 
 
 
+-- Submenús
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(4, 2, 2, 'Inventario', '/inventario', 2, 'fa fa-warehouse', 'Gestión de inventario', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(5, 2, 3, 'Agendar', '/agendar', 2, 'fa fa-calendar-plus', 'Agendar citas', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(6, 2, 3, 'Mis Citas', '/miscitas', 2, 'fa fa-calendar-day', 'Mis citas', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(7, 2, 3, 'Citas', '/citas', 2, 'fa fa-calendar-alt', 'Todas las citas', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(10, 2, NULL, 'Repuestos', '/UsuarioInventario', 1, 'fa fa-cogs', 'Gestión de Repuestos', '000000001', 1, SYSDATE);
+
+-- Supongamos que el rol con ID 1 es 'Administrador'
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 2, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 3, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 3, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 4, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 5, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 6, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 7, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 8, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 11, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 11, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 9, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 10, '000000001', 1, SYSDATE);
+
+--TERCEROS
+INSERT INTO "CITAS" (CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, DESCRIPCION, HORAAGENDADA, HORAFINALIZACION, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES ('117580634', 'ABC123', '1HGBH41JXMN109186', 23, 1, TRUNC(SYSDATE), 'Mi carro necesita...', TO_CHAR(SYSTIMESTAMP, 'HH24:MI'), '21:30', '00000001', 1, SYSDATE);
+
+INSERT INTO "CITAS" (CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, DESCRIPCION, HORAAGENDADA, HORAFINALIZACION, EDITADOPOR, HABILITADO, FECHACREACION)
+VALUES ('123456789', 'DEF456', '2HGBH31JXMN108184', 14, 1, TRUNC(SYSDATE), 'Estoy teniendo este problema...', TO_CHAR(SYSTIMESTAMP, 'HH24:MI'), '23:00', '00000001', 1, SYSDATE);
 
 
 
