@@ -1902,6 +1902,14 @@ INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE
 INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
 (11, 1, NULL, 'Cerrar Sesión', '/index', 1, 'fa fa-power-off', 'Cerrar Sesión', '000000001', 1, SYSDATE);
 
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(8, 1, NULL, 'Repuestos', '/UsuarioInventario', 1, 'fa fa-cogs', 'Gestión de Repuestos', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(9, 1, NULL, 'Gestión de Vehículos', '/ManageVehicle', 1, 'fa fa-car', 'Gestiona los vehículos del cliente', '000000001', 1, SYSDATE);
+
+
+
 -- Submenús
 INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
 (4, 2, 2, 'Inventario', '/inventario', 2, 'fa fa-warehouse', 'Gestión de inventario', '000000001', 1, SYSDATE);
@@ -1914,8 +1922,6 @@ INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE
 
 INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
 (7, 2, 3, 'Citas', '/citas', 2, 'fa fa-calendar-alt', 'Todas las citas', '000000001', 1, SYSDATE);
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(8, 1, NULL, 'Repuestos', '/UsuarioInventario', 1, 'fa fa-cogs', 'Gesti n de Repuestos', '000000001', 1, SYSDATE);
 
 
 -- Supongamos que el rol con ID 1 es 'Administrador'
@@ -1954,6 +1960,11 @@ INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO,
 
 INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
 (2, 11, '000000001', 1, SYSDATE);
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 9, '000000001', 1, SYSDATE);
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 10, '000000001', 1, SYSDATE);
+
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -2693,7 +2704,7 @@ INSERT INTO "ARTAVIARACING"."ESTADOCITA"
 VALUES (3, 'Cancelada', 'La cita ha sido cancelada.', '000000001', 1, SYSDATE);
 
 /****************************************************************************************************************************************************************
-Autor: [Tu Nombre]
+Autor: Andres Alvarado
 Id Requirement: AR-001
 Creation Date: 08/19/2024   (MM/dd/YYYY)
 Requirement: Procedimiento Almacenado para guardar un registro en las tablas VEHICULO y VEHICULOPORCLIENTE.
@@ -2735,7 +2746,7 @@ END;
 
 
 /****************************************************************************************************************************************************************
-Autor: [Tu Nombre]
+Autor: Andres Alvarado
 Id Requirement: AR-002
 Creation Date: 08/19/2024   (MM/dd/YYYY)
 Requirement: Procedimiento Almacenado para actualizar un registro en las tablas VEHICULO y VEHICULOPORCLIENTE.
@@ -2754,7 +2765,8 @@ CREATE OR REPLACE PROCEDURE USP_UpdateVehicleAndClient(
     p_año IN NUMBER,
     p_color IN VARCHAR2,
     p_aldia IN NUMBER,
-    p_tituloPropiedad IN BLOB
+    p_tituloPropiedad IN BLOB,
+    p_habilitadoVehiculo IN NUMBER
 ) AS
 BEGIN
     UPDATE VEHICULO
@@ -2765,13 +2777,14 @@ BEGIN
         AÑO = p_año,
         COLOR = p_color,
         ALDIA = p_aldia,
-        TITULOPROPIEDAD = p_tituloPropiedad
+        TITULOPROPIEDAD = p_tituloPropiedad,
+        HABILITADO = p_habilitadoVehiculo
     WHERE PLACAVEHICULOID = p_placaVehiculoID;   
 END;
 /
 
 /****************************************************************************************************************************************************************
-Autor: [Tu Nombre]
+Autor: Andres Alvarado
 Id Requirement: AR-003
 Creation Date: 08/19/2024   (MM/dd/YYYY)
 Requirement: Procedimiento Almacenado para eliminar un registro en las tablas VEHICULO y VEHICULOPORCLIENTE.
@@ -2795,7 +2808,7 @@ END;
 /
 
 /****************************************************************************************************************************************************************
-Autor: [Tu Nombre]
+Autor: Andres Alvarado
 Id Requirement: AR-004
 Creation Date: 08/19/2024   (MM/dd/YYYY)
 Requirement: Procedimiento Almacenado para obtener todos los registros de las tablas VEHICULO y VEHICULOPORCLIENTE con un INNER JOIN.
@@ -2869,6 +2882,9 @@ BEGIN
         V.PLACAVEHICULOID = p_Placa;
 END;
 /
+
+
+
 
 /****************************************************************************************************************************************************************
 Autor: Horacio Porras Marin 
