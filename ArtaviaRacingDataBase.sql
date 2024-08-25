@@ -5,12 +5,10 @@
 
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga
-Id Requirement: AR-001
-Creation Date: 08/20/2024   (MM/dd/YYYY)
-Requirement: Creacion de la tabla auditoria 
-para llevar el historial de los triggers.
+Requerimiento: AR-001
+Fecha Creación: 08/20/2024   (MM/dd/YYYY)
+Enunciado: Creacion de la tabla auditoria para llevar el historial de los triggers.
 ****************************************************************************************************************************************************************/
-
 CREATE TABLE Auditoria (
     Id NUMBER GENERATED ALWAYS AS IDENTITY MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE  NOKEEP  NOSCALE  NOT NULL ENABLE,
     Tabla VARCHAR2(100) NOT NULL,
@@ -189,7 +187,6 @@ CREATE TABLE "CREDENCIALESPORUSUARIO"
     FECHACREACION        DATE                 NOT NULL
 );
 
-
 -- Agregar la restricción de llave primaria
 ALTER TABLE "CREDENCIALESPORUSUARIO"
 ADD CONSTRAINT "CREDENCIALESPORUSUARIO_PK" PRIMARY KEY (CREDENCIALID);
@@ -290,7 +287,6 @@ Requerimiento: AR-001
 Fecha Creación: 07/09/2024   (MM/dd/YYYY)
 Enunciado: Esta tabla se creo  para guardar la informacion de los estados del Pais
 ****************************************************************************************************************************************************************/  
-
 CREATE TABLE "ESTADO"
 (
     CODIGOESTADO   NUMBER          NOT NULL,
@@ -423,11 +419,9 @@ CREATE TABLE SERVICIO (
     FOREIGN KEY (CATEGORIASERVICIOID) REFERENCES CATEGORIASERVICIO(CATEGORIASERVICIOID)
 );
 
-/****************************************************************************************************************************************************************/  
-
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: EstadoCita
-Autor: Jason zuñiga solorzano
+Autor: Horacio Porras Marín
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena el estado de la cita
@@ -479,16 +473,10 @@ DROP TABLE VEHICULO;
 
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Citas
-Autor: Jason zuñiga solorzano
+Autor: Horacio Porras Marín
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la Tabla: Tabla que almacena las citas
-
-*Modificaciones*
-Autor: Horacio Porras Marín
-Id Requirement: AR-003 
-Creation Date: 11/08/2024   (MM/dd/YYYY)
-Information: Cambio de Type en HORAAGENDADA y HORAFINALIZACION. CITAID ahora es auto-incrementable.
 ****************************************************************************************************************************************************************/  
 CREATE TABLE CITAS (
     CITAID              NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY NOT NULL,
@@ -659,19 +647,11 @@ CREATE TABLE PRODUCTOPORDIAGNOSTICO (
 ****************************************************************************************************************************************************************/ 
 
 /****************************************************************************************************************************************************************  
-Creacion de las vistas: Apartir de aqui estaran todas las vistas de la DB
-Autor: Jason zuñiga solorzano
-Requerimiento: AR-001
-Fecha de Creacion: 17-07-24 DD-MM-YYYY
-Enunciado de la vista: Creacion de las vistas
-****************************************************************************************************************************************************************/  
-
-/****************************************************************************************************************************************************************  
-Creacion de la vista: ClientesCompletos
+Creacion de la vista: PersonalDetalle
 Autor: Jason zuñiga solorzano
 Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
-Enunciado de la vista: nos muestra todos los datos importantes del cliente
+Enunciado de la vista: nos muestra todos los datos importantes del personal
 ****************************************************************************************************************************************************************/  
 CREATE VIEW vw_personal_detalle AS 
 SELECT 
@@ -690,7 +670,8 @@ SELECT
 FROM PERSONAL p
 JOIN ROL r ON p.ROLID = r.ROLID
 JOIN PUESTOTRABAJO pt ON p.PUESTOTRABAJOID = pt.PUESTOTRABAJOID;
-  
+/
+
 /****************************************************************************************************************************************************************  
 Creacion de la vista: ClientesDireccion
 Autor: Jason zuñiga solorzano
@@ -708,6 +689,7 @@ SELECT
     d.DESCRIPCION AS DIRECCION
 FROM CLIENTE c
 JOIN DIRECCIONPORUSUARIO d ON c.CREDENCIALID = d.CREDENCIALID;
+/
 
 /****************************************************************************************************************************************************************  
 Creacion de la vista: CitasDetalles
@@ -730,6 +712,8 @@ SELECT
 FROM CITAS c
 JOIN CLIENTE cl ON c.CREDENCIALID = cl.CREDENCIALID
 JOIN VEHICULO v ON c.PLACAVEHICULOID = v.PLACAVEHICULOID;
+/
+
 /****************************************************************************************************************************************************************  
 Creacion de la vista: DiagnosticosDetalle
 Autor: Jason zuñiga solorzano
@@ -749,9 +733,10 @@ SELECT
 FROM DIAGNOSTICO d
 JOIN CITAS c ON d.CITAID = c.CITAID
 JOIN PERSONAL p ON d.CODTRABAJADOR = p.CODTRABAJADOR;
+/
 
 /****************************************************************************************************************************************************************  
-Creacion de la vista: DiagnosticosDetalle
+Creacion de la vista: ObtenerPais
 Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
@@ -762,9 +747,10 @@ SELECT
      CODIGOPAIS  
     ,NOMBRE      
 FROM PAIS;
+/
 
 /****************************************************************************************************************************************************************  
-Creacion de la vista: DiagnosticosDetalle
+Creacion de la vista: ObtenerEstado
 Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
@@ -776,9 +762,10 @@ SELECT
     ,NOMBRE       
     ,CODIGOPAIS    
 FROM ESTADO;
+/
 
 /****************************************************************************************************************************************************************  
-Creacion de la vista: DiagnosticosDetalle
+Creacion de la vista: ObtenerCondado
 Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
@@ -790,9 +777,10 @@ SELECT
     ,NOMBRE         
     ,CODIGOESTADO   
 FROM CONDADO;
+/
 
 /****************************************************************************************************************************************************************  
-Creacion de la vista: DiagnosticosDetalle
+Creacion de la vista: ObtenerDistritos
 Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
@@ -804,6 +792,7 @@ SELECT
     ,NOMBRE          
     ,CODIGOCONDADO   
 FROM DISTRITO;
+/
 
 /****************************************************************************************************************************************************************  
 Creacion de la vista: ProductosDetalle
@@ -825,6 +814,7 @@ SELECT
     cp.NOMBRE AS CATEGORIA_NOMBRE
 FROM PRODUCTO p
 JOIN CATEGORIAPRODUCTO cp ON p.CATEGORIAPRODUCTOID = cp.CATEGORIAPRODUCTOID;
+/
 
 /****************************************************************************************************************************************************************  
 Creacion de la vista: ServiciosDetalle
@@ -846,9 +836,10 @@ SELECT
     cs.NOMBRE AS CATEGORIA_NOMBRE
 FROM SERVICIO s
 JOIN CATEGORIASERVICIO cs ON s.CATEGORIASERVICIOID = cs.CATEGORIASERVICIOID;
+/
 
 /****************************************************************************************************************************************************************  
-Creacion de la vista: DiagnosticosDetalle
+Creacion de la vista: ObtenerVehiculo
 Autor: Horacio Porras Marín
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
@@ -867,9 +858,10 @@ SELECT
     ,HABILITADO
     ,FECHACREACION
 FROM VEHICULO;
+/
 
 /****************************************************************************************************************************************************************  
-Creacion de la vista: DiagnosticosDetalle
+Creacion de la vista: ObtenerPuesto
 Autor: Horacio Porras Marín
 Requerimiento: AR-001
 Fecha de Creacion: 21-07-24 DD-MM-YYYY
@@ -884,7 +876,652 @@ SELECT
     ,HABILITADO
     ,FECHACREACION
 FROM PUESTOTRABAJO;
+/
 
+
+/****************************************************************************************************************************************************************
+***                                                             CREACION DE FUNCIONES APARTIR DE AQUI                                         --ENCABEZADOS   ***
+****************************************************************************************************************************************************************/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para agregar una cita en la tabla CITAS.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_AgregarCita (
+    p_CREDENCIALID IN VARCHAR2,
+    p_PLACAVEHICULOID IN VARCHAR2,
+    p_VIN IN VARCHAR2,
+    p_SERVICIOID IN NUMBER,
+    p_ESTADOCITAID IN NUMBER,
+    p_FECHAAGENDADA IN DATE,
+    p_DESCRIPCION IN VARCHAR2,
+    p_HORAAGENDADA IN VARCHAR2,
+    p_EDITADOPOR IN VARCHAR2,
+    p_HABILITADO IN NUMBER
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        INSERT INTO CITAS (
+            CREDENCIALID,
+            PLACAVEHICULOID,
+            VIN,
+            SERVICIOID,
+            ESTADOCITAID,
+            FECHAAGENDADA,
+            DESCRIPCION,
+            HORAAGENDADA,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION
+        ) VALUES (
+            p_CREDENCIALID,
+            p_PLACAVEHICULOID,
+            p_VIN,
+            p_SERVICIOID,
+            p_ESTADOCITAID,
+            p_FECHAAGENDADA,
+            p_DESCRIPCION,
+            p_HORAAGENDADA,
+            p_EDITADOPOR,
+            p_HABILITADO,
+            SYSDATE
+        );
+
+        -- Si la inserción fue exitosa, se cambia el valor a TRUE
+        v_result := TRUE;
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre un error durante la inserción, se mantiene el valor FALSE
+            v_result := FALSE;
+    END;
+
+    RETURN v_result;
+END FN_AgregarCita;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para actualizar una cita existente en la tabla CITAS.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_ActualizarCita (
+    p_CITAID IN NUMBER,
+    p_CREDENCIALID IN VARCHAR2,
+    p_PLACAVEHICULOID IN VARCHAR2,
+    p_VIN IN VARCHAR2,
+    p_SERVICIOID IN NUMBER,
+    p_ESTADOCITAID IN NUMBER,
+    p_FECHAAGENDADA IN DATE,
+    p_HORAAGENDADA IN VARCHAR2,
+    p_EDITADOPOR IN VARCHAR2,
+    p_HABILITADO IN NUMBER
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        UPDATE CITAS
+        SET CREDENCIALID = p_CREDENCIALID,
+            PLACAVEHICULOID = p_PLACAVEHICULOID,
+            VIN = p_VIN,
+            SERVICIOID = p_SERVICIOID,
+            ESTADOCITAID = p_ESTADOCITAID,
+            FECHAAGENDADA = p_FECHAAGENDADA,
+            HORAAGENDADA = p_HORAAGENDADA,
+            EDITADOPOR = p_EDITADOPOR,
+            HABILITADO = p_HABILITADO,
+            FECHACREACION = SYSDATE
+        WHERE CITAID = p_CITAID;
+
+        -- Si la actualización fue exitosa, se cambia el valor a TRUE
+        IF SQL%ROWCOUNT > 0 THEN
+            v_result := TRUE;
+        ELSE
+            v_result := FALSE;
+        END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre un error durante la actualización, se mantiene el valor FALSE
+            v_result := FALSE;
+    END;
+
+    RETURN v_result;
+END FN_ActualizarCita;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para cancelar una cita existente en la tabla CITAS.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_CancelarCita (
+    p_citaId NUMBER,
+    p_editadoPor VARCHAR2
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    UPDATE CITAS
+    SET HABILITADO = 0,
+        EDITADOPOR = p_editadoPor,
+        HORAFINALIZACION = TO_CHAR(SYSDATE, 'HH24:MI')
+    WHERE CITAID = p_citaId AND HABILITADO != 0; -- Solo actualiza si la cita no está cancelada.
+
+    -- Si se actualizó algún registro, cambiamos el valor a TRUE
+    IF SQL%ROWCOUNT > 0 THEN
+        v_result := TRUE;
+    ELSE
+        v_result := FALSE;
+    END IF;
+
+    RETURN v_result;
+END FN_CancelarCita;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para listar citas existentes en la tabla CITAS.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_ListarCitas (
+    CedulaId VARCHAR2
+) RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+    SELECT 
+        C.PLACAVEHICULOID,
+        V.MARCA || ' ' || V.MODELO || ' ' || V.AÑO AS VEHICULO,
+        CS.NOMBRE AS CATEGORIA,
+        S.NOMBRE AS SERVICIO,
+        C.FECHAAGENDADA,
+        C.HORAAGENDADA
+    FROM CITAS C
+    JOIN SERVICIO S
+        ON S.SERVICIOID = C.SERVICIOID
+    JOIN CATEGORIASERVICIO CS
+        ON CS.CATEGORIASERVICIOID = S.CATEGORIASERVICIOID
+    JOIN VEHICULO V
+        ON V.PLACAVEHICULOID = C.PLACAVEHICULOID
+    WHERE C.CREDENCIALID = CedulaId;
+
+    RETURN v_cursor;
+END FN_ListarCitas;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para insertar un producto en la tabla PRODUCTO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_InsertarProducto (
+    p_categoriaProductoId IN NUMBER,
+    p_nombre             IN VARCHAR2,
+    p_descripcion        IN VARCHAR2,
+    p_precioUnitario     IN NUMBER,
+    p_cantidad           IN NUMBER,
+    p_editadoPor         IN VARCHAR2,
+    p_habilitado         IN NUMBER,
+    p_fechaCreacion      IN DATE,
+    p_imagen             IN BLOB
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        INSERT INTO ARTAVIARACING.PRODUCTO (        
+            CATEGORIAPRODUCTOID,
+            NOMBRE,
+            DESCRIPCION,
+            PRECIOUNITARIO,
+            CANTIDAD,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION,
+            IMAGEN
+        ) VALUES (        
+            p_categoriaProductoId,
+            p_nombre,
+            p_descripcion,
+            p_precioUnitario,
+            p_cantidad,
+            p_editadoPor,
+            p_habilitado,
+            p_fechaCreacion,
+            p_imagen
+        );
+        
+        -- Si no hubo error, se cambia el valor a TRUE
+        v_result := TRUE;
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Aquí se maneja cualquier error que ocurra
+            v_result := FALSE;
+    END;
+    
+    RETURN v_result;
+END FN_InsertarProducto;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para actualizar un producto existente en la tabla PRODUCTO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_ActualizarProducto (
+    p_productoId         IN NUMBER,
+    p_categoriaProductoId IN NUMBER,
+    p_nombre             IN VARCHAR2,
+    p_descripcion        IN VARCHAR2,
+    p_precioUnitario     IN NUMBER,
+    p_cantidad           IN NUMBER,
+    p_editadoPor         IN VARCHAR2,
+    p_habilitado         IN NUMBER,
+    p_fechaCreacion      IN DATE,
+    p_imagen             IN BLOB
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        UPDATE ARTAVIARACING.PRODUCTO
+        SET
+            CATEGORIAPRODUCTOID = p_categoriaProductoId,
+            NOMBRE = p_nombre,
+            DESCRIPCION = p_descripcion,
+            PRECIOUNITARIO = p_precioUnitario,
+            CANTIDAD = p_cantidad,
+            EDITADOPOR = p_editadoPor,
+            HABILITADO = p_habilitado,
+            FECHACREACION = p_fechaCreacion,
+            IMAGEN = p_imagen
+        WHERE PRODUCTOID = p_productoId;
+
+        -- Verificamos si se actualizó algún registro
+        IF SQL%ROWCOUNT > 0 THEN
+            v_result := TRUE;
+        ELSE
+            v_result := FALSE;
+        END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre algún error, retornamos FALSE
+            v_result := FALSE;
+    END;
+
+    RETURN v_result;
+END FN_ActualizarProducto;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para obtener un producto existente en la tabla PRODUCTO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_ObtenerProducto (
+    p_productoId IN NUMBER
+) RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+    SELECT
+        PRODUCTOID,
+        CATEGORIAPRODUCTOID,
+        NOMBRE,
+        DESCRIPCION,
+        PRECIOUNITARIO,
+        CANTIDAD,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION,
+        IMAGEN
+    FROM ARTAVIARACING.PRODUCTO
+    WHERE PRODUCTOID = p_productoId;
+
+    RETURN v_cursor;
+END FN_ObtenerProducto;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para mostrar productos existentes en la tabla PRODUCTO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_GenerarHTMLProductos RETURN CLOB IS
+    v_html CLOB;
+BEGIN
+    -- Inicializar HTML
+    v_html := '<div class="container">';
+    v_html := v_html || '<div class="btn-group" role="group" aria-label="Categor as">';
+
+    -- Botón para mostrar todos los productos
+    v_html := v_html || '<button type="button" class="btn btn-primary filter-button" data-category="all">Todo</button>';
+
+    -- Botones para cada categoría
+    FOR CATEGORIA IN (
+        SELECT CATEGORIAPRODUCTOID, NOMBRE 
+        FROM CATEGORIAPRODUCTO 
+        WHERE HABILITADO = 1
+    ) LOOP
+        v_html := v_html || '<button type="button" class="btn btn-primary filter-button" data-category="' || CATEGORIA.CATEGORIAPRODUCTOID || '">' || CATEGORIA.NOMBRE || '</button>';
+    END LOOP;
+
+    v_html := v_html || '</div>';
+    v_html := v_html || '<div class="row" id="product-container">';
+
+    -- Productos activos
+    FOR PRODUCTO IN (
+        SELECT P.PRODUCTOID, P.NOMBRE, P.DESCRIPCION, P.CANTIDAD, P.PRECIOUNITARIO, P.IMAGEN, C.CATEGORIAPRODUCTOID
+        FROM PRODUCTO P
+        JOIN CATEGORIAPRODUCTO C ON P.CATEGORIAPRODUCTOID = C.CATEGORIAPRODUCTOID
+        WHERE P.HABILITADO = 1
+    ) LOOP
+        -- Generar el placeholder para la imagen
+        DECLARE
+            img_placeholder VARCHAR2(50);
+        BEGIN
+            img_placeholder := '[ImagenProducto' || PRODUCTO.PRODUCTOID || ']';
+
+            v_html := v_html || '<div class="col-md-4 product-card" data-category="' || PRODUCTO.CATEGORIAPRODUCTOID || '">';
+            v_html := v_html || '<div class="card">';
+            v_html := v_html || '<img src="data:image/jpeg;base64,' || img_placeholder || '" class="card-img-top" alt="' || PRODUCTO.NOMBRE || '" width="50">';
+            v_html := v_html || '<div class="card-body">';
+            v_html := v_html || '<h5 class="card-title">' || PRODUCTO.NOMBRE || '</h5>';
+            v_html := v_html || '<p class="card-text">' || PRODUCTO.DESCRIPCION || '</p>';
+            v_html := v_html || '<p class="card-text">Cantidad: ' || PRODUCTO.CANTIDAD || '</p>';
+            v_html := v_html || '<p class="card-text">Precio: ' || TO_CHAR(PRODUCTO.PRECIOUNITARIO, 'FM999G999D00') || ' Colones' || '</p>';
+            v_html := v_html || '</div></div></div>';
+        END;
+    END LOOP;
+
+    v_html := v_html || '</div></div>';
+    RETURN v_html;
+END FN_GenerarHTMLProductos;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para mostrar clientes existentes en la tabla CLIENTE.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_VerificarExistenciaUsuario (
+    p_credencialId IN VARCHAR2
+) RETURN VARCHAR2
+IS
+    v_credencialId VARCHAR2(100); -- Ajusta el tamaño según el esquema de tu base de datos
+BEGIN
+    SELECT c.CREDENCIALID INTO v_credencialId
+    FROM CLIENTE c
+    WHERE c.CREDENCIALID = p_credencialId;
+
+    RETURN v_credencialId; -- Devuelve el CREDENCIALID si se encuentra
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        -- Si no se encuentra ningún dato, devuelve NULL
+        RETURN NULL;
+    WHEN OTHERS THEN
+        -- Muestra el mensaje de error y devuelve NULL
+        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+        RETURN NULL;
+END FN_VerificarExistenciaUsuario;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para insertar clientes en la tabla CLIENTE.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_InsertarCliente (
+    p_credencial_id       VARCHAR2,
+    p_rol_id              NUMBER,
+    p_nombre              VARCHAR2,
+    p_primer_apellido     VARCHAR2,
+    p_segundo_apellido    VARCHAR2,
+    p_fecha_nacimiento    DATE,
+    p_editado_por         VARCHAR2,
+    p_habilitado          NUMBER,
+    p_fecha_creacion      DATE
+) RETURN BOOLEAN IS
+BEGIN
+    INSERT INTO CLIENTE (
+        CREDENCIALID,
+        ROLID,
+        NOMBRE,
+        PRIMERAPELLIDO,
+        SEGUNDOAPELLIDO,
+        FECHANACIMIENTO,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        p_credencial_id,
+        p_rol_id,
+        p_nombre,
+        p_primer_apellido,
+        p_segundo_apellido,
+        p_fecha_nacimiento,
+        p_editado_por,
+        p_habilitado,
+        p_fecha_creacion
+    );
+    RETURN TRUE;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN FALSE;
+END FN_InsertarCliente;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para insertar telefonos en la tabla TELEFONOPORUSUARIO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_InsertarTelefono (
+    p_numero_telefono      VARCHAR2,
+    p_credencial_id        VARCHAR2,
+    p_categoria_telefono_id NUMBER,
+    p_numero_extension     NUMBER,
+    p_descripcion          VARCHAR2,
+    p_editado_por          VARCHAR2,
+    p_habilitado           NUMBER,
+    p_fecha_creacion       DATE
+) RETURN BOOLEAN IS
+BEGIN
+    INSERT INTO TELEFONOPORUSUARIO (
+        NUMEROTELEFONO,
+        CREDENCIALID,
+        CATEGORIATELEFONOID,
+        NUMEROEXTENSION,
+        DESCRIPCION,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        p_numero_telefono,
+        p_credencial_id,
+        p_categoria_telefono_id,
+        p_numero_extension,
+        p_descripcion,
+        p_editado_por,
+        p_habilitado,
+        p_fecha_creacion
+    );
+    RETURN TRUE;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN FALSE;
+END FN_InsertarTelefono;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para insertar direcciones en la tabla DIRECCIONPORUSUARIO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_InsertarDireccion (
+    p_credencial_id       VARCHAR2,
+    p_codigo_pais         NUMBER,
+    p_codigo_estado       NUMBER,
+    p_codigo_condado      NUMBER,
+    p_codigo_distrito     NUMBER,
+    p_descripcion_direccion VARCHAR2,
+    p_editado_por         VARCHAR2,
+    p_habilitado          NUMBER,
+    p_fecha_creacion      DATE
+) RETURN BOOLEAN IS
+BEGIN
+    INSERT INTO DIRECCIONPORUSUARIO (
+        CREDENCIALID,
+        CODIGOPAIS,
+        CODIGOESTADO,
+        CODIGOCONDADO,
+        CODIGODISTRITO,
+        DESCRIPCION,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        p_credencial_id,
+        p_codigo_pais,
+        p_codigo_estado,
+        p_codigo_condado,
+        p_codigo_distrito,
+        p_descripcion_direccion,
+        p_editado_por,
+        p_habilitado,
+        p_fecha_creacion
+    );
+    RETURN TRUE;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN FALSE;
+END FN_InsertarDireccion;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para insertar credenciales en la tabla CREDENCIALESPORUSUARIO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_InsertarCredenciales (
+    p_credencial_id       VARCHAR2,
+    p_correo_electronico  VARCHAR2,
+    p_contrasena          VARCHAR2,
+    p_es_contrasena_temporal NUMBER,
+    p_editado_por         VARCHAR2,
+    p_habilitado          NUMBER,
+    p_fecha_creacion      DATE
+) RETURN BOOLEAN IS
+BEGIN
+    INSERT INTO CREDENCIALESPORUSUARIO (
+        CREDENCIALID,
+        CORREOELECTRONICO,
+        CONTRASEÑA,
+        ESCONTRASEÑATEMPORAL,
+        EDITADOPOR,
+        HABILITADO,
+        FECHACREACION
+    ) VALUES (
+        p_credencial_id,
+        p_correo_electronico,
+        p_contrasena,
+        p_es_contrasena_temporal,
+        p_editado_por,
+        p_habilitado,
+        p_fecha_creacion
+    );
+    RETURN TRUE;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN FALSE;
+END FN_InsertarCredenciales;
+/
 
 /****************************************************************************************************************************************************************
 ***                                                          CREACION DE USP DE PAQUETES APARTIR DE AQUI                                      --ENCABEZADOS   ***
@@ -1127,7 +1764,6 @@ CREATE OR REPLACE PACKAGE pkg_CategoriaServicio AS
 END pkg_CategoriaServicio;
 /
 
-
 CREATE OR REPLACE PACKAGE BODY pkg_CategoriaServicio AS
 
     FUNCTION FP_ObtenerCategoriasDeServicio RETURN SYS_REFCURSOR IS
@@ -1204,7 +1840,6 @@ CREATE OR REPLACE PACKAGE pkg_Servicio AS
 END pkg_Servicio;
 /
 
-
 CREATE OR REPLACE PACKAGE BODY pkg_Servicio AS
 
     FUNCTION FP_ObtenerServiciosPorCategoria(CodigoCategoriaServicio NUMBER) RETURN SYS_REFCURSOR IS
@@ -1248,6 +1883,7 @@ CREATE OR REPLACE PACKAGE pkg_EstadoCita AS
     FUNCTION FP_ObtenerEstadosCita RETURN SYS_REFCURSOR;
 END pkg_EstadoCita;
 /
+
 CREATE OR REPLACE PACKAGE BODY pkg_EstadoCita AS
 
     FUNCTION FP_ObtenerEstadosCita RETURN SYS_REFCURSOR IS
@@ -1744,7 +2380,6 @@ Id Requirement: AR-003
 Creation Date: 21/07/2024   (MM/dd/YYYY)
 Requirement:  Este procedimiento se encarga de agregar informacion en la tabla cita
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE PROCEDURE USP_AGREGAR_CITA (
     p_CREDENCIALID IN VARCHAR2,
     p_PLACAVEHICULOID IN VARCHAR2,
@@ -2080,7 +2715,7 @@ BEGIN
 END USP_InsertarProducto;
 /
 
- /****************************************************************************************************************************************************************
+/****************************************************************************************************************************************************************
 Autor: Andrés Alvarado Matamoros
 Id Requirement: AR-002
 Creation Date: 10/08/2024   (MM/dd/YYYY)
@@ -2091,7 +2726,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE PROCEDURE USP_ActualizarProducto (
     p_productoId         IN NUMBER,
     p_categoriaProductoId IN NUMBER,
@@ -2130,18 +2764,6 @@ BEGIN
 END USP_ActualizarProducto;
 /
 
- /****************************************************************************************************************************************************************
-Autor: Horacio Porras Marin
-Id Requirement: AR-009
-Creation Date: 10/08/2024   (MM/dd/YYYY)
-Requirement: Función para actualizar un producto existente en la tabla PRODUCTO.
-****************************************************************************************************************************************************************/
-/****************************************************************************************************************************************************************
-Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-****************************************************************************************************************************************************************/
-
 /****************************************************************************************************************************************************************
 Autor: Andrés Alvarado Matamoros
 Id Requirement: AR-003
@@ -2153,7 +2775,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE PROCEDURE USP_ObtenerProducto (
     p_productoId         IN NUMBER,
     p_cursor             OUT SYS_REFCURSOR
@@ -2202,7 +2823,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE PROCEDURE USP_ObtenerTodosProductos (
     p_cursor             OUT SYS_REFCURSOR
 )
@@ -2235,7 +2855,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE PROCEDURE USP_EliminarProducto (
     p_productoId IN NUMBER
 )
@@ -2264,7 +2883,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE FUNCTION FN_EliminarProducto (
     p_productoId IN NUMBER
 ) RETURN BOOLEAN
@@ -2358,9 +2976,6 @@ BEGIN
 END SP_Obtener_Productos_HTML;
 /
 
-
-
-
 /****************************************************************************************************************************************************************
 Autor: Andrés Alvarado Matamoros
 Id Requirement: AR-001
@@ -2373,7 +2988,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE PROCEDURE SP_Obtener_Imagenes_Activas(
     OUT_CURSOR OUT SYS_REFCURSOR
 ) AS 
@@ -2400,7 +3014,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarVehiculo (
     RespuestaVehiculo OUT SYS_REFCURSOR
 ) AS
@@ -2432,7 +3045,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_ObtenerCategoriaServicio (
     RespuestaCategoria OUT SYS_REFCURSOR
 ) AS
@@ -2485,7 +3097,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarServicio (
     CodigoCategoriaServicio IN NUMBER,
     RespuestaServicio OUT SYS_REFCURSOR
@@ -2656,7 +3267,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarEstadoCita (
     RespuestaEstadoCita OUT SYS_REFCURSOR
 ) AS
@@ -2696,7 +3306,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE PROCEDURE USP_SaveVehicleAndClient(
     p_placaVehiculoID IN VARCHAR2,
     p_vin IN VARCHAR2,
@@ -2726,7 +3335,6 @@ BEGIN
 END;
 /
 
-
 /****************************************************************************************************************************************************************
 Autor: Andres Alvarado
 Id Requirement: AR-002
@@ -2738,7 +3346,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE PROCEDURE USP_UpdateVehicleAndClient(
     p_placaVehiculoID IN VARCHAR2,
     p_vin IN VARCHAR2,
@@ -2776,7 +3383,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE PROCEDURE USP_DeleteVehicleAndClient(
     p_placaVehiculoID IN VARCHAR2    
 ) AS
@@ -2837,7 +3443,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE PROCEDURE USP_GetVehiclesByPlaca(
       p_Placa IN VARCHAR2,
       p_cursor OUT SYS_REFCURSOR
@@ -2865,9 +3470,6 @@ BEGIN
 END;
 /
 
-
-
-
 /****************************************************************************************************************************************************************
 Autor: Horacio Porras Marin 
 Id Requirement: AR-009
@@ -2879,7 +3481,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE  USP_VehiculoPorCliente (
      CedulaId          VARCHAR2
     ,RespuestaVehiculo OUT SYS_REFCURSOR
@@ -2908,7 +3509,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_Listar_Citas (
      CedulaId VARCHAR2,
      RespuestaCitas OUT SYS_REFCURSOR
@@ -2917,9 +3517,6 @@ BEGIN
     RespuestaCitas := FN_ListarCitas(CedulaId);
 END USP_Listar_Citas;
 /
-
-
-
 
 /****************************************************************************************************************************************************************
 Autor: LUIS SOLORZANO
@@ -3000,586 +3597,8 @@ END USP_INSERTAR_DIAGNOSTICO;
 /
 
 /****************************************************************************************************************************************************************
-***                                                             CREACION DE FUNCIONES APARTIR DE AQUI                                         --ENCABEZADOS   ***
-****************************************************************************************************************************************************************/
-
---1
-CREATE OR REPLACE FUNCTION FN_AgregarCita (
-    p_CREDENCIALID IN VARCHAR2,
-    p_PLACAVEHICULOID IN VARCHAR2,
-    p_VIN IN VARCHAR2,
-    p_SERVICIOID IN NUMBER,
-    p_ESTADOCITAID IN NUMBER,
-    p_FECHAAGENDADA IN DATE,
-    p_DESCRIPCION IN VARCHAR2,
-    p_HORAAGENDADA IN VARCHAR2,
-    p_EDITADOPOR IN VARCHAR2,
-    p_HABILITADO IN NUMBER
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    BEGIN
-        INSERT INTO CITAS (
-            CREDENCIALID,
-            PLACAVEHICULOID,
-            VIN,
-            SERVICIOID,
-            ESTADOCITAID,
-            FECHAAGENDADA,
-            DESCRIPCION,
-            HORAAGENDADA,
-            EDITADOPOR,
-            HABILITADO,
-            FECHACREACION
-        ) VALUES (
-            p_CREDENCIALID,
-            p_PLACAVEHICULOID,
-            p_VIN,
-            p_SERVICIOID,
-            p_ESTADOCITAID,
-            p_FECHAAGENDADA,
-            p_DESCRIPCION,
-            p_HORAAGENDADA,
-            p_EDITADOPOR,
-            p_HABILITADO,
-            SYSDATE
-        );
-
-        -- Si la inserción fue exitosa, se cambia el valor a TRUE
-        v_result := TRUE;
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- Si ocurre un error durante la inserción, se mantiene el valor FALSE
-            v_result := FALSE;
-    END;
-
-    RETURN v_result;
-END FN_AgregarCita;
-/
-
---2
-CREATE OR REPLACE FUNCTION FN_ActualizarCita (
-    p_CITAID IN NUMBER,
-    p_CREDENCIALID IN VARCHAR2,
-    p_PLACAVEHICULOID IN VARCHAR2,
-    p_VIN IN VARCHAR2,
-    p_SERVICIOID IN NUMBER,
-    p_ESTADOCITAID IN NUMBER,
-    p_FECHAAGENDADA IN DATE,
-    p_HORAAGENDADA IN VARCHAR2,
-    p_EDITADOPOR IN VARCHAR2,
-    p_HABILITADO IN NUMBER
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    BEGIN
-        UPDATE CITAS
-        SET CREDENCIALID = p_CREDENCIALID,
-            PLACAVEHICULOID = p_PLACAVEHICULOID,
-            VIN = p_VIN,
-            SERVICIOID = p_SERVICIOID,
-            ESTADOCITAID = p_ESTADOCITAID,
-            FECHAAGENDADA = p_FECHAAGENDADA,
-            HORAAGENDADA = p_HORAAGENDADA,
-            EDITADOPOR = p_EDITADOPOR,
-            HABILITADO = p_HABILITADO,
-            FECHACREACION = SYSDATE
-        WHERE CITAID = p_CITAID;
-
-        -- Si la actualización fue exitosa, se cambia el valor a TRUE
-        IF SQL%ROWCOUNT > 0 THEN
-            v_result := TRUE;
-        ELSE
-            v_result := FALSE;
-        END IF;
-
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- Si ocurre un error durante la actualización, se mantiene el valor FALSE
-            v_result := FALSE;
-    END;
-
-    RETURN v_result;
-END FN_ActualizarCita;
-/
-
---3
-CREATE OR REPLACE FUNCTION FN_ActualizarProducto (
-    p_productoId         IN NUMBER,
-    p_categoriaProductoId IN NUMBER,
-    p_nombre             IN VARCHAR2,
-    p_descripcion        IN VARCHAR2,
-    p_precioUnitario     IN NUMBER,
-    p_cantidad           IN NUMBER,
-    p_editadoPor         IN VARCHAR2,
-    p_habilitado         IN NUMBER,
-    p_fechaCreacion      IN DATE,
-    p_imagen             IN BLOB
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    BEGIN
-        UPDATE ARTAVIARACING.PRODUCTO
-        SET
-            CATEGORIAPRODUCTOID = p_categoriaProductoId,
-            NOMBRE = p_nombre,
-            DESCRIPCION = p_descripcion,
-            PRECIOUNITARIO = p_precioUnitario,
-            CANTIDAD = p_cantidad,
-            EDITADOPOR = p_editadoPor,
-            HABILITADO = p_habilitado,
-            FECHACREACION = p_fechaCreacion,
-            IMAGEN = p_imagen
-        WHERE PRODUCTOID = p_productoId;
-
-        -- Verificamos si se actualizó algún registro
-        IF SQL%ROWCOUNT > 0 THEN
-            v_result := TRUE;
-        ELSE
-            v_result := FALSE;
-        END IF;
-
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- Si ocurre algún error, retornamos FALSE
-            v_result := FALSE;
-    END;
-
-    RETURN v_result;
-END FN_ActualizarProducto;
-/
-
---4
-CREATE OR REPLACE FUNCTION FN_AgregarCita (
-    p_CREDENCIALID IN VARCHAR2,
-    p_PLACAVEHICULOID IN VARCHAR2,
-    p_VIN IN VARCHAR2,
-    p_SERVICIOID IN NUMBER,
-    p_ESTADOCITAID IN NUMBER,
-    p_FECHAAGENDADA IN DATE,
-    p_DESCRIPCION IN VARCHAR2,
-    p_HORAAGENDADA IN VARCHAR2,
-    p_EDITADOPOR IN VARCHAR2,
-    p_HABILITADO IN NUMBER
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    BEGIN
-        INSERT INTO CITAS (
-            CREDENCIALID,
-            PLACAVEHICULOID,
-            VIN,
-            SERVICIOID,
-            ESTADOCITAID,
-            FECHAAGENDADA,
-            DESCRIPCION,
-            HORAAGENDADA,
-            EDITADOPOR,
-            HABILITADO,
-            FECHACREACION
-        ) VALUES (
-            p_CREDENCIALID,
-            p_PLACAVEHICULOID,
-            p_VIN,
-            p_SERVICIOID,
-            p_ESTADOCITAID,
-            p_FECHAAGENDADA,
-            p_DESCRIPCION,
-            p_HORAAGENDADA,
-            p_EDITADOPOR,
-            p_HABILITADO,
-            SYSDATE
-        );
-
-        -- Si la inserción fue exitosa, se cambia el valor a TRUE
-        v_result := TRUE;
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- Si ocurre un error durante la inserción, se mantiene el valor FALSE
-            v_result := FALSE;
-    END;
-
-    RETURN v_result;
-END FN_AgregarCita;
-/
-
---5
-CREATE OR REPLACE FUNCTION FN_CancelarCita (
-    p_citaId NUMBER,
-    p_editadoPor VARCHAR2
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    UPDATE CITAS
-    SET HABILITADO = 0,
-        EDITADOPOR = p_editadoPor,
-        HORAFINALIZACION = TO_CHAR(SYSDATE, 'HH24:MI')
-    WHERE CITAID = p_citaId AND HABILITADO != 0; -- Solo actualiza si la cita no está cancelada.
-
-    -- Si se actualizó algún registro, cambiamos el valor a TRUE
-    IF SQL%ROWCOUNT > 0 THEN
-        v_result := TRUE;
-    ELSE
-        v_result := FALSE;
-    END IF;
-
-    RETURN v_result;
-END FN_CancelarCita;
-/
-
---6
-CREATE OR REPLACE FUNCTION FN_GenerarHTMLProductos RETURN CLOB IS
-    v_html CLOB;
-BEGIN
-    -- Inicializar HTML
-    v_html := '<div class="container">';
-    v_html := v_html || '<div class="btn-group" role="group" aria-label="Categor as">';
-
-    -- Botón para mostrar todos los productos
-    v_html := v_html || '<button type="button" class="btn btn-primary filter-button" data-category="all">Todo</button>';
-
-    -- Botones para cada categoría
-    FOR CATEGORIA IN (
-        SELECT CATEGORIAPRODUCTOID, NOMBRE 
-        FROM CATEGORIAPRODUCTO 
-        WHERE HABILITADO = 1
-    ) LOOP
-        v_html := v_html || '<button type="button" class="btn btn-primary filter-button" data-category="' || CATEGORIA.CATEGORIAPRODUCTOID || '">' || CATEGORIA.NOMBRE || '</button>';
-    END LOOP;
-
-    v_html := v_html || '</div>';
-    v_html := v_html || '<div class="row" id="product-container">';
-
-    -- Productos activos
-    FOR PRODUCTO IN (
-        SELECT P.PRODUCTOID, P.NOMBRE, P.DESCRIPCION, P.CANTIDAD, P.PRECIOUNITARIO, P.IMAGEN, C.CATEGORIAPRODUCTOID
-        FROM PRODUCTO P
-        JOIN CATEGORIAPRODUCTO C ON P.CATEGORIAPRODUCTOID = C.CATEGORIAPRODUCTOID
-        WHERE P.HABILITADO = 1
-    ) LOOP
-        -- Generar el placeholder para la imagen
-        DECLARE
-            img_placeholder VARCHAR2(50);
-        BEGIN
-            img_placeholder := '[ImagenProducto' || PRODUCTO.PRODUCTOID || ']';
-
-            v_html := v_html || '<div class="col-md-4 product-card" data-category="' || PRODUCTO.CATEGORIAPRODUCTOID || '">';
-            v_html := v_html || '<div class="card">';
-            v_html := v_html || '<img src="data:image/jpeg;base64,' || img_placeholder || '" class="card-img-top" alt="' || PRODUCTO.NOMBRE || '" width="50">';
-            v_html := v_html || '<div class="card-body">';
-            v_html := v_html || '<h5 class="card-title">' || PRODUCTO.NOMBRE || '</h5>';
-            v_html := v_html || '<p class="card-text">' || PRODUCTO.DESCRIPCION || '</p>';
-            v_html := v_html || '<p class="card-text">Cantidad: ' || PRODUCTO.CANTIDAD || '</p>';
-            v_html := v_html || '<p class="card-text">Precio: ' || TO_CHAR(PRODUCTO.PRECIOUNITARIO, 'FM999G999D00') || ' Colones' || '</p>';
-            v_html := v_html || '</div></div></div>';
-        END;
-    END LOOP;
-
-    v_html := v_html || '</div></div>';
-    RETURN v_html;
-END FN_GenerarHTMLProductos;
-/
-
---7
-CREATE OR REPLACE FUNCTION FN_InsertarCliente (
-    p_credencial_id       VARCHAR2,
-    p_rol_id              NUMBER,
-    p_nombre              VARCHAR2,
-    p_primer_apellido     VARCHAR2,
-    p_segundo_apellido    VARCHAR2,
-    p_fecha_nacimiento    DATE,
-    p_editado_por         VARCHAR2,
-    p_habilitado          NUMBER,
-    p_fecha_creacion      DATE
-) RETURN BOOLEAN IS
-BEGIN
-    INSERT INTO CLIENTE (
-        CREDENCIALID,
-        ROLID,
-        NOMBRE,
-        PRIMERAPELLIDO,
-        SEGUNDOAPELLIDO,
-        FECHANACIMIENTO,
-        EDITADOPOR,
-        HABILITADO,
-        FECHACREACION
-    ) VALUES (
-        p_credencial_id,
-        p_rol_id,
-        p_nombre,
-        p_primer_apellido,
-        p_segundo_apellido,
-        p_fecha_nacimiento,
-        p_editado_por,
-        p_habilitado,
-        p_fecha_creacion
-    );
-    RETURN TRUE;
-EXCEPTION
-    WHEN OTHERS THEN
-        RETURN FALSE;
-END FN_InsertarCliente;
-/
-
---8
-CREATE OR REPLACE FUNCTION FN_InsertarTelefono (
-    p_numero_telefono      VARCHAR2,
-    p_credencial_id        VARCHAR2,
-    p_categoria_telefono_id NUMBER,
-    p_numero_extension     NUMBER,
-    p_descripcion          VARCHAR2,
-    p_editado_por          VARCHAR2,
-    p_habilitado           NUMBER,
-    p_fecha_creacion       DATE
-) RETURN BOOLEAN IS
-BEGIN
-    INSERT INTO TELEFONOPORUSUARIO (
-        NUMEROTELEFONO,
-        CREDENCIALID,
-        CATEGORIATELEFONOID,
-        NUMEROEXTENSION,
-        DESCRIPCION,
-        EDITADOPOR,
-        HABILITADO,
-        FECHACREACION
-    ) VALUES (
-        p_numero_telefono,
-        p_credencial_id,
-        p_categoria_telefono_id,
-        p_numero_extension,
-        p_descripcion,
-        p_editado_por,
-        p_habilitado,
-        p_fecha_creacion
-    );
-    RETURN TRUE;
-EXCEPTION
-    WHEN OTHERS THEN
-        RETURN FALSE;
-END FN_InsertarTelefono;
-/
-
---9
-CREATE OR REPLACE FUNCTION FN_InsertarCredenciales (
-    p_credencial_id       VARCHAR2,
-    p_correo_electronico  VARCHAR2,
-    p_contrasena          VARCHAR2,
-    p_es_contrasena_temporal NUMBER,
-    p_editado_por         VARCHAR2,
-    p_habilitado          NUMBER,
-    p_fecha_creacion      DATE
-) RETURN BOOLEAN IS
-BEGIN
-    INSERT INTO CREDENCIALESPORUSUARIO (
-        CREDENCIALID,
-        CORREOELECTRONICO,
-        CONTRASEÑA,
-        ESCONTRASEÑATEMPORAL,
-        EDITADOPOR,
-        HABILITADO,
-        FECHACREACION
-    ) VALUES (
-        p_credencial_id,
-        p_correo_electronico,
-        p_contrasena,
-        p_es_contrasena_temporal,
-        p_editado_por,
-        p_habilitado,
-        p_fecha_creacion
-    );
-    RETURN TRUE;
-EXCEPTION
-    WHEN OTHERS THEN
-        RETURN FALSE;
-END FN_InsertarCredenciales;
-/
-
---10
-CREATE OR REPLACE FUNCTION FN_InsertarDireccion (
-    p_credencial_id       VARCHAR2,
-    p_codigo_pais         NUMBER,
-    p_codigo_estado       NUMBER,
-    p_codigo_condado      NUMBER,
-    p_codigo_distrito     NUMBER,
-    p_descripcion_direccion VARCHAR2,
-    p_editado_por         VARCHAR2,
-    p_habilitado          NUMBER,
-    p_fecha_creacion      DATE
-) RETURN BOOLEAN IS
-BEGIN
-    INSERT INTO DIRECCIONPORUSUARIO (
-        CREDENCIALID,
-        CODIGOPAIS,
-        CODIGOESTADO,
-        CODIGOCONDADO,
-        CODIGODISTRITO,
-        DESCRIPCION,
-        EDITADOPOR,
-        HABILITADO,
-        FECHACREACION
-    ) VALUES (
-        p_credencial_id,
-        p_codigo_pais,
-        p_codigo_estado,
-        p_codigo_condado,
-        p_codigo_distrito,
-        p_descripcion_direccion,
-        p_editado_por,
-        p_habilitado,
-        p_fecha_creacion
-    );
-    RETURN TRUE;
-EXCEPTION
-    WHEN OTHERS THEN
-        RETURN FALSE;
-END FN_InsertarDireccion;
-/
-
---11
-CREATE OR REPLACE FUNCTION FN_InsertarProducto (
-    p_categoriaProductoId IN NUMBER,
-    p_nombre             IN VARCHAR2,
-    p_descripcion        IN VARCHAR2,
-    p_precioUnitario     IN NUMBER,
-    p_cantidad           IN NUMBER,
-    p_editadoPor         IN VARCHAR2,
-    p_habilitado         IN NUMBER,
-    p_fechaCreacion      IN DATE,
-    p_imagen             IN BLOB
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    BEGIN
-        INSERT INTO ARTAVIARACING.PRODUCTO (        
-            CATEGORIAPRODUCTOID,
-            NOMBRE,
-            DESCRIPCION,
-            PRECIOUNITARIO,
-            CANTIDAD,
-            EDITADOPOR,
-            HABILITADO,
-            FECHACREACION,
-            IMAGEN
-        ) VALUES (        
-            p_categoriaProductoId,
-            p_nombre,
-            p_descripcion,
-            p_precioUnitario,
-            p_cantidad,
-            p_editadoPor,
-            p_habilitado,
-            p_fechaCreacion,
-            p_imagen
-        );
-        
-        -- Si no hubo error, se cambia el valor a TRUE
-        v_result := TRUE;
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- Aquí se maneja cualquier error que ocurra
-            v_result := FALSE;
-    END;
-    
-    RETURN v_result;
-END FN_InsertarProducto;
-/
-
---12
-CREATE OR REPLACE FUNCTION FN_ListarCitas (
-    CedulaId VARCHAR2
-) RETURN SYS_REFCURSOR
-IS
-    v_cursor SYS_REFCURSOR;
-BEGIN
-    OPEN v_cursor FOR
-    SELECT 
-        C.PLACAVEHICULOID,
-        V.MARCA || ' ' || V.MODELO || ' ' || V.AÑO AS VEHICULO,
-        CS.NOMBRE AS CATEGORIA,
-        S.NOMBRE AS SERVICIO,
-        C.FECHAAGENDADA,
-        C.HORAAGENDADA
-    FROM CITAS C
-    JOIN SERVICIO S
-        ON S.SERVICIOID = C.SERVICIOID
-    JOIN CATEGORIASERVICIO CS
-        ON CS.CATEGORIASERVICIOID = S.CATEGORIASERVICIOID
-    JOIN VEHICULO V
-        ON V.PLACAVEHICULOID = C.PLACAVEHICULOID
-    WHERE C.CREDENCIALID = CedulaId;
-
-    RETURN v_cursor;
-END FN_ListarCitas;
-/
-
---13
-CREATE OR REPLACE FUNCTION FN_ObtenerProducto (
-    p_productoId IN NUMBER
-) RETURN SYS_REFCURSOR
-IS
-    v_cursor SYS_REFCURSOR;
-BEGIN
-    OPEN v_cursor FOR
-    SELECT
-        PRODUCTOID,
-        CATEGORIAPRODUCTOID,
-        NOMBRE,
-        DESCRIPCION,
-        PRECIOUNITARIO,
-        CANTIDAD,
-        EDITADOPOR,
-        HABILITADO,
-        FECHACREACION,
-        IMAGEN
-    FROM ARTAVIARACING.PRODUCTO
-    WHERE PRODUCTOID = p_productoId;
-
-    RETURN v_cursor;
-END FN_ObtenerProducto;
-/
-
---14
-CREATE OR REPLACE FUNCTION FN_VerificarExistenciaUsuario (
-    p_credencialId IN VARCHAR2
-) RETURN VARCHAR2
-IS
-    v_credencialId VARCHAR2(100); -- Ajusta el tamaño según el esquema de tu base de datos
-BEGIN
-    SELECT c.CREDENCIALID INTO v_credencialId
-    FROM CLIENTE c
-    WHERE c.CREDENCIALID = p_credencialId;
-
-    RETURN v_credencialId; -- Devuelve el CREDENCIALID si se encuentra
-
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        -- Si no se encuentra ningún dato, devuelve NULL
-        RETURN NULL;
-    WHEN OTHERS THEN
-        -- Muestra el mensaje de error y devuelve NULL
-        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
-        RETURN NULL;
-END FN_VerificarExistenciaUsuario;
-/
-
-/****************************************************************************************************************************************************************
 ***                                                            CREACION DE TRIGGERS APARTIR DE AQUI                                           --ENCABEZADOS   ***
 ****************************************************************************************************************************************************************/
-
-/****************************************************************************************************************************************************************
-Autor: Jason Zuñiga
-Id Requirement: AR-001
-Creation Date: 08/20/2024   (MM/dd/YYYY)
-Requirement: Triggers de la base de datos
-
-****************************************************************************************************************************************************************/
-
 
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga
@@ -3588,7 +3607,6 @@ Creation Date: 08/20/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_PUESTOTRABAJO
 AFTER INSERT OR UPDATE OR DELETE ON PUESTOTRABAJO
 FOR EACH ROW
@@ -3645,7 +3663,6 @@ Creation Date: 08/20/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_ROL
 AFTER INSERT OR UPDATE OR DELETE ON ROL
 FOR EACH ROW
@@ -3696,7 +3713,6 @@ Creation Date: 08/20/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CLIENTE
 AFTER INSERT OR UPDATE OR DELETE ON CLIENTE
 FOR EACH ROW
@@ -3747,7 +3763,6 @@ Creation Date: 08/20/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CATEGORIATELEFONO
 AFTER INSERT OR UPDATE OR DELETE ON CATEGORIATELEFONO
 FOR EACH ROW
@@ -3798,7 +3813,6 @@ Creation Date: 08/20/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_TELEFONOPORUSUARIO
 AFTER INSERT OR UPDATE OR DELETE ON TELEFONOPORUSUARIO
 FOR EACH ROW
@@ -3849,7 +3863,6 @@ Creation Date: 08/20/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla CREDENCIALESPORUSUARIO
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CREDENCIALESPORUSUARIO
 AFTER INSERT OR UPDATE OR DELETE ON CREDENCIALESPORUSUARIO
@@ -3896,7 +3909,6 @@ Creation Date: 08/20/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla CATEGORIAMENU
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CATEGORIAMENU
 AFTER INSERT OR UPDATE OR DELETE ON CATEGORIAMENU
@@ -3943,7 +3955,6 @@ Creation Date: 08/20/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla MENU
 create or replace TRIGGER TRG_AUDITORIA_MENU
 AFTER INSERT OR UPDATE OR DELETE ON MENU
@@ -3991,7 +4002,6 @@ Creation Date: 08/20/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla MENUPORROL
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_MENUPORROL
 AFTER INSERT OR UPDATE OR DELETE ON MENUPORROL
@@ -4038,7 +4048,6 @@ Creation Date: 08/20/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla PAIS
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_PAIS
 AFTER INSERT OR UPDATE OR DELETE ON PAIS
@@ -4085,7 +4094,6 @@ Creation Date: 08/20/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla ESTADO
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_ESTADO
 AFTER INSERT OR UPDATE OR DELETE ON ESTADO
@@ -4132,7 +4140,6 @@ Creation Date: 08/20/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla CONDADO
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CONDADO
 AFTER INSERT OR UPDATE OR DELETE ON CONDADO
@@ -4179,7 +4186,6 @@ Creation Date: 08/20/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla DISTRITO
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_DISTRITO
 AFTER INSERT OR UPDATE OR DELETE ON DISTRITO
@@ -4226,7 +4232,6 @@ Creation Date: 08/23/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla CATEGORIASERVICIO
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CATEGORIASERVICIO
 AFTER INSERT OR UPDATE OR DELETE ON CATEGORIASERVICIO
@@ -4273,7 +4278,6 @@ Creation Date: 08/23/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CATEGORIAPRODUCTO
 AFTER INSERT OR UPDATE OR DELETE ON CATEGORIAPRODUCTO
 FOR EACH ROW
@@ -4319,7 +4323,6 @@ Creation Date: 08/23/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla DIRECCIONPORUSUARIO
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_DIRECCIONPORUSUARIO
 AFTER INSERT OR UPDATE OR DELETE ON DIRECCIONPORUSUARIO
@@ -4366,7 +4369,6 @@ Creation Date: 08/23/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla SERVICIO
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_SERVICIO
 AFTER INSERT OR UPDATE OR DELETE ON SERVICIO
@@ -4413,7 +4415,6 @@ Creation Date: 08/23/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla ESTADOCITA
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_ESTADOCITA
 AFTER INSERT OR UPDATE OR DELETE ON ESTADOCITA
@@ -4460,7 +4461,6 @@ Creation Date: 08/23/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla VEHICULO
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_VEHICULO
 AFTER INSERT OR UPDATE OR DELETE ON VEHICULO
@@ -4507,7 +4507,6 @@ Creation Date: 08/23/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla CITAS
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CITAS
 AFTER INSERT OR UPDATE OR DELETE ON CITAS
@@ -4554,7 +4553,6 @@ Creation Date: 08/23/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla VEHICULOPORCLIENTE
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_VEHICULOPORCLIENTE
 AFTER INSERT OR UPDATE OR DELETE ON VEHICULOPORCLIENTE
@@ -4601,7 +4599,6 @@ Creation Date: 08/23/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla DIAGNOSTICO
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_DIAGNOSTICO
 AFTER INSERT OR UPDATE OR DELETE ON DIAGNOSTICO
@@ -4648,7 +4645,6 @@ Creation Date: 08/24/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla SERVICIOSPORDIAGNOSTICO
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_SERVICIOSPORDIAGNOSTICO
 AFTER INSERT OR UPDATE OR DELETE ON SERVICIOSPORDIAGNOSTICO
@@ -4695,7 +4691,6 @@ Creation Date: 08/24/2024   (MM/dd/YYYY)
 Requirement: Trigger encargado de crear un insert
 en la tabla 'Auditoria' para llevar un historial.
 ****************************************************************************************************************************************************************/
-
 -- Trigger para la tabla PRODUCTO
 CREATE OR REPLACE TRIGGER TRG_AUDITORIA_PRODUCTO
 AFTER INSERT OR UPDATE OR DELETE ON PRODUCTO
