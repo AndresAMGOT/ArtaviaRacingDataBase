@@ -1,8 +1,7 @@
 
 /****************************************************************************************************************************************************************
-***                               CREACION DE TABLAS APARTIR DE AQUI              --ENCABESADOS                                                 ***
+***                                                             CREACION DE TABLAS APARTIR DE AQUI                                            --ENCABEZADOS   ***
 ****************************************************************************************************************************************************************/
-
 
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga
@@ -212,6 +211,7 @@ CREATE TABLE "CATEGORIAMENU"
     FECHACREACION    DATE             NOT NULL,
     CONSTRAINT "CATEGORIAMENU_PK" PRIMARY KEY (CATEGORIAMENUID)
 );
+
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
@@ -283,6 +283,7 @@ CREATE TABLE "PAIS"
     FECHACREACION   DATE            NOT NULL,
     CONSTRAINT "PAIS_PK" PRIMARY KEY (CODIGOPAIS)
 );
+
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
@@ -304,6 +305,7 @@ CREATE TABLE "ESTADO"
 ALTER TABLE "ESTADO"
 ADD CONSTRAINT "ESTADO_FK_PAIS"
 FOREIGN KEY (CODIGOPAIS) REFERENCES "PAIS" (CODIGOPAIS);
+
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
@@ -324,6 +326,7 @@ CREATE TABLE "CONDADO"
 ALTER TABLE "CONDADO"
 ADD CONSTRAINT "CONDADO_FK_ESTADO"
 FOREIGN KEY (CODIGOESTADO) REFERENCES "ESTADO" (CODIGOESTADO);
+
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
@@ -345,7 +348,6 @@ ALTER TABLE "DISTRITO"
 ADD CONSTRAINT "DISTRITO_FK_CONDADO"
 FOREIGN KEY (CODIGOCONDADO) REFERENCES "CONDADO" (CODIGOCONDADO);
 
-
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: CategoriaServicio
 Autor: Jason zuñiga solorzano
@@ -361,6 +363,7 @@ CREATE TABLE CATEGORIASERVICIO (
     HABILITADO              NUMBER(1)       NOT NULL,
     FECHACREACION           DATE            NOT NULL
 );
+
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: CategoriaProducto
 Autor: Jason zuñiga solorzano
@@ -376,6 +379,7 @@ CREATE TABLE CATEGORIAPRODUCTO (
     HABILITADO             NUMBER(1)       NOT NULL,
     FECHACREACION          DATE            NOT NULL
 );
+
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: DireccionPorUsuario
 Autor: Jason zuñiga solorzano
@@ -398,6 +402,7 @@ CREATE TABLE DIRECCIONPORUSUARIO (
     FOREIGN KEY (CODIGOCONDADO) REFERENCES CONDADO(CODIGOCONDADO),
     FOREIGN KEY (CODIGODISTRITO) REFERENCES DISTRITO(CODIGODISTRITO)
 );
+
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Servicio
 Autor: Jason zuñiga solorzano
@@ -417,6 +422,7 @@ CREATE TABLE SERVICIO (
     FECHACREACION           DATE NOT NULL,
     FOREIGN KEY (CATEGORIASERVICIOID) REFERENCES CATEGORIASERVICIO(CATEGORIASERVICIOID)
 );
+
 /****************************************************************************************************************************************************************/  
 
 /****************************************************************************************************************************************************************  
@@ -538,6 +544,7 @@ CREATE TABLE VEHICULOPORCLIENTE (
     FOREIGN KEY (CREDENCIALID) REFERENCES CLIENTE(CREDENCIALID),
     FOREIGN KEY (PLACAVEHICULO) REFERENCES VEHICULO(PLACAVEHICULOID)
 );
+
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Diagnostico
 Autor: Jason zuñiga solorzano
@@ -555,6 +562,7 @@ CREATE TABLE DIAGNOSTICO (
     FECHACREACION       DATE NOT NULL,
     FOREIGN KEY (CITAID) REFERENCES CITAS(CITAID)
 );
+
 /*
 SELECT CONSTRAINT_NAME, TABLE_NAME
 FROM USER_CONSTRAINTS
@@ -564,9 +572,9 @@ WHERE R_CONSTRAINT_NAME IN (
     WHERE TABLE_NAME = 'DIAGNOSTICO' AND CONSTRAINT_TYPE = 'P'
 ) AND CONSTRAINT_TYPE = 'R';
 
-ALTER TABLE SERVICIOSPORDIAGNOSTICO DROP CONSTRAINT SYS_C008046;
+ALTER TABLE SERVICIOSPORDIAGNOSTICO DROP CONSTRAINT SYS_C007630;
 
-ALTER TABLE PRODUCTOPORDIAGNOSTICO DROP CONSTRAINT SYS_C008065;
+ALTER TABLE PRODUCTOPORDIAGNOSTICO DROP CONSTRAINT SYS_C007649;
 
 DROP TABLE DIAGNOSTICO;
 */
@@ -588,6 +596,7 @@ CREATE TABLE SERVICIOSPORDIAGNOSTICO (
     FOREIGN KEY (DIAGNOSTICOID) REFERENCES DIAGNOSTICO(DIAGNOSTICOID),
     FOREIGN KEY (SERVICIOID) REFERENCES SERVICIO(SERVICIOID)
 );
+
 /****************************************************************************************************************************************************************  
 Creacion de la tabla: Producto
 Autor: Jason zuñiga solorzano
@@ -645,10 +654,9 @@ CREATE TABLE PRODUCTOPORDIAGNOSTICO (
 );
 
 
-
-/****************************************************************************************************************************************************************  
-                 Apartir de aqui estaran todas las vistas de la DB          --ENCABESADOS
-*****************************************************************************************************************************************************************/ 
+/****************************************************************************************************************************************************************
+***                                                            CREACION DE VISTAS APARTIR DE AQUI                                             --ENCABEZADOS   ***
+****************************************************************************************************************************************************************/ 
 
 /****************************************************************************************************************************************************************  
 Creacion de las vistas: Apartir de aqui estaran todas las vistas de la DB
@@ -879,17 +887,20 @@ FROM PUESTOTRABAJO;
 
 
 /****************************************************************************************************************************************************************
-***                                                 USP DE PAQUETES A PARTIR DE AQUI                        --ENCABESADOS                                       ***
+***                                                          CREACION DE USP DE PAQUETES APARTIR DE AQUI                                      --ENCABEZADOS   ***
 ****************************************************************************************************************************************************************/
-
 
 /****************************************************************************************************************************************************************
-Autor: Jason Zuñiga Solorzano
+Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
-Creation Date: 24/08/2024   (MM/dd/YYYY)
-Requirement: Paquete encargado de llamar la vista de paises
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado encargado de obtener los paises desde base de datos
 ****************************************************************************************************************************************************************/
-
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Jason Zuñiga Solorzano                       24/08/2024                                  Paquete encargado de llamar la vista de Pais
+****************************************************************************************************************************************************************/
 CREATE OR REPLACE PACKAGE pkg_Pais AS
     -- Declaración de la función que obtendrá los países
     FUNCTION FP_ObtenerPaises RETURN SYS_REFCURSOR;
@@ -923,10 +934,61 @@ END USP_SeleccionarPaises;
 /
 
 /****************************************************************************************************************************************************************
-Autor: Jason Zuñiga Solorzano
+Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
-Creation Date: 24/08/2024   (MM/dd/YYYY)
-Requirement: Paquete encargado de llamar la vista de Condado
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado encargado de obtener los estados de los paises desde base de datos
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Jason Zuñiga Solorzano                       24/08/2024                                  Paquete encargado de llamar la vista de Estado
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE PACKAGE pkg_Estados AS
+    -- Declaración de la función que obtendrá los estados filtrados por país
+    FUNCTION FP_ObtenerEstados(CodigoPais IN NUMBER) RETURN SYS_REFCURSOR;
+END pkg_Estados;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_Estados AS
+
+    FUNCTION FP_ObtenerEstados(CodigoPais IN NUMBER) RETURN SYS_REFCURSOR IS
+        cursor_estados SYS_REFCURSOR;
+    BEGIN
+        OPEN cursor_estados FOR
+            SELECT 
+                CODIGOESTADO,
+                NOMBRE
+            FROM Estado
+            WHERE CODIGOPAIS = CodigoPais;
+        RETURN cursor_estados;
+    END FP_ObtenerEstados;
+
+END pkg_Estados;
+/
+
+--Usp actualizados
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarEstados (
+    CodigoPais IN NUMBER,
+    RespuestaEstados OUT SYS_REFCURSOR
+) AS
+BEGIN
+    -- Utilizar la función ObtenerEstados del paquete
+    RespuestaEstados := pkg_Estados.FP_ObtenerEstados(CodigoPais);
+END USP_SeleccionarEstados;
+/
+
+/****************************************************************************************************************************************************************
+Autor: José Andrés Alvarado Matamoros
+Id Requirement: AR-001 
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado encargado de obtener los condados de los estados desde base de datos
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Jason Zuñiga Solorzano                       24/08/2024                                  Paquete encargado de llamar la vista de Condado
 ****************************************************************************************************************************************************************/
 
 CREATE OR REPLACE PACKAGE pkg_Condado AS
@@ -964,10 +1026,15 @@ END USP_SeleccionarCondado;
 /
 
 /****************************************************************************************************************************************************************
-Autor: Jason Zuñiga Solorzano
+Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
-Creation Date: 24/08/2024   (MM/dd/YYYY)
-Requirement: Paquete encargado de llamar la vista de Distrito
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement: Procedimiento Almacenado encargado de obtener los condados de los estados desde base de datos
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Jason Zuñiga Solorzano                       24/08/2024                                  Paquete encargado de llamar la vista de Distrito
 ****************************************************************************************************************************************************************/
 
 CREATE OR REPLACE PACKAGE pkg_Distrito AS
@@ -1217,7 +1284,7 @@ Id Requirement: AR-001
 Creation Date: 24/08/2024   (MM/dd/YYYY)
 Requirement: Paquete encargado de trabajar con el CITAS
 ****************************************************************************************************************************************************************/
-
+/*
 CREATE OR REPLACE PACKAGE pkg_Citas AS
     -- Declaración de la función que obtendrá las citas
     FUNCTION FP_ObtenerCitas RETURN SYS_REFCURSOR;
@@ -1247,106 +1314,10 @@ BEGIN
     p_cursor := pkg_Citas.FP_ObtenerCitas;
 END USP_LISTAR_CITAS_ADMIN;
 /
-
-
-CREATE OR REPLACE PACKAGE pkg_Estados AS
-    -- Declaración de la función que obtendrá los estados filtrados por país
-    FUNCTION FP_ObtenerEstados(CodigoPais IN NUMBER) RETURN SYS_REFCURSOR;
-END pkg_Estados;
-/
-
-CREATE OR REPLACE PACKAGE BODY pkg_Estados AS
-
-    FUNCTION FP_ObtenerEstados(CodigoPais IN NUMBER) RETURN SYS_REFCURSOR IS
-        cursor_estados SYS_REFCURSOR;
-    BEGIN
-        OPEN cursor_estados FOR
-            SELECT 
-                CODIGOESTADO,
-                NOMBRE
-            FROM Estado
-            WHERE CODIGOPAIS = CodigoPais;
-        RETURN cursor_estados;
-    END FP_ObtenerEstados;
-
-END pkg_Estados;
-/
-
---Usp actualizados
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarEstados (
-    CodigoPais IN NUMBER,
-    RespuestaEstados OUT SYS_REFCURSOR
-) AS
-BEGIN
-    -- Utilizar la función ObtenerEstados del paquete
-    RespuestaEstados := pkg_Estados.FP_ObtenerEstados(CodigoPais);
-END USP_SeleccionarEstados;
-/
+*/
 
 /****************************************************************************************************************************************************************
-***                                 PROCEDIMIENTOS ALMACENADOS A PARTIR DE AQUI             --ENCABESADOS                                                        ***
-****************************************************************************************************************************************************************/
-
-
-
-/****************************************************************************************************************************************************************
-Autor: José Andrés Alvarado Matamoros
-Id Requirement: AR-001 
-Creation Date: 21/07/2024   (MM/dd/YYYY)
-Requirement: Procedimiento Almacenado encargado de obtener los paises desde base de datos
-****************************************************************************************************************************************************************/
-/****************************************************************************************************************************************************************
-Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-****************************************************************************************************************************************************************/
-
-/****************************************************************************************************************************************************************
-Autor: José Andrés Alvarado Matamoros
-Id Requirement: AR-001 
-Creation Date: 21/07/2024   (MM/dd/YYYY)
-Requirement: Procedimiento Almacenado encargado de obtener los estados de los paises desde base de datos
-****************************************************************************************************************************************************************/
-/****************************************************************************************************************************************************************
-Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-****************************************************************************************************************************************************************/
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_SeleccionarEstados (
-    CodigoPais IN NUMBER,
-    RespuestaEstados OUT SYS_REFCURSOR
-) AS
-BEGIN
-    OPEN RespuestaEstados FOR
-    SELECT 
-        CODIGOESTADO,
-        NOMBRE
-    FROM Estado
-    WHERE CODIGOPAIS = CodigoPais;
-END USP_SeleccionarEstados;
-/
-/****************************************************************************************************************************************************************
-Autor: José Andrés Alvarado Matamoros
-Id Requirement: AR-001 
-Creation Date: 21/07/2024   (MM/dd/YYYY)
-Requirement: Procedimiento Almacenado encargado de obtener los condados de los estados desde base de datos
-****************************************************************************************************************************************************************/
-/****************************************************************************************************************************************************************
-Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-****************************************************************************************************************************************************************/
-
-/****************************************************************************************************************************************************************
-Autor: José Andrés Alvarado Matamoros
-Id Requirement: AR-001 
-Creation Date: 21/07/2024   (MM/dd/YYYY)
-Requirement: Procedimiento Almacenado encargado de obtener los condados de los estados desde base de datos
-****************************************************************************************************************************************************************/
-/****************************************************************************************************************************************************************
-Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+***                                                  CREACION DE PROCEDIMIENTOS ALMACENADOS APARTIR DE AQUI                                   --ENCABEZADOS   ***
 ****************************************************************************************************************************************************************/
 
  /****************************************************************************************************************************************************************
@@ -1704,16 +1675,10 @@ END USP_VerificarUsuario;
 /
 
 /****************************************************************************************************************************************************************
-Autor: Luis Solorzano Campos
-Id Requirement: AR-001
+Autor: Horacio Porras Marín
+Id Requirement: AR-003
 Creation Date: [22/07/2024]   (MM/dd/YYYY)
 Requirement: Procedimiento encargado de cancelar una cita previamente agendada.
-
-*Modificaciones*
-Autor: Horacio Porras Marín
-Id Requirement: AR-003 
-Creation Date: 11/08/2024   (MM/dd/YYYY)
-Information: Recreación del SP para el CRUD de Citas.
 ****************************************************************************************************************************************************************/
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_CANCELAR_CITA (
     p_citaId NUMBER,
@@ -1733,17 +1698,11 @@ END;
 /
 
 /****************************************************************************************************************************************************************
-Autor: Jason Zuñiga Solorzano
-Id Requirement: AR-001 
-Creation Date: 21/07/2024   (MM/dd/YYYY)
-Requirement:  Este procedimiento se encarga de actualizar cualquier cambio en la tabla cita
-
-*Modificaciones*
 Autor: Horacio Porras Marín
 Id Requirement: AR-003 
-Creation Date: 11/08/2024   (MM/dd/YYYY)
-Information: Cambio de Type en varias columnas.
-*************************************************************************************************************************/
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement:  Este procedimiento se encarga de actualizar cualquier cambio en la tabla cita
+****************************************************************************************************************************************************************/
 CREATE OR REPLACE PROCEDURE USP_ACTUALIZAR_CITA (
     p_CITAID IN NUMBER,
     p_CREDENCIALID IN VARCHAR2,
@@ -1780,17 +1739,11 @@ END USP_ACTUALIZAR_CITA;
 /
 
 /****************************************************************************************************************************************************************
-Autor: Jason Zuñiga Solorzano
-Id Requirement: AR-001 
-Creation Date: 21/07/2024   (MM/dd/YYYY)
-Requirement:  Este procedimiento se encarga de agregar informacion en la tabla cita
-
-*Modificaciones*
 Autor: Horacio Porras Marín
 Id Requirement: AR-003 
-Creation Date: 11/08/2024   (MM/dd/YYYY)
-Information: Cambio de Type en varias columnas.
-*************************************************************************************************************************/
+Creation Date: 21/07/2024   (MM/dd/YYYY)
+Requirement:  Este procedimiento se encarga de agregar informacion en la tabla cita
+****************************************************************************************************************************************************************/
 
 CREATE OR REPLACE PROCEDURE USP_AGREGAR_CITA (
     p_CREDENCIALID IN VARCHAR2,
@@ -1825,62 +1778,6 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('Ocurrió un error al agregar la cita.');
     END IF;
 END USP_AGREGAR_CITA;
-/
-
---222333
-
-CREATE OR REPLACE FUNCTION FN_AgregarCita (
-    p_CREDENCIALID IN VARCHAR2,
-    p_PLACAVEHICULOID IN VARCHAR2,
-    p_VIN IN VARCHAR2,
-    p_SERVICIOID IN NUMBER,
-    p_ESTADOCITAID IN NUMBER,
-    p_FECHAAGENDADA IN DATE,
-    p_DESCRIPCION IN VARCHAR2,
-    p_HORAAGENDADA IN VARCHAR2,
-    p_EDITADOPOR IN VARCHAR2,
-    p_HABILITADO IN NUMBER
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    BEGIN
-        INSERT INTO CITAS (
-            CREDENCIALID,
-            PLACAVEHICULOID,
-            VIN,
-            SERVICIOID,
-            ESTADOCITAID,
-            FECHAAGENDADA,
-            DESCRIPCION,
-            HORAAGENDADA,
-            EDITADOPOR,
-            HABILITADO,
-            FECHACREACION
-        ) VALUES (
-            p_CREDENCIALID,
-            p_PLACAVEHICULOID,
-            p_VIN,
-            p_SERVICIOID,
-            p_ESTADOCITAID,
-            p_FECHAAGENDADA,
-            p_DESCRIPCION,
-            p_HORAAGENDADA,
-            p_EDITADOPOR,
-            p_HABILITADO,
-            SYSDATE
-        );
-
-        -- Si la inserción fue exitosa, se cambia el valor a TRUE
-        v_result := TRUE;
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- Si ocurre un error durante la inserción, se mantiene el valor FALSE
-            v_result := FALSE;
-    END;
-
-    RETURN v_result;
-END FN_AgregarCita;
 /
 
 /****************************************************************************************************************************************************************
@@ -2182,10 +2079,6 @@ BEGIN
     END IF;
 END USP_InsertarProducto;
 /
-
----222333
-
-
 
  /****************************************************************************************************************************************************************
 Autor: Andrés Alvarado Matamoros
@@ -3105,106 +2998,12 @@ BEGIN
     COMMIT;
 END USP_INSERTAR_DIAGNOSTICO;
 /
+
 /****************************************************************************************************************************************************************
-***                                                 FUNCIONES APARTIR DE AQUI              --ENCABESADOS                                                 ***
+***                                                             CREACION DE FUNCIONES APARTIR DE AQUI                                         --ENCABEZADOS   ***
 ****************************************************************************************************************************************************************/
 
 --1
-
-CREATE OR REPLACE FUNCTION FN_ActualizarCita (
-    p_CITAID IN NUMBER,
-    p_CREDENCIALID IN VARCHAR2,
-    p_PLACAVEHICULOID IN VARCHAR2,
-    p_VIN IN VARCHAR2,
-    p_SERVICIOID IN NUMBER,
-    p_ESTADOCITAID IN NUMBER,
-    p_FECHAAGENDADA IN DATE,
-    p_HORAAGENDADA IN VARCHAR2,
-    p_EDITADOPOR IN VARCHAR2,
-    p_HABILITADO IN NUMBER
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    BEGIN
-        UPDATE CITAS
-        SET CREDENCIALID = p_CREDENCIALID,
-            PLACAVEHICULOID = p_PLACAVEHICULOID,
-            VIN = p_VIN,
-            SERVICIOID = p_SERVICIOID,
-            ESTADOCITAID = p_ESTADOCITAID,
-            FECHAAGENDADA = p_FECHAAGENDADA,
-            HORAAGENDADA = p_HORAAGENDADA,
-            EDITADOPOR = p_EDITADOPOR,
-            HABILITADO = p_HABILITADO,
-            FECHACREACION = SYSDATE
-        WHERE CITAID = p_CITAID;
-
-        -- Si la actualización fue exitosa, se cambia el valor a TRUE
-        IF SQL%ROWCOUNT > 0 THEN
-            v_result := TRUE;
-        ELSE
-            v_result := FALSE;
-        END IF;
-
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- Si ocurre un error durante la actualización, se mantiene el valor FALSE
-            v_result := FALSE;
-    END;
-
-    RETURN v_result;
-END FN_ActualizarCita;
-/
---2
-
-CREATE OR REPLACE FUNCTION FN_ActualizarProducto (
-    p_productoId         IN NUMBER,
-    p_categoriaProductoId IN NUMBER,
-    p_nombre             IN VARCHAR2,
-    p_descripcion        IN VARCHAR2,
-    p_precioUnitario     IN NUMBER,
-    p_cantidad           IN NUMBER,
-    p_editadoPor         IN VARCHAR2,
-    p_habilitado         IN NUMBER,
-    p_fechaCreacion      IN DATE,
-    p_imagen             IN BLOB
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    BEGIN
-        UPDATE ARTAVIARACING.PRODUCTO
-        SET
-            CATEGORIAPRODUCTOID = p_categoriaProductoId,
-            NOMBRE = p_nombre,
-            DESCRIPCION = p_descripcion,
-            PRECIOUNITARIO = p_precioUnitario,
-            CANTIDAD = p_cantidad,
-            EDITADOPOR = p_editadoPor,
-            HABILITADO = p_habilitado,
-            FECHACREACION = p_fechaCreacion,
-            IMAGEN = p_imagen
-        WHERE PRODUCTOID = p_productoId;
-
-        -- Verificamos si se actualizó algún registro
-        IF SQL%ROWCOUNT > 0 THEN
-            v_result := TRUE;
-        ELSE
-            v_result := FALSE;
-        END IF;
-
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- Si ocurre algún error, retornamos FALSE
-            v_result := FALSE;
-    END;
-
-    RETURN v_result;
-END FN_ActualizarProducto;
-/
-
---3
 CREATE OR REPLACE FUNCTION FN_AgregarCita (
     p_CREDENCIALID IN VARCHAR2,
     p_PLACAVEHICULOID IN VARCHAR2,
@@ -3259,7 +3058,156 @@ BEGIN
 END FN_AgregarCita;
 /
 
+--2
+CREATE OR REPLACE FUNCTION FN_ActualizarCita (
+    p_CITAID IN NUMBER,
+    p_CREDENCIALID IN VARCHAR2,
+    p_PLACAVEHICULOID IN VARCHAR2,
+    p_VIN IN VARCHAR2,
+    p_SERVICIOID IN NUMBER,
+    p_ESTADOCITAID IN NUMBER,
+    p_FECHAAGENDADA IN DATE,
+    p_HORAAGENDADA IN VARCHAR2,
+    p_EDITADOPOR IN VARCHAR2,
+    p_HABILITADO IN NUMBER
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        UPDATE CITAS
+        SET CREDENCIALID = p_CREDENCIALID,
+            PLACAVEHICULOID = p_PLACAVEHICULOID,
+            VIN = p_VIN,
+            SERVICIOID = p_SERVICIOID,
+            ESTADOCITAID = p_ESTADOCITAID,
+            FECHAAGENDADA = p_FECHAAGENDADA,
+            HORAAGENDADA = p_HORAAGENDADA,
+            EDITADOPOR = p_EDITADOPOR,
+            HABILITADO = p_HABILITADO,
+            FECHACREACION = SYSDATE
+        WHERE CITAID = p_CITAID;
+
+        -- Si la actualización fue exitosa, se cambia el valor a TRUE
+        IF SQL%ROWCOUNT > 0 THEN
+            v_result := TRUE;
+        ELSE
+            v_result := FALSE;
+        END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre un error durante la actualización, se mantiene el valor FALSE
+            v_result := FALSE;
+    END;
+
+    RETURN v_result;
+END FN_ActualizarCita;
+/
+
+--3
+CREATE OR REPLACE FUNCTION FN_ActualizarProducto (
+    p_productoId         IN NUMBER,
+    p_categoriaProductoId IN NUMBER,
+    p_nombre             IN VARCHAR2,
+    p_descripcion        IN VARCHAR2,
+    p_precioUnitario     IN NUMBER,
+    p_cantidad           IN NUMBER,
+    p_editadoPor         IN VARCHAR2,
+    p_habilitado         IN NUMBER,
+    p_fechaCreacion      IN DATE,
+    p_imagen             IN BLOB
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        UPDATE ARTAVIARACING.PRODUCTO
+        SET
+            CATEGORIAPRODUCTOID = p_categoriaProductoId,
+            NOMBRE = p_nombre,
+            DESCRIPCION = p_descripcion,
+            PRECIOUNITARIO = p_precioUnitario,
+            CANTIDAD = p_cantidad,
+            EDITADOPOR = p_editadoPor,
+            HABILITADO = p_habilitado,
+            FECHACREACION = p_fechaCreacion,
+            IMAGEN = p_imagen
+        WHERE PRODUCTOID = p_productoId;
+
+        -- Verificamos si se actualizó algún registro
+        IF SQL%ROWCOUNT > 0 THEN
+            v_result := TRUE;
+        ELSE
+            v_result := FALSE;
+        END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre algún error, retornamos FALSE
+            v_result := FALSE;
+    END;
+
+    RETURN v_result;
+END FN_ActualizarProducto;
+/
+
 --4
+CREATE OR REPLACE FUNCTION FN_AgregarCita (
+    p_CREDENCIALID IN VARCHAR2,
+    p_PLACAVEHICULOID IN VARCHAR2,
+    p_VIN IN VARCHAR2,
+    p_SERVICIOID IN NUMBER,
+    p_ESTADOCITAID IN NUMBER,
+    p_FECHAAGENDADA IN DATE,
+    p_DESCRIPCION IN VARCHAR2,
+    p_HORAAGENDADA IN VARCHAR2,
+    p_EDITADOPOR IN VARCHAR2,
+    p_HABILITADO IN NUMBER
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        INSERT INTO CITAS (
+            CREDENCIALID,
+            PLACAVEHICULOID,
+            VIN,
+            SERVICIOID,
+            ESTADOCITAID,
+            FECHAAGENDADA,
+            DESCRIPCION,
+            HORAAGENDADA,
+            EDITADOPOR,
+            HABILITADO,
+            FECHACREACION
+        ) VALUES (
+            p_CREDENCIALID,
+            p_PLACAVEHICULOID,
+            p_VIN,
+            p_SERVICIOID,
+            p_ESTADOCITAID,
+            p_FECHAAGENDADA,
+            p_DESCRIPCION,
+            p_HORAAGENDADA,
+            p_EDITADOPOR,
+            p_HABILITADO,
+            SYSDATE
+        );
+
+        -- Si la inserción fue exitosa, se cambia el valor a TRUE
+        v_result := TRUE;
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre un error durante la inserción, se mantiene el valor FALSE
+            v_result := FALSE;
+    END;
+
+    RETURN v_result;
+END FN_AgregarCita;
+/
+
+--5
 CREATE OR REPLACE FUNCTION FN_CancelarCita (
     p_citaId NUMBER,
     p_editadoPor VARCHAR2
@@ -3284,7 +3232,7 @@ BEGIN
 END FN_CancelarCita;
 /
 
---5
+--6
 CREATE OR REPLACE FUNCTION FN_GenerarHTMLProductos RETURN CLOB IS
     v_html CLOB;
 BEGIN
@@ -3336,7 +3284,8 @@ BEGIN
     RETURN v_html;
 END FN_GenerarHTMLProductos;
 /
---6
+
+--7
 CREATE OR REPLACE FUNCTION FN_InsertarCliente (
     p_credencial_id       VARCHAR2,
     p_rol_id              NUMBER,
@@ -3377,7 +3326,7 @@ EXCEPTION
 END FN_InsertarCliente;
 /
 
---7
+--8
 CREATE OR REPLACE FUNCTION FN_InsertarTelefono (
     p_numero_telefono      VARCHAR2,
     p_credencial_id        VARCHAR2,
@@ -3414,7 +3363,8 @@ EXCEPTION
         RETURN FALSE;
 END FN_InsertarTelefono;
 /
---8
+
+--9
 CREATE OR REPLACE FUNCTION FN_InsertarCredenciales (
     p_credencial_id       VARCHAR2,
     p_correo_electronico  VARCHAR2,
@@ -3448,7 +3398,8 @@ EXCEPTION
         RETURN FALSE;
 END FN_InsertarCredenciales;
 /
---9
+
+--10
 CREATE OR REPLACE FUNCTION FN_InsertarDireccion (
     p_credencial_id       VARCHAR2,
     p_codigo_pais         NUMBER,
@@ -3488,7 +3439,8 @@ EXCEPTION
         RETURN FALSE;
 END FN_InsertarDireccion;
 /
---10
+
+--11
 CREATE OR REPLACE FUNCTION FN_InsertarProducto (
     p_categoriaProductoId IN NUMBER,
     p_nombre             IN VARCHAR2,
@@ -3537,7 +3489,8 @@ BEGIN
     RETURN v_result;
 END FN_InsertarProducto;
 /
---11
+
+--12
 CREATE OR REPLACE FUNCTION FN_ListarCitas (
     CedulaId VARCHAR2
 ) RETURN SYS_REFCURSOR
@@ -3564,7 +3517,8 @@ BEGIN
     RETURN v_cursor;
 END FN_ListarCitas;
 /
---12
+
+--13
 CREATE OR REPLACE FUNCTION FN_ObtenerProducto (
     p_productoId IN NUMBER
 ) RETURN SYS_REFCURSOR
@@ -3589,7 +3543,8 @@ BEGIN
     RETURN v_cursor;
 END FN_ObtenerProducto;
 /
---13
+
+--14
 CREATE OR REPLACE FUNCTION FN_VerificarExistenciaUsuario (
     p_credencialId IN VARCHAR2
 ) RETURN VARCHAR2
@@ -3613,11 +3568,9 @@ EXCEPTION
 END FN_VerificarExistenciaUsuario;
 /
 
-
 /****************************************************************************************************************************************************************
-***                                                 TRIGGERS APARTIR DE AQUI              --ENCABESADOS                                                 ***
+***                                                            CREACION DE TRIGGERS APARTIR DE AQUI                                           --ENCABEZADOS   ***
 ****************************************************************************************************************************************************************/
-/****************************************************************************************************************************************************************
 
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga
@@ -4831,9 +4784,8 @@ END;
 
 
 /****************************************************************************************************************************************************************
-encabesados/        A partir de este punto se estarán agregando los insert harcodeados para los diferentes catalogos.
-****************************************************************************************************************************************************************/  
-
+***                                                             CREACION DE INSERTS APARTIR DE AQUI                                           --ENCABEZADOS   ***
+****************************************************************************************************************************************************************/
 
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
@@ -5306,5 +5258,4 @@ VALUES ('117580634', 'ABC123', '1HGBH41JXMN109186', 23, 1, TRUNC(SYSDATE), 'Mi c
 INSERT INTO "CITAS" (CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, DESCRIPCION, HORAAGENDADA, HORAFINALIZACION, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES ('123456789', 'DEF456', '2HGBH31JXMN108184', 14, 1, TRUNC(SYSDATE), 'Estoy teniendo este problema...', TO_CHAR(SYSTIMESTAMP, 'HH24:MI'), '23:00', '00000001', 1, SYSDATE);
 
-
-
+COMMIT;
