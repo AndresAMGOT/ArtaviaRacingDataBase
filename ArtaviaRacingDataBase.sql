@@ -1,4 +1,24 @@
 /****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Creacion de la tabla auditoria 
+para llevar el historial de los triggers.
+****************************************************************************************************************************************************************/
+
+CREATE TABLE Auditoria (
+    Id NUMBER GENERATED ALWAYS AS IDENTITY MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE  NOKEEP  NOSCALE  NOT NULL ENABLE,
+    Tabla VARCHAR2(100) NOT NULL,
+    Operacion VARCHAR2(10) NOT NULL,
+    Usuario VARCHAR2(30) DEFAULT USER NOT NULL,
+    Fecha TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    Clave_Primaria VARCHAR2(200) NOT NULL,
+    Datos_Antiguos CLOB,
+    Datos_Nuevos CLOB,
+    PRIMARY KEY (Id)
+);
+
+/****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Requerimiento: AR-001
 Fecha Creación: 06/07/2024   (MM/dd/YYYY)
@@ -2958,3 +2978,1212 @@ INSERT INTO "CITAS" (CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAI
 VALUES ('123456789', 'DEF456', '2HGBH31JXMN108184', 14, 1, TRUNC(SYSDATE), 'Estoy teniendo este problema...', TO_CHAR(SYSTIMESTAMP, 'HH24:MI'), '23:00', '00000001', 1, SYSDATE);
 
 COMMIT;
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Triggers de la base de datos
+
+****************************************************************************************************************************************************************/
+
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_PUESTOTRABAJO
+AFTER INSERT OR UPDATE OR DELETE ON PUESTOTRABAJO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    -- Determina el tipo de operación
+    --Declaramos las variables
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.PUESTOTRABAJOID;
+    --Insertamos las variables si es un insert
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('PUESTOTRABAJO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('PUESTO=' || :NEW.PUESTO || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS'))
+        );
+    -- Determina el tipo de operación
+    --Declaramos las variables
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.PUESTOTRABAJOID;
+    --Insertamos las variables si es un insert     
+        INSERT INTO Auditoria (
+            Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos
+        ) VALUES (
+            'PUESTOTRABAJO', v_operacion, USER, v_clave_primaria, 
+            TO_CLOB('PUESTO=' || :OLD.PUESTO || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+            TO_CLOB('PUESTO=' || :NEW.PUESTO || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS'))
+        );
+    -- Determina el tipo de operación
+    --Declaramos las variables
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.PUESTOTRABAJOID;
+    --Insertamos las variables si es un insert     
+        INSERT INTO Auditoria (
+            Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos
+        ) VALUES (
+            'PUESTOTRABAJO', v_operacion, USER, v_clave_primaria, 
+            TO_CLOB('PUESTO=' || :OLD.PUESTO || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS'))
+        );
+
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_ROL
+AFTER INSERT OR UPDATE OR DELETE ON ROL
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    -- Determina el tipo de operación
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.ROLID;
+        INSERT INTO Auditoria (
+            Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos
+        ) VALUES (
+            'ROL', v_operacion, USER, v_clave_primaria, 
+            TO_CLOB('NOMBRE=' || :NEW.NOMBRE || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS'))
+        );
+
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.ROLID;
+        INSERT INTO Auditoria (
+            Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos
+        ) VALUES (
+            'ROL', v_operacion, USER, v_clave_primaria, 
+            TO_CLOB('NOMBRE=' || :OLD.NOMBRE || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+            TO_CLOB('NOMBRE=' || :NEW.NOMBRE || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS'))
+        );
+
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.ROLID;
+        INSERT INTO Auditoria (
+            Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos
+        ) VALUES (
+            'ROL', v_operacion, USER, v_clave_primaria, 
+            TO_CLOB('NOMBRE=' || :OLD.NOMBRE || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS'))
+        );
+
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CLIENTE
+AFTER INSERT OR UPDATE OR DELETE ON CLIENTE
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.CREDENCIALID;
+        
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('CLIENTE', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('NOMBRE=' || :NEW.NOMBRE || ', PRIMERAPELLIDO=' || :NEW.PRIMERAPELLIDO || ', SEGUNDOAPELLIDO=' || :NEW.SEGUNDOAPELLIDO || ', FECHANACIMIENTO=' || TO_CHAR(:NEW.FECHANACIMIENTO, 'YYYY-MM-DD') || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.CREDENCIALID;
+        
+        INSERT INTO Auditoria (
+            Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos
+        ) VALUES (
+            'CLIENTE', v_operacion, USER, v_clave_primaria, 
+            TO_CLOB('NOMBRE=' || :OLD.NOMBRE || ', PRIMERAPELLIDO=' || :OLD.PRIMERAPELLIDO || ', SEGUNDOAPELLIDO=' || :OLD.SEGUNDOAPELLIDO || ', FECHANACIMIENTO=' || TO_CHAR(:OLD.FECHANACIMIENTO, 'YYYY-MM-DD') || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+            TO_CLOB('NOMBRE=' || :NEW.NOMBRE || ', PRIMERAPELLIDO=' || :NEW.PRIMERAPELLIDO || ', SEGUNDOAPELLIDO=' || :NEW.SEGUNDOAPELLIDO || ', FECHANACIMIENTO=' || TO_CHAR(:NEW.FECHANACIMIENTO, 'YYYY-MM-DD') || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS'))
+        );
+
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.CREDENCIALID;
+        
+        INSERT INTO Auditoria (
+            Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos
+        ) VALUES (
+            'CLIENTE', v_operacion, USER, v_clave_primaria, 
+            TO_CLOB('NOMBRE=' || :OLD.NOMBRE || ', PRIMERAPELLIDO=' || :OLD.PRIMERAPELLIDO || ', SEGUNDOAPELLIDO=' || :OLD.SEGUNDOAPELLIDO || ', FECHANACIMIENTO=' || TO_CHAR(:OLD.FECHANACIMIENTO, 'YYYY-MM-DD') || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS'))
+        );
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CATEGORIATELEFONO
+AFTER INSERT OR UPDATE OR DELETE ON CATEGORIATELEFONO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.CATEGORIATELEFONOID;
+        
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('CATEGORIATELEFONO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('TIPOTELEFONO=' || :NEW.TIPOTELEFONO || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.CATEGORIATELEFONOID;
+        
+        INSERT INTO Auditoria (
+            Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos
+        ) VALUES (
+            'CATEGORIATELEFONO', v_operacion, USER, v_clave_primaria, 
+            TO_CLOB('TIPOTELEFONO=' || :OLD.TIPOTELEFONO || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+            TO_CLOB('TIPOTELEFONO=' || :NEW.TIPOTELEFONO || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS'))
+        );
+
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.CATEGORIATELEFONOID;
+        
+        INSERT INTO Auditoria (
+            Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos
+        ) VALUES (
+            'CATEGORIATELEFONO', v_operacion, USER, v_clave_primaria, 
+            TO_CLOB('TIPOTELEFONO=' || :OLD.TIPOTELEFONO || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS'))
+        );
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_TELEFONOPORUSUARIO
+AFTER INSERT OR UPDATE OR DELETE ON TELEFONOPORUSUARIO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.NUMEROTELEFONO || '-' || :NEW.CREDENCIALID;
+        
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('TELEFONOPORUSUARIO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('NUMEROTELEFONO=' || :NEW.NUMEROTELEFONO || ', CREDENCIALID=' || :NEW.CREDENCIALID || ', CATEGORIATELEFONOID=' || :NEW.CATEGORIATELEFONOID || ', NUMEROEXTENSION=' || :NEW.NUMEROEXTENSION || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.NUMEROTELEFONO || '-' || :OLD.CREDENCIALID;
+        
+        INSERT INTO Auditoria (
+            Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos
+        ) VALUES (
+            'TELEFONOPORUSUARIO', v_operacion, USER, v_clave_primaria, 
+            TO_CLOB('NUMEROTELEFONO=' || :OLD.NUMEROTELEFONO || ', CREDENCIALID=' || :OLD.CREDENCIALID || ', CATEGORIATELEFONOID=' || :OLD.CATEGORIATELEFONOID || ', NUMEROEXTENSION=' || :OLD.NUMEROEXTENSION || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+            TO_CLOB('NUMEROTELEFONO=' || :NEW.NUMEROTELEFONO || ', CREDENCIALID=' || :NEW.CREDENCIALID || ', CATEGORIATELEFONOID=' || :NEW.CATEGORIATELEFONOID || ', NUMEROEXTENSION=' || :NEW.NUMEROEXTENSION || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS'))
+        );
+
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.NUMEROTELEFONO || '-' || :OLD.CREDENCIALID;
+        
+        INSERT INTO Auditoria (
+            Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos
+        ) VALUES (
+            'TELEFONOPORUSUARIO', v_operacion, USER, v_clave_primaria, 
+            TO_CLOB('NUMEROTELEFONO=' || :OLD.NUMEROTELEFONO || ', CREDENCIALID=' || :OLD.CREDENCIALID || ', CATEGORIATELEFONOID=' || :OLD.CATEGORIATELEFONOID || ', NUMEROEXTENSION=' || :OLD.NUMEROEXTENSION || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS'))
+        );
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla CREDENCIALESPORUSUARIO
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CREDENCIALESPORUSUARIO
+AFTER INSERT OR UPDATE OR DELETE ON CREDENCIALESPORUSUARIO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.CREDENCIALID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('CREDENCIALESPORUSUARIO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CORREOELECTRONICO=' || :NEW.CORREOELECTRONICO || ', CONTRASEÑA=' || :NEW.CONTRASEÑA || ', ESCONTRASEÑATEMPORAL=' || :NEW.ESCONTRASEÑATEMPORAL || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.CREDENCIALID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('CREDENCIALESPORUSUARIO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CORREOELECTRONICO=' || :OLD.CORREOELECTRONICO || ', CONTRASEÑA=' || :OLD.CONTRASEÑA || ', ESCONTRASEÑATEMPORAL=' || :OLD.ESCONTRASEÑATEMPORAL || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('CORREOELECTRONICO=' || :NEW.CORREOELECTRONICO || ', CONTRASEÑA=' || :NEW.CONTRASEÑA || ', ESCONTRASEÑATEMPORAL=' || :NEW.ESCONTRASEÑATEMPORAL || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.CREDENCIALID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('CREDENCIALESPORUSUARIO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CORREOELECTRONICO=' || :OLD.CORREOELECTRONICO || ', CONTRASEÑA=' || :OLD.CONTRASEÑA || ', ESCONTRASEÑATEMPORAL=' || :OLD.ESCONTRASEÑATEMPORAL || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla CATEGORIAMENU
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CATEGORIAMENU
+AFTER INSERT OR UPDATE OR DELETE ON CATEGORIAMENU
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.CATEGORIAMENUID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('CATEGORIAMENU', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('TIPOMENU=' || :NEW.TIPOMENU || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.CATEGORIAMENUID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('CATEGORIAMENU', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('TIPOMENU=' || :OLD.TIPOMENU || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('TIPOMENU=' || :NEW.TIPOMENU || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.CATEGORIAMENUID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('CATEGORIAMENU', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('TIPOMENU=' || :OLD.TIPOMENU || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla MENU
+create or replace TRIGGER TRG_AUDITORIA_MENU
+AFTER INSERT OR UPDATE OR DELETE ON MENU
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.MENUID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('MENU', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CATEGORIAMENUID=' || :NEW.CATEGORIAMENUID || ', MENUPADREID=' || :NEW.MENUPADREID || ', NOMBRE=' || :NEW.NOMBRE || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', NIVEL=' || :NEW.NIVEL || ', URL=' || :NEW.URL || ', ICONO=' || :NEW.ICONO || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.MENUID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('MENU', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CATEGORIAMENUID=' || :OLD.CATEGORIAMENUID || ', MENUPADREID=' || :OLD.MENUPADREID || ', NOMBRE=' || :OLD.NOMBRE || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', NIVEL=' || :OLD.NIVEL || ', URL=' || :OLD.URL || ', ICONO=' || :OLD.ICONO || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('CATEGORIAMENUID=' || :NEW.CATEGORIAMENUID || ', MENUPADREID=' || :NEW.MENUPADREID || ', NOMBRE=' || :NEW.NOMBRE || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', NIVEL=' || :NEW.NIVEL || ', URL=' || :NEW.URL || ', ICONO=' || :NEW.ICONO || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.MENUID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('MENU', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CATEGORIAMENUID=' || :OLD.CATEGORIAMENUID || ', MENUPADREID=' || :OLD.MENUPADREID || ', NOMBRE=' || :OLD.NOMBRE || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', NIVEL=' || :OLD.NIVEL || ', URL=' || :OLD.URL || ', ICONO=' || :OLD.ICONO || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla MENUPORROL
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_MENUPORROL
+AFTER INSERT OR UPDATE OR DELETE ON MENUPORROL
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.ROLID || ',' || :NEW.MENUID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('MENUPORROL', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('ROLID=' || :NEW.ROLID || ', MENUID=' || :NEW.MENUID || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.ROLID || ',' || :OLD.MENUID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('MENUPORROL', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('ROLID=' || :OLD.ROLID || ', MENUID=' || :OLD.MENUID || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('ROLID=' || :NEW.ROLID || ', MENUID=' || :NEW.MENUID || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.ROLID || ',' || :OLD.MENUID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('MENUPORROL', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('ROLID=' || :OLD.ROLID || ', MENUID=' || :OLD.MENUID || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla PAIS
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_PAIS
+AFTER INSERT OR UPDATE OR DELETE ON PAIS
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.CODIGOPAIS;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('PAIS', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('NOMBRE=' || :NEW.NOMBRE || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.CODIGOPAIS;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('PAIS', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('NOMBRE=' || :OLD.NOMBRE || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('NOMBRE=' || :NEW.NOMBRE || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.CODIGOPAIS;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('PAIS', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('NOMBRE=' || :OLD.NOMBRE || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla ESTADO
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_ESTADO
+AFTER INSERT OR UPDATE OR DELETE ON ESTADO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.CODIGOESTADO;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('ESTADO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CODIGOPAIS=' || :NEW.CODIGOPAIS || ', NOMBRE=' || :NEW.NOMBRE || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.CODIGOESTADO;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('ESTADO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CODIGOPAIS=' || :OLD.CODIGOPAIS || ', NOMBRE=' || :OLD.NOMBRE || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('CODIGOPAIS=' || :NEW.CODIGOPAIS || ', NOMBRE=' || :NEW.NOMBRE || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.CODIGOESTADO;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('ESTADO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CODIGOPAIS=' || :OLD.CODIGOPAIS || ', NOMBRE=' || :OLD.NOMBRE || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla CONDADO
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CONDADO
+AFTER INSERT OR UPDATE OR DELETE ON CONDADO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.CODIGOCONDADO;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('CONDADO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CODIGOESTADO=' || :NEW.CODIGOESTADO || ', NOMBRE=' || :NEW.NOMBRE || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.CODIGOCONDADO;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('CONDADO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CODIGOESTADO=' || :OLD.CODIGOESTADO || ', NOMBRE=' || :OLD.NOMBRE || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('CODIGOESTADO=' || :NEW.CODIGOESTADO || ', NOMBRE=' || :NEW.NOMBRE || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.CODIGOCONDADO;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('CONDADO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CODIGOESTADO=' || :OLD.CODIGOESTADO || ', NOMBRE=' || :OLD.NOMBRE || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/20/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla DISTRITO
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_DISTRITO
+AFTER INSERT OR UPDATE OR DELETE ON DISTRITO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.CODIGODISTRITO;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('DISTRITO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CODIGOCONDADO=' || :NEW.CODIGOCONDADO || ', NOMBRE=' || :NEW.NOMBRE || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.CODIGODISTRITO;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('DISTRITO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CODIGOCONDADO=' || :OLD.CODIGOCONDADO || ', NOMBRE=' || :OLD.NOMBRE || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('CODIGOCONDADO=' || :NEW.CODIGOCONDADO || ', NOMBRE=' || :NEW.NOMBRE || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.CODIGODISTRITO;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('DISTRITO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CODIGOCONDADO=' || :OLD.CODIGOCONDADO || ', NOMBRE=' || :OLD.NOMBRE || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/23/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla CATEGORIASERVICIO
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CATEGORIASERVICIO
+AFTER INSERT OR UPDATE OR DELETE ON CATEGORIASERVICIO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.CATEGORIASERVICIOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('CATEGORIASERVICIO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('NOMBRE=' || :NEW.NOMBRE || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.CATEGORIASERVICIOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('CATEGORIASERVICIO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('NOMBRE=' || :OLD.NOMBRE || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('NOMBRE=' || :NEW.NOMBRE || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.CATEGORIASERVICIOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('CATEGORIASERVICIO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('NOMBRE=' || :OLD.NOMBRE || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/23/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CATEGORIAPRODUCTO
+AFTER INSERT OR UPDATE OR DELETE ON CATEGORIAPRODUCTO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.CATEGORIAPRODUCTOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('CATEGORIAPRODUCTO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('NOMBRE=' || :NEW.NOMBRE || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.CATEGORIAPRODUCTOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('CATEGORIAPRODUCTO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('NOMBRE=' || :OLD.NOMBRE || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('NOMBRE=' || :NEW.NOMBRE || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.CATEGORIAPRODUCTOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('CATEGORIAPRODUCTO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('NOMBRE=' || :OLD.NOMBRE || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/23/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla DIRECCIONPORUSUARIO
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_DIRECCIONPORUSUARIO
+AFTER INSERT OR UPDATE OR DELETE ON DIRECCIONPORUSUARIO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.CREDENCIALID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('DIRECCIONPORUSUARIO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CODIGOPAIS=' || :NEW.CODIGOPAIS || ', CODIGOESTADO=' || :NEW.CODIGOESTADO || ', CODIGOCONDADO=' || :NEW.CODIGOCONDADO || ', CODIGODISTRITO=' || :NEW.CODIGODISTRITO || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.CREDENCIALID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('DIRECCIONPORUSUARIO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CODIGOPAIS=' || :OLD.CODIGOPAIS || ', CODIGOESTADO=' || :OLD.CODIGOESTADO || ', CODIGOCONDADO=' || :OLD.CODIGOCONDADO || ', CODIGODISTRITO=' || :OLD.CODIGODISTRITO || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('CODIGOPAIS=' || :NEW.CODIGOPAIS || ', CODIGOESTADO=' || :NEW.CODIGOESTADO || ', CODIGOCONDADO=' || :NEW.CODIGOCONDADO || ', CODIGODISTRITO=' || :NEW.CODIGODISTRITO || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.CREDENCIALID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('DIRECCIONPORUSUARIO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CODIGOPAIS=' || :OLD.CODIGOPAIS || ', CODIGOESTADO=' || :OLD.CODIGOESTADO || ', CODIGOCONDADO=' || :OLD.CODIGOCONDADO || ', CODIGODISTRITO=' || :OLD.CODIGODISTRITO || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/23/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla SERVICIO
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_SERVICIO
+AFTER INSERT OR UPDATE OR DELETE ON SERVICIO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.SERVICIOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('SERVICIO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CATEGORIASERVICIOID=' || :NEW.CATEGORIASERVICIOID || ', NOMBRE=' || :NEW.NOMBRE || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', PRECIO=' || :NEW.PRECIO || ', TIEMPOSERVICIO=' || :NEW.TIEMPOSERVICIO || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.SERVICIOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('SERVICIO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CATEGORIASERVICIOID=' || :OLD.CATEGORIASERVICIOID || ', NOMBRE=' || :OLD.NOMBRE || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', PRECIO=' || :OLD.PRECIO || ', TIEMPOSERVICIO=' || :OLD.TIEMPOSERVICIO || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('CATEGORIASERVICIOID=' || :NEW.CATEGORIASERVICIOID || ', NOMBRE=' || :NEW.NOMBRE || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', PRECIO=' || :NEW.PRECIO || ', TIEMPOSERVICIO=' || :NEW.TIEMPOSERVICIO || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.SERVICIOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('SERVICIO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CATEGORIASERVICIOID=' || :OLD.CATEGORIASERVICIOID || ', NOMBRE=' || :OLD.NOMBRE || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', PRECIO=' || :OLD.PRECIO || ', TIEMPOSERVICIO=' || :OLD.TIEMPOSERVICIO || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/23/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla ESTADOCITA
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_ESTADOCITA
+AFTER INSERT OR UPDATE OR DELETE ON ESTADOCITA
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.ESTADOCITAID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('ESTADOCITA', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('ESTADO=' || :NEW.ESTADO || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.ESTADOCITAID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('ESTADOCITA', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('ESTADO=' || :OLD.ESTADO || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('ESTADO=' || :NEW.ESTADO || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.ESTADOCITAID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('ESTADOCITA', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('ESTADO=' || :OLD.ESTADO || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/23/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla VEHICULO
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_VEHICULO
+AFTER INSERT OR UPDATE OR DELETE ON VEHICULO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.PLACAVEHICULOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('VEHICULO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('VIN=' || :NEW.VIN || ', MARCA=' || :NEW.MARCA || ', MODELO=' || :NEW.MODELO || ', AÑO=' || :NEW.AÑO || ', COLOR=' || :NEW.COLOR || ', ALDIA=' || :NEW.ALDIA || ', TITULOPROPIEDAD=' || DBMS_LOB.GETLENGTH(:NEW.TITULOPROPIEDAD) || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.PLACAVEHICULOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('VEHICULO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('VIN=' || :OLD.VIN || ', MARCA=' || :OLD.MARCA || ', MODELO=' || :OLD.MODELO || ', AÑO=' || :OLD.AÑO || ', COLOR=' || :OLD.COLOR || ', ALDIA=' || :OLD.ALDIA || ', TITULOPROPIEDAD=' || DBMS_LOB.GETLENGTH(:OLD.TITULOPROPIEDAD) || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('VIN=' || :NEW.VIN || ', MARCA=' || :NEW.MARCA || ', MODELO=' || :NEW.MODELO || ', AÑO=' || :NEW.AÑO || ', COLOR=' || :NEW.COLOR || ', ALDIA=' || :NEW.ALDIA || ', TITULOPROPIEDAD=' || DBMS_LOB.GETLENGTH(:NEW.TITULOPROPIEDAD) || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.PLACAVEHICULOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('VEHICULO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('VIN=' || :OLD.VIN || ', MARCA=' || :OLD.MARCA || ', MODELO=' || :OLD.MODELO || ', AÑO=' || :OLD.AÑO || ', COLOR=' || :OLD.COLOR || ', ALDIA=' || :OLD.ALDIA || ', TITULOPROPIEDAD=' || DBMS_LOB.GETLENGTH(:OLD.TITULOPROPIEDAD) || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/23/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla CITAS
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_CITAS
+AFTER INSERT OR UPDATE OR DELETE ON CITAS
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.CITAID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('CITAS', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CREDENCIALID=' || :NEW.CREDENCIALID || ', PLACAVEHICULOID=' || :NEW.PLACAVEHICULOID || ', VIN=' || :NEW.VIN || ', SERVICIOID=' || :NEW.SERVICIOID || ', ESTADOCITAID=' || :NEW.ESTADOCITAID || ', FECHAAGENDADA=' || TO_CHAR(:NEW.FECHAAGENDADA, 'YYYY-MM-DD HH24:MI:SS') || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', HORAAGENDADA=' || :NEW.HORAAGENDADA || ', HORAFINALIZACION=' || :NEW.HORAFINALIZACION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.CITAID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('CITAS', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CREDENCIALID=' || :OLD.CREDENCIALID || ', PLACAVEHICULOID=' || :OLD.PLACAVEHICULOID || ', VIN=' || :OLD.VIN || ', SERVICIOID=' || :OLD.SERVICIOID || ', ESTADOCITAID=' || :OLD.ESTADOCITAID || ', FECHAAGENDADA=' || TO_CHAR(:OLD.FECHAAGENDADA, 'YYYY-MM-DD HH24:MI:SS') || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', HORAAGENDADA=' || :OLD.HORAAGENDADA || ', HORAFINALIZACION=' || :OLD.HORAFINALIZACION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('CREDENCIALID=' || :NEW.CREDENCIALID || ', PLACAVEHICULOID=' || :NEW.PLACAVEHICULOID || ', VIN=' || :NEW.VIN || ', SERVICIOID=' || :NEW.SERVICIOID || ', ESTADOCITAID=' || :NEW.ESTADOCITAID || ', FECHAAGENDADA=' || TO_CHAR(:NEW.FECHAAGENDADA, 'YYYY-MM-DD HH24:MI:SS') || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', HORAAGENDADA=' || :NEW.HORAAGENDADA || ', HORAFINALIZACION=' || :NEW.HORAFINALIZACION || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.CITAID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('CITAS', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CREDENCIALID=' || :OLD.CREDENCIALID || ', PLACAVEHICULOID=' || :OLD.PLACAVEHICULOID || ', VIN=' || :OLD.VIN || ', SERVICIOID=' || :OLD.SERVICIOID || ', ESTADOCITAID=' || :OLD.ESTADOCITAID || ', FECHAAGENDADA=' || TO_CHAR(:OLD.FECHAAGENDADA, 'YYYY-MM-DD HH24:MI:SS') || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', HORAAGENDADA=' || :OLD.HORAAGENDADA || ', HORAFINALIZACION=' || :OLD.HORAFINALIZACION || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/23/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla VEHICULOPORCLIENTE
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_VEHICULOPORCLIENTE
+AFTER INSERT OR UPDATE OR DELETE ON VEHICULOPORCLIENTE
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.VIN;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('VEHICULOPORCLIENTE', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CREDENCIALID=' || :NEW.CREDENCIALID || ', PLACAVEHICULO=' || :NEW.PLACAVEHICULO || ', VIN=' || :NEW.VIN || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.VIN;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('VEHICULOPORCLIENTE', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CREDENCIALID=' || :OLD.CREDENCIALID || ', PLACAVEHICULO=' || :OLD.PLACAVEHICULO || ', VIN=' || :OLD.VIN || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('CREDENCIALID=' || :NEW.CREDENCIALID || ', PLACAVEHICULO=' || :NEW.PLACAVEHICULO || ', VIN=' || :NEW.VIN || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.VIN;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('VEHICULOPORCLIENTE', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CREDENCIALID=' || :OLD.CREDENCIALID || ', PLACAVEHICULO=' || :OLD.PLACAVEHICULO || ', VIN=' || :OLD.VIN || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/23/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla DIAGNOSTICO
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_DIAGNOSTICO
+AFTER INSERT OR UPDATE OR DELETE ON DIAGNOSTICO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.DIAGNOSTICOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('DIAGNOSTICO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CITAID=' || :NEW.CITAID || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', CODTRABAJADOR=' || :NEW.CODTRABAJADOR || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.DIAGNOSTICOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('DIAGNOSTICO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CITAID=' || :OLD.CITAID || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', CODTRABAJADOR=' || :OLD.CODTRABAJADOR || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('CITAID=' || :NEW.CITAID || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', CODTRABAJADOR=' || :NEW.CODTRABAJADOR || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.DIAGNOSTICOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('DIAGNOSTICO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CITAID=' || :OLD.CITAID || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', CODTRABAJADOR=' || :OLD.CODTRABAJADOR || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/24/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla SERVICIOSPORDIAGNOSTICO
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_SERVICIOSPORDIAGNOSTICO
+AFTER INSERT OR UPDATE OR DELETE ON SERVICIOSPORDIAGNOSTICO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria VARCHAR2(200);
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.SERVICIOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('SERVICIOSPORDIAGNOSTICO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('DIAGNOSTICOID=' || :NEW.DIAGNOSTICOID || ', SERVICIOID=' || :NEW.SERVICIOID || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.SERVICIOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('SERVICIOSPORDIAGNOSTICO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('DIAGNOSTICOID=' || :OLD.DIAGNOSTICOID || ', SERVICIOID=' || :OLD.SERVICIOID || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('DIAGNOSTICOID=' || :NEW.DIAGNOSTICOID || ', SERVICIOID=' || :NEW.SERVICIOID || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.SERVICIOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('SERVICIOSPORDIAGNOSTICO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('DIAGNOSTICOID=' || :OLD.DIAGNOSTICOID || ', SERVICIOID=' || :OLD.SERVICIOID || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/24/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+
+-- Trigger para la tabla PRODUCTO
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_PRODUCTO
+AFTER INSERT OR UPDATE OR DELETE ON PRODUCTO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria NUMBER;
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.PRODUCTOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('PRODUCTO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CATEGORIAPRODUCTOID=' || :NEW.CATEGORIAPRODUCTOID || ', NOMBRE=' || :NEW.NOMBRE || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', PRECIOUNITARIO=' || :NEW.PRECIOUNITARIO || ', CANTIDAD=' || :NEW.CANTIDAD || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.PRODUCTOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('PRODUCTO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CATEGORIAPRODUCTOID=' || :OLD.CATEGORIAPRODUCTOID || ', NOMBRE=' || :OLD.NOMBRE || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', PRECIOUNITARIO=' || :OLD.PRECIOUNITARIO || ', CANTIDAD=' || :OLD.CANTIDAD || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('CATEGORIAPRODUCTOID=' || :NEW.CATEGORIAPRODUCTOID || ', NOMBRE=' || :NEW.NOMBRE || ', DESCRIPCION=' || :NEW.DESCRIPCION || ', PRECIOUNITARIO=' || :NEW.PRECIOUNITARIO || ', CANTIDAD=' || :NEW.CANTIDAD || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.PRODUCTOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('PRODUCTO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('CATEGORIAPRODUCTOID=' || :OLD.CATEGORIAPRODUCTOID || ', NOMBRE=' || :OLD.NOMBRE || ', DESCRIPCION=' || :OLD.DESCRIPCION || ', PRECIOUNITARIO=' || :OLD.PRECIOUNITARIO || ', CANTIDAD=' || :OLD.CANTIDAD || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Jason Zuñiga
+Id Requirement: AR-001
+Creation Date: 08/24/2024   (MM/dd/YYYY)
+Requirement: Trigger encargado de crear un insert
+en la tabla 'Auditoria' para llevar un historial.
+****************************************************************************************************************************************************************/
+-- Trigger para la tabla PRODUCTOPORDIAGNOSTICO
+CREATE OR REPLACE TRIGGER TRG_AUDITORIA_PRODUCTOPORDIAGNOSTICO
+AFTER INSERT OR UPDATE OR DELETE ON PRODUCTOPORDIAGNOSTICO
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_clave_primaria NUMBER;
+BEGIN
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+        v_clave_primaria := :NEW.PRODUCTOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Nuevos) 
+        VALUES 
+        ('PRODUCTOPORDIAGNOSTICO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('DIAGNOSTICOID=' || :NEW.DIAGNOSTICOID || ', PRODUCTOID=' || :NEW.PRODUCTOID || ', CANTIDAD=' || :NEW.CANTIDAD || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+        v_clave_primaria := :OLD.PRODUCTOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos, Datos_Nuevos) 
+        VALUES 
+        ('PRODUCTOPORDIAGNOSTICO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('DIAGNOSTICOID=' || :OLD.DIAGNOSTICOID || ', PRODUCTOID=' || :OLD.PRODUCTOID || ', CANTIDAD=' || :OLD.CANTIDAD || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')),
+        TO_CLOB('DIAGNOSTICOID=' || :NEW.DIAGNOSTICOID || ', PRODUCTOID=' || :NEW.PRODUCTOID || ', CANTIDAD=' || :NEW.CANTIDAD || ', EDITADOPOR=' || :NEW.EDITADOPOR || ', HABILITADO=' || :NEW.HABILITADO || ', FECHACREACION=' || TO_CHAR(:NEW.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+        v_clave_primaria := :OLD.PRODUCTOID;
+        INSERT INTO Auditoria 
+        (Tabla, Operacion, Usuario, Clave_Primaria, Datos_Antiguos) 
+        VALUES 
+        ('PRODUCTOPORDIAGNOSTICO', v_operacion, USER, v_clave_primaria, 
+        TO_CLOB('DIAGNOSTICOID=' || :OLD.DIAGNOSTICOID || ', PRODUCTOID=' || :OLD.PRODUCTOID || ', CANTIDAD=' || :OLD.CANTIDAD || ', EDITADOPOR=' || :OLD.EDITADOPOR || ', HABILITADO=' || :OLD.HABILITADO || ', FECHACREACION=' || TO_CHAR(:OLD.FECHACREACION, 'YYYY-MM-DD HH24:MI:SS')));
+    END IF;
+END;
+/
