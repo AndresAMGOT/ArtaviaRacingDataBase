@@ -1028,14 +1028,17 @@ BEGIN
         EDITADOPOR = p_editadoPor,
         HORAFINALIZACION = TO_CHAR(SYSDATE, 'HH24:MI')
     WHERE CITAID = p_citaId AND HABILITADO != 0; -- Solo actualiza si la cita no está cancelada.
-
+ 
+     UPDATE CITAS
+        SET ESTADOCITAID = 3
+    WHERE CITAID= p_citaId;
     -- Si se actualizó algún registro, cambiamos el valor a TRUE
     IF SQL%ROWCOUNT > 0 THEN
         v_result := TRUE;
     ELSE
         v_result := FALSE;
     END IF;
-
+ 
     RETURN v_result;
 END FN_CancelarCita;
 /
@@ -1064,7 +1067,8 @@ BEGIN
         CS.NOMBRE AS CATEGORIA,
         S.NOMBRE AS SERVICIO,
         C.FECHAAGENDADA,
-        C.HORAAGENDADA
+        C.HORAAGENDADA,
+        EC.ESTADO AS ESTADOCITAID
     FROM CITAS C
     JOIN SERVICIO S
         ON S.SERVICIOID = C.SERVICIOID
@@ -1072,8 +1076,10 @@ BEGIN
         ON CS.CATEGORIASERVICIOID = S.CATEGORIASERVICIOID
     JOIN VEHICULO V
         ON V.PLACAVEHICULOID = C.PLACAVEHICULOID
+    JOIN ESTADOCITA EC
+        ON EC.ESTADOCITAID = C.ESTADOCITAID        
     WHERE C.CREDENCIALID = CedulaId;
-
+ 
     RETURN v_cursor;
 END FN_ListarCitas;
 /
@@ -1920,7 +1926,7 @@ Id Requirement: AR-001
 Creation Date: 24/08/2024   (MM/dd/YYYY)
 Requirement: Paquete encargado de trabajar con el CITAS
 ****************************************************************************************************************************************************************/
-/*
+
 CREATE OR REPLACE PACKAGE pkg_Citas AS
     -- Declaración de la función que obtendrá las citas
     FUNCTION FP_ObtenerCitas RETURN SYS_REFCURSOR;
@@ -1928,12 +1934,36 @@ END pkg_Citas;
 /
 
 CREATE OR REPLACE PACKAGE BODY pkg_Citas AS
-
     FUNCTION FP_ObtenerCitas RETURN SYS_REFCURSOR IS
         cursor_citas SYS_REFCURSOR;
     BEGIN
         OPEN cursor_citas FOR
-            SELECT * FROM CITAS;
+            SELECT 
+             C.CITAID
+            ,C.FECHAAGENDADA
+            ,C.HORAAGENDADA
+            ,C.PLACAVEHICULOID
+            ,V.MARCA || ' ' || V.MODELO || ' ' || V.AÑO AS VEHICULO
+            ,CL.NOMBRE || ' ' || CL.PRIMERAPELLIDO AS CLIENTE
+            ,CS.NOMBRE AS CATEGORIA
+            ,S.NOMBRE AS SERVICIO     
+            ,EC.ESTADO
+            ,C.DESCRIPCION
+            ,D.Descripcion AS DIAGNOSTICO
+        FROM CITAS C
+        JOIN SERVICIO S
+            ON S.SERVICIOID = C.SERVICIOID
+        JOIN CATEGORIASERVICIO CS
+            ON CS.CATEGORIASERVICIOID = S.CATEGORIASERVICIOID
+        JOIN VEHICULO V
+            ON V.PLACAVEHICULOID = C.PLACAVEHICULOID
+        JOIN ESTADOCITA EC
+            ON EC.ESTADOCITAID = C.ESTADOCITAID
+       JOIN CLIENTE CL
+         ON CL.CREDENCIALID = C.CREDENCIALID
+       LEFT JOIN DIAGNOSTICO D
+            ON D.CITAID = C.CITAID
+       WHERE C.HABILITADO = 1;
         RETURN cursor_citas;
     END FP_ObtenerCitas;
 
@@ -1950,7 +1980,7 @@ BEGIN
     p_cursor := pkg_Citas.FP_ObtenerCitas;
 END USP_LISTAR_CITAS_ADMIN;
 /
-*/
+
 
 /****************************************************************************************************************************************************************
 ***                                                  CREACION DE PROCEDIMIENTOS ALMACENADOS APARTIR DE AQUI                                   --ENCABEZADOS   ***
@@ -2459,94 +2489,6 @@ BEGIN
 END USP_SeleccionarTipoTelefono;
 /
 
--- Categorías para menús y submenús
-INSERT INTO "ARTAVIARACING"."CATEGORIAMENU" (CATEGORIAMENUID, TIPOMENU, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 'MENU', 'Menú Principal', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."CATEGORIAMENU" (CATEGORIAMENUID, TIPOMENU, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 'SUBMENU', 'Sub menú', '000000001', 1, SYSDATE);
-
-
--- Menús principales
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 1, NULL, 'Home', '/home', 1, 'fa fa-home', 'Página principal', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 1, NULL, 'Gestión Administradora', '/adminmanager', 1, 'fa fa-box-open', 'Gestión de administración', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(3, 1, NULL, 'Gestión de Citas', '/shedulemanager', 1, 'fa fa-calendar-check', 'Gestión de citas', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(11, 1, NULL, 'Cerrar Sesión', '/index', 1, 'fa fa-power-off', 'Cerrar Sesión', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(8, 1, NULL, 'Repuestos', '/UsuarioInventario', 1, 'fa fa-cogs', 'Gestión de Repuestos', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(9, 1, NULL, 'Gestión de Vehículos', '/ManageVehicle', 1, 'fa fa-car', 'Gestiona los vehículos del cliente', '000000001', 1, SYSDATE);
-
-
-
--- Submenús
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(4, 2, 2, 'Inventario', '/inventario', 2, 'fa fa-warehouse', 'Gestión de inventario', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(5, 2, 3, 'Agendar', '/agendar', 2, 'fa fa-calendar-plus', 'Agendar citas', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(6, 2, 3, 'Mis Citas', '/miscitas', 2, 'fa fa-calendar-day', 'Mis citas', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(7, 2, 3, 'Citas', '/citas', 2, 'fa fa-calendar-alt', 'Todas las citas', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(10, 2, NULL, 'Repuestos', '/UsuarioInventario', 1, 'fa fa-cogs', 'Gestión de Repuestos', '000000001', 1, SYSDATE);
-
--- Supongamos que el rol con ID 1 es 'Administrador'
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 2, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 3, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 3, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 4, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 5, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 6, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 7, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 8, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 11, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 11, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 9, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 10, '000000001', 1, SYSDATE);
-
 /****************************************************************************************************************************************************************
 Autor: José Andrés Alvarado Matamoros
 Id Requirement: AR-001 
@@ -2678,7 +2620,6 @@ Updated By                                  (MM/dd/YYYY)                        
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************************************************************************/
-
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE USP_InsertarProducto (    
     p_categoriaProductoId IN NUMBER,
     p_nombre             IN VARCHAR2,
@@ -2910,27 +2851,6 @@ BEGIN
 END FN_EliminarProducto;
 /
 
-INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
-("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (1, 'Aceites y Lubricantes', 'Aceites y lubricantes para motores y transmisión.', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
-("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (2, 'Filtros', 'Filtros de aceite, aire, combustible y aire de cabina.', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
-("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (3, 'Componentes de Frenos', 'Pastillas de freno, discos, tambores y cilindros de freno.', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
-("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (4, 'Sistemas de Escape', 'Silenciadores, tubos de escape, catalizadores y juntas.', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
-("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (5, 'Partes de Suspensión', 'Amortiguadores, resortes, bieletas y brazos de control.', '000000001', 1, SYSDATE);
-
-
 /****************************************************************************************************************************************************************
 Autor: Andrés Alvarado Matamoros
 Id Requirement: AR-005
@@ -3058,34 +2978,6 @@ BEGIN
 END;
 /
 
-INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
-("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (1, 'Mantenimiento Preventivo', 'Servicios de Mantenimiento Preventivo.', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
-("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (2, 'Diagnóstico y Reparación de Sistemas Mecánicos', 'Servicios de Diagnóstico y Reparación de Sistemas Mecánicos.', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
-("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (3, 'Servicios Eléctricos y Electrónicos', 'Servicios Eléctricos y Electrónicos para vehiculos.', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
-("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (4, 'Reparaciones Especializadas', 'Servicios de Reparaciones Especializadas.', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
-("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (5, 'Servicios de Frenos y Seguridad', 'Servicios de Frenos y Seguridad para vehiculos.', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
-("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (6, 'Servicios de Carrocería y Pintura', 'Servicios de Carrocería y Pintura para vehiculos.', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
-("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (7, 'Inspecciones y Revisiones', 'Servicios de Inspecciones y Revisiones.', '000000001', 1, SYSDATE);
-
 /****************************************************************************************************************************************************************
 Autor: Horacio Porras Marín
 Id Requirement: AR-003
@@ -3113,149 +3005,6 @@ BEGIN
 END USP_SeleccionarServicio;
 /
 
---Categoria Mantenimiento Preventivo 1
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (1, 1, 'Cambio de aceite y filtro', 'Servicio de Cambio de aceite y filtro.', 30000, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (2, 1, 'Revisión y cambio de filtros', 'Servicio de Revisión y cambio de filtros(aire, combustible, cabina).', 10000, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (3, 1, 'Rotación y balanceo de neumáticos', 'Servicio de Rotación y balanceo de neumáticos.', 20000, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (4, 1, 'Alineación de ruedas', 'Servicio de Alineación de ruedas.', 25000, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (5, 1, 'Inspección de frenos', 'Servicio de Inspección de frenos.', 15000, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (6, 1, 'Revisión de líquidos', 'Servicio de Revisión de líquidos (refrigerante, frenos, dirección, etc.).', 10000, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (7, 1, 'Revisión de correas y mangueras', 'Servicio de Revisión de correas y mangueras.', 22000, 1, '000000001', 1, SYSDATE);
-
---Categoria Diagnóstico y Reparación de Sistemas Mecánicos 2
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (8, 2, 'Diagnóstico y reparación de motor', 'Servicio de Diagnóstico y reparación de motor.', 325000, 5, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (9, 2, 'Reparación de transmisión', 'Servicio de Reparación de transmisión.', 430000, 8, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (10, 2, 'Reparación de sistemas de escape', 'Servicio de Reparación de sistemas de escape.', 75000, 2, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (11, 2, 'Reparación de sistemas de suspensión', 'Servicio de Reparación de sistemas de suspensión.', 110000, 3, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (12, 2, 'Reemplazo de embrague', 'Servicio de Reemplazo de embrague.', 180000, 1, '000000001', 7, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (13, 2, 'Reparación de sistema de dirección', 'Servicio de Reparación de sistema de dirección.', 90000, 3, '000000001', 1, SYSDATE);
-
---Categoria Servicios Eléctricos y Electrónicos 3
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (14, 3, 'Diagnóstico y reparación de sistemas eléctricos', 'Servicio de Diagnóstico y reparación de sistemas eléctricos.', 60000, 2, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (15, 3, 'Reemplazo y revisión de batería', 'Servicio de Reemplazo y revisión de batería.', 35000, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (16, 3, 'Reparación de alternadores y motores de arranque', 'Servicio de Reparación de alternadores y motores de arranque.', 75000, 2, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (17, 3, 'Diagnóstico y reparación de sistemas de luces', 'Servicio de Diagnóstico y reparación de sistemas de luces.', 33000, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (18, 3, 'Reparación de sistemas de control electrónico (ECU)', 'Servicio de Reparación de sistemas de control electrónico (ECU).', 150000, 3, '000000001', 1, SYSDATE);
-
---Categoria Servicios de Frenos y Seguridad 4
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (19, 4, 'Reemplazo de pastillas y discos de freno', 'Servicio de Reemplazo de pastillas y discos de freno.', 45000, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (20, 4, 'Reparación de frenos ABS', 'Servicio de Reparación de frenos ABS.', 82000, 2, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (21, 4, 'Cambio de líquido de frenos', 'Servicio de Cambio de líquido de frenos.', 18000, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (22, 4, 'Inspección y reparación de sistemas de seguridad', 'Servicio de Inspección y reparación de sistemas de seguridad (airbags, sensores, etc.).', 66000, 2, '000000001', 1, SYSDATE);
-
---Categoria Reparaciones Especializadas 5
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (23, 5, 'Reparación de sistemas de climatización', 'Servicio de Reparación de sistemas de climatización (A/C y calefacción).', 90000, 3, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (24, 5, 'Reprogramación de centralitas electrónicas (ECU)', 'Servicio de Reprogramación de centralitas electrónicas (ECU).', 45000, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (25, 5, 'Instalación y reparación de sistemas de entretenimiento y navegación', 'Servicio de Instalación y reparación de sistemas de entretenimiento y navegación.', 120000, 2, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (26, 5, 'Reparación de sistemas de combustible', 'Servicio de Reparación de sistemas de combustible.', 77000, 2, '000000001', 1, SYSDATE);
-
---Categoria Servicios de Carrocería y Pintura 6
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (27, 6, 'Reparación de golpes y abolladuras', 'Servicio de Reparación de golpes y abolladuras.', 150000, 48, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (28, 6, 'Pintura de carrocería', 'Servicio de Pintura de carrocería.', 320000, 72, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (29, 6, 'Pulido y detallado de pintura', 'Servicio de Pulido y detallado de pintura.', 38000, 5, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (30, 6, 'Reparación de parabrisas', 'Servicio de Reparación de parabrisas.', 30000, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (31, 6, 'Instalación y reparación de vidrios', 'Servicio de Instalación y reparación de vidrios.', 50000, 1, '000000001', 1, SYSDATE);
-
---Inspecciones y Revisiones 7
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (32, 7, 'Inspección técnica vehicular', 'Servicio de Inspección técnica vehicular.', 21000, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (33, 7, 'Revisión previa a la compra de vehículos', 'Servicio de Revisión previa a la compra de vehículos.', 36000, 2, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."SERVICIO" 
-("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (34, 7, 'Inspección de emisiones contaminantes', 'Servicio de Inspección de emisiones contaminantes.', 14000, 1, '000000001', 1, SYSDATE);
-
 /****************************************************************************************************************************************************************
 Autor: Horacio Porras Marín
 Id Requirement: AR-003
@@ -3282,18 +3031,6 @@ BEGIN
     FROM ARTAVIARACING.ESTADOCITA;
 END USP_SeleccionarEstadoCita;
 /
-
-INSERT INTO "ARTAVIARACING"."ESTADOCITA" 
-("ESTADOCITAID", "ESTADO", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (1, 'En Proceso', 'La cita está en proceso.', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."ESTADOCITA" 
-("ESTADOCITAID", "ESTADO", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (2, 'Completada', 'La cita ha sido completada.', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."ESTADOCITA" 
-("ESTADOCITAID", "ESTADO", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
-VALUES (3, 'Cancelada', 'La cita ha sido cancelada.', '000000001', 1, SYSDATE);
 
 /****************************************************************************************************************************************************************
 Autor: Andres Alvarado
@@ -3527,17 +3264,6 @@ Requirement: Procedimiento Almacenado para obtener los vehículos y sus detalles 
 /*
 Editado y comentado por jason por cuestiones de orden enla base de datos
 */
-CREATE OR REPLACE PROCEDURE USP_LISTAR_CITAS_ADMIN (
-    p_cursor OUT SYS_REFCURSOR
-)
-IS
-BEGIN
-    -- Selecciona todas las citas de la tabla CITAS
-    OPEN p_cursor FOR
-    SELECT * FROM CITAS;
-END;
-/
-
 CREATE OR REPLACE PROCEDURE USP_OBTENER_CITA_POR_ID (
     p_id_cita IN NUMBER,
     p_cursor OUT SYS_REFCURSOR
@@ -3566,6 +3292,7 @@ BEGIN
 END;
 /
 
+--
 
 CREATE OR REPLACE PROCEDURE USP_INSERTAR_DIAGNOSTICO(
     p_IdCita IN NUMBER,
@@ -3591,7 +3318,9 @@ BEGIN
         p_Habilitado,
         p_FechaCreacion
     );
-    
+    UPDATE CITAS
+        SET ESTADOCITAID = 2
+    WHERE CITAID= p_IdCita;
     COMMIT;
 END USP_INSERTAR_DIAGNOSTICO;
 /
@@ -3993,7 +3722,6 @@ BEGIN
     END IF;
 END;
 /
-
 
 /****************************************************************************************************************************************************************
 Autor: Jason Zuñiga
@@ -4777,7 +4505,6 @@ END;
 /
 
 
-
 /****************************************************************************************************************************************************************
 ***                                                             CREACION DE INSERTS APARTIR DE AQUI                                           --ENCABEZADOS   ***
 ****************************************************************************************************************************************************************/
@@ -4838,6 +4565,298 @@ INSERT INTO PERSONAL (
         SYSDATE                         -- Valor para FECHACREACION
     );
 --SELECT * FROM  "PERSONAL" 
+-- Categorías para menús y submenús
+INSERT INTO "ARTAVIARACING"."CATEGORIAMENU" (CATEGORIAMENUID, TIPOMENU, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 'MENU', 'Menú Principal', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIAMENU" (CATEGORIAMENUID, TIPOMENU, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 'SUBMENU', 'Sub menú', '000000001', 1, SYSDATE);
+
+-- Menús principales
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 1, NULL, 'Home', '/home', 1, 'fa fa-home', 'Página principal', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 1, NULL, 'Gestión Administradora', '/adminmanager', 1, 'fa fa-box-open', 'Gestión de administración', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(3, 1, NULL, 'Gestión de Citas', '/shedulemanager', 1, 'fa fa-calendar-check', 'Gestión de citas', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(11, 1, NULL, 'Cerrar Sesión', '/index', 1, 'fa fa-power-off', 'Cerrar Sesión', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(8, 1, NULL, 'Repuestos', '/UsuarioInventario', 1, 'fa fa-cogs', 'Gestión de Repuestos', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(9, 1, NULL, 'Gestión de Vehículos', '/ManageVehicle', 1, 'fa fa-car', 'Gestiona los vehículos del cliente', '000000001', 1, SYSDATE);
+
+-- Submenús
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(4, 2, 2, 'Inventario', '/inventario', 2, 'fa fa-warehouse', 'Gestión de inventario', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(5, 2, 3, 'Agendar', '/agendar', 2, 'fa fa-calendar-plus', 'Agendar citas', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(6, 2, 3, 'Mis Citas', '/miscitas', 2, 'fa fa-calendar-day', 'Mis citas', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(7, 2, 3, 'Citas', '/citas', 2, 'fa fa-calendar-alt', 'Todas las citas', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(10, 2, NULL, 'Repuestos', '/UsuarioInventario', 1, 'fa fa-cogs', 'Gestión de Repuestos', '000000001', 1, SYSDATE);
+
+-- Supongamos que el rol con ID 1 es 'Administrador'
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 2, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 3, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 3, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 4, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 5, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 6, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 7, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 8, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(1, 11, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 11, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 9, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
+(2, 10, '000000001', 1, SYSDATE);
+
+--Insert CategoriaProducto
+INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
+("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (1, 'Aceites y Lubricantes', 'Aceites y lubricantes para motores y transmisión.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
+("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (2, 'Filtros', 'Filtros de aceite, aire, combustible y aire de cabina.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
+("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (3, 'Componentes de Frenos', 'Pastillas de freno, discos, tambores y cilindros de freno.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
+("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (4, 'Sistemas de Escape', 'Silenciadores, tubos de escape, catalizadores y juntas.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIAPRODUCTO" 
+("CATEGORIAPRODUCTOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (5, 'Partes de Suspensión', 'Amortiguadores, resortes, bieletas y brazos de control.', '000000001', 1, SYSDATE);
+
+--Insert CategoriaServicio
+INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
+("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (1, 'Mantenimiento Preventivo', 'Servicios de Mantenimiento Preventivo.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
+("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (2, 'Diagnóstico y Reparación de Sistemas Mecánicos', 'Servicios de Diagnóstico y Reparación de Sistemas Mecánicos.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
+("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (3, 'Servicios Eléctricos y Electrónicos', 'Servicios Eléctricos y Electrónicos para vehiculos.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
+("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (4, 'Reparaciones Especializadas', 'Servicios de Reparaciones Especializadas.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
+("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (5, 'Servicios de Frenos y Seguridad', 'Servicios de Frenos y Seguridad para vehiculos.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
+("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (6, 'Servicios de Carrocería y Pintura', 'Servicios de Carrocería y Pintura para vehiculos.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."CATEGORIASERVICIO" 
+("CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (7, 'Inspecciones y Revisiones', 'Servicios de Inspecciones y Revisiones.', '000000001', 1, SYSDATE);
+
+--Insert Servicios
+--Categoria Mantenimiento Preventivo 1
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (1, 1, 'Cambio de aceite y filtro', 'Servicio de Cambio de aceite y filtro.', 30000, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (2, 1, 'Revisión y cambio de filtros', 'Servicio de Revisión y cambio de filtros(aire, combustible, cabina).', 10000, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (3, 1, 'Rotación y balanceo de neumáticos', 'Servicio de Rotación y balanceo de neumáticos.', 20000, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (4, 1, 'Alineación de ruedas', 'Servicio de Alineación de ruedas.', 25000, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (5, 1, 'Inspección de frenos', 'Servicio de Inspección de frenos.', 15000, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (6, 1, 'Revisión de líquidos', 'Servicio de Revisión de líquidos (refrigerante, frenos, dirección, etc.).', 10000, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (7, 1, 'Revisión de correas y mangueras', 'Servicio de Revisión de correas y mangueras.', 22000, 1, '000000001', 1, SYSDATE);
+
+--Categoria Diagnóstico y Reparación de Sistemas Mecánicos 2
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (8, 2, 'Diagnóstico y reparación de motor', 'Servicio de Diagnóstico y reparación de motor.', 325000, 5, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (9, 2, 'Reparación de transmisión', 'Servicio de Reparación de transmisión.', 430000, 8, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (10, 2, 'Reparación de sistemas de escape', 'Servicio de Reparación de sistemas de escape.', 75000, 2, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (11, 2, 'Reparación de sistemas de suspensión', 'Servicio de Reparación de sistemas de suspensión.', 110000, 3, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (12, 2, 'Reemplazo de embrague', 'Servicio de Reemplazo de embrague.', 180000, 1, '000000001', 7, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (13, 2, 'Reparación de sistema de dirección', 'Servicio de Reparación de sistema de dirección.', 90000, 3, '000000001', 1, SYSDATE);
+
+--Categoria Servicios Eléctricos y Electrónicos 3
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (14, 3, 'Diagnóstico y reparación de sistemas eléctricos', 'Servicio de Diagnóstico y reparación de sistemas eléctricos.', 60000, 2, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (15, 3, 'Reemplazo y revisión de batería', 'Servicio de Reemplazo y revisión de batería.', 35000, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (16, 3, 'Reparación de alternadores y motores de arranque', 'Servicio de Reparación de alternadores y motores de arranque.', 75000, 2, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (17, 3, 'Diagnóstico y reparación de sistemas de luces', 'Servicio de Diagnóstico y reparación de sistemas de luces.', 33000, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (18, 3, 'Reparación de sistemas de control electrónico (ECU)', 'Servicio de Reparación de sistemas de control electrónico (ECU).', 150000, 3, '000000001', 1, SYSDATE);
+
+--Categoria Servicios de Frenos y Seguridad 4
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (19, 4, 'Reemplazo de pastillas y discos de freno', 'Servicio de Reemplazo de pastillas y discos de freno.', 45000, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (20, 4, 'Reparación de frenos ABS', 'Servicio de Reparación de frenos ABS.', 82000, 2, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (21, 4, 'Cambio de líquido de frenos', 'Servicio de Cambio de líquido de frenos.', 18000, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (22, 4, 'Inspección y reparación de sistemas de seguridad', 'Servicio de Inspección y reparación de sistemas de seguridad (airbags, sensores, etc.).', 66000, 2, '000000001', 1, SYSDATE);
+
+--Categoria Reparaciones Especializadas 5
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (23, 5, 'Reparación de sistemas de climatización', 'Servicio de Reparación de sistemas de climatización (A/C y calefacción).', 90000, 3, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (24, 5, 'Reprogramación de centralitas electrónicas (ECU)', 'Servicio de Reprogramación de centralitas electrónicas (ECU).', 45000, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (25, 5, 'Instalación y reparación de sistemas de entretenimiento y navegación', 'Servicio de Instalación y reparación de sistemas de entretenimiento y navegación.', 120000, 2, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (26, 5, 'Reparación de sistemas de combustible', 'Servicio de Reparación de sistemas de combustible.', 77000, 2, '000000001', 1, SYSDATE);
+
+--Categoria Servicios de Carrocería y Pintura 6
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (27, 6, 'Reparación de golpes y abolladuras', 'Servicio de Reparación de golpes y abolladuras.', 150000, 48, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (28, 6, 'Pintura de carrocería', 'Servicio de Pintura de carrocería.', 320000, 72, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (29, 6, 'Pulido y detallado de pintura', 'Servicio de Pulido y detallado de pintura.', 38000, 5, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (30, 6, 'Reparación de parabrisas', 'Servicio de Reparación de parabrisas.', 30000, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (31, 6, 'Instalación y reparación de vidrios', 'Servicio de Instalación y reparación de vidrios.', 50000, 1, '000000001', 1, SYSDATE);
+
+--Inspecciones y Revisiones 7
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (32, 7, 'Inspección técnica vehicular', 'Servicio de Inspección técnica vehicular.', 21000, 1, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (33, 7, 'Revisión previa a la compra de vehículos', 'Servicio de Revisión previa a la compra de vehículos.', 36000, 2, '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."SERVICIO" 
+("SERVICIOID", "CATEGORIASERVICIOID", "NOMBRE", "DESCRIPCION", "PRECIO", "TIEMPOSERVICIO", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (34, 7, 'Inspección de emisiones contaminantes', 'Servicio de Inspección de emisiones contaminantes.', 14000, 1, '000000001', 1, SYSDATE);
+
+--Insert EstadoCita
+INSERT INTO "ARTAVIARACING"."ESTADOCITA" 
+("ESTADOCITAID", "ESTADO", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (1, 'En Proceso', 'La cita está en proceso.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."ESTADOCITA" 
+("ESTADOCITAID", "ESTADO", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (2, 'Completada', 'La cita ha sido completada.', '000000001', 1, SYSDATE);
+
+INSERT INTO "ARTAVIARACING"."ESTADOCITA" 
+("ESTADOCITAID", "ESTADO", "DESCRIPCION", "EDITADOPOR", "HABILITADO", "FECHACREACION") 
+VALUES (3, 'Cancelada', 'La cita ha sido cancelada.', '000000001', 1, SYSDATE);
+
 --Insert Tabla Pais
 INSERT INTO "PAIS" (CODIGOPAIS, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (1, 'COSTA RICA', '00000001', 1, SYSDATE);
@@ -5111,8 +5130,8 @@ VALUES (79, 7, 'MATINA', '00000001', 1, SYSDATE);
 INSERT INTO "CONDADO" (CODIGOCONDADO, CODIGOESTADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES (80, 7, 'GUÁCIMO', '00000001', 1, SYSDATE);
 
---select * from "CONDADO";
--- Inserts para los distritos del cant?n Para?so
+
+-- Inserts para los distritos del canton Paraiso
 INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
 VALUES  (1, 37, 'Paraiso', '00000001', 1, SYSDATE);
 INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABILITADO, FECHACREACION)
@@ -5123,7 +5142,7 @@ INSERT INTO "DISTRITO" (CODIGODISTRITO, CODIGOCONDADO, NOMBRE, EDITADOPOR, HABIL
 VALUES   (4, 37, 'Cachi', '00000001', 1, SYSDATE);
 select * from "DISTRITO";
 
---  Insert de la categoria del telefono. 
+-- Insert de la categoria del telefono. 
 INSERT INTO "ARTAVIARACING"."CATEGORIATELEFONO" 
 (
     "TIPOTELEFONO",
@@ -5156,101 +5175,5 @@ VALUES
     1,                        -- Habilitado (1 para habilitado, 0 para deshabilitado)
     SYSDATE                   -- Fecha de creación (actual)
 );
-
---SEGUNDOS
--- Categorías para menús y submenús
-INSERT INTO "ARTAVIARACING"."CATEGORIAMENU" (CATEGORIAMENUID, TIPOMENU, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 'MENU', 'Menú Principal', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."CATEGORIAMENU" (CATEGORIAMENUID, TIPOMENU, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 'SUBMENU', 'Sub menú', '000000001', 1, SYSDATE);
-
-
--- Menús principales
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 1, NULL, 'Home', '/home', 1, 'fa fa-home', 'Página principal', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 1, NULL, 'Gestión Administradora', '/adminmanager', 1, 'fa fa-box-open', 'Gestión de administración', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(3, 1, NULL, 'Gestión de Citas', '/shedulemanager', 1, 'fa fa-calendar-check', 'Gestión de citas', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(11, 1, NULL, 'Cerrar Sesión', '/index', 1, 'fa fa-power-off', 'Cerrar Sesión', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(8, 1, NULL, 'Repuestos', '/UsuarioInventario', 1, 'fa fa-cogs', 'Gestión de Repuestos', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(9, 1, NULL, 'Gestión de Vehículos', '/ManageVehicle', 1, 'fa fa-car', 'Gestiona los vehículos del cliente', '000000001', 1, SYSDATE);
-
-
-
--- Submenús
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(4, 2, 2, 'Inventario', '/inventario', 2, 'fa fa-warehouse', 'Gestión de inventario', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(5, 2, 3, 'Agendar', '/agendar', 2, 'fa fa-calendar-plus', 'Agendar citas', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(6, 2, 3, 'Mis Citas', '/miscitas', 2, 'fa fa-calendar-day', 'Mis citas', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(7, 2, 3, 'Citas', '/citas', 2, 'fa fa-calendar-alt', 'Todas las citas', '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENU" (MENUID, CATEGORIAMENUID, MENUPADREID, NOMBRE, URL, NIVEL, ICONO, DESCRIPCION, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(10, 2, NULL, 'Repuestos', '/UsuarioInventario', 1, 'fa fa-cogs', 'Gestión de Repuestos', '000000001', 1, SYSDATE);
-
--- Supongamos que el rol con ID 1 es 'Administrador'
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 1, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 2, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 3, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 3, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 4, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 5, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 6, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 7, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 8, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(1, 11, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 11, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 9, '000000001', 1, SYSDATE);
-
-INSERT INTO "ARTAVIARACING"."MENUPORROL" (ROLID, MENUID, EDITADOPOR, HABILITADO, FECHACREACION) VALUES 
-(2, 10, '000000001', 1, SYSDATE);
-
---TERCEROS
-INSERT INTO "CITAS" (CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, DESCRIPCION, HORAAGENDADA, HORAFINALIZACION, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES ('117580634', 'ABC123', '1HGBH41JXMN109186', 23, 1, TRUNC(SYSDATE), 'Mi carro necesita...', TO_CHAR(SYSTIMESTAMP, 'HH24:MI'), '21:30', '00000001', 1, SYSDATE);
-
-INSERT INTO "CITAS" (CREDENCIALID, PLACAVEHICULOID, VIN, SERVICIOID, ESTADOCITAID, FECHAAGENDADA, DESCRIPCION, HORAAGENDADA, HORAFINALIZACION, EDITADOPOR, HABILITADO, FECHACREACION)
-VALUES ('123456789', 'DEF456', '2HGBH31JXMN108184', 14, 1, TRUNC(SYSDATE), 'Estoy teniendo este problema...', TO_CHAR(SYSTIMESTAMP, 'HH24:MI'), '23:00', '00000001', 1, SYSDATE);
 
 COMMIT;
