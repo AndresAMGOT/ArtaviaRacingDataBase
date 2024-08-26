@@ -653,7 +653,7 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: nos muestra todos los datos importantes del personal
 ****************************************************************************************************************************************************************/  
-CREATE VIEW vw_personal_detalle AS 
+CREATE OR REPLACE VIEW vw_personal_detalle AS 
 SELECT 
     p.CREDENCIALID,
     p.NOMBRE,
@@ -679,7 +679,7 @@ Requerimiento: AR-001
 Fecha de Creacion: 14-07-24 DD-MM-YYYY
 Enunciado de la vista: Esta vista muestra toda la dirrecion del cliente
 ****************************************************************************************************************************************************************/  
-CREATE VIEW vw_clientes_con_direccion AS 
+CREATE OR REPLACE VIEW vw_clientes_con_direccion AS 
 SELECT 
     c.CREDENCIALID,
     c.NOMBRE,
