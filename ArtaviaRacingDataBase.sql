@@ -1241,6 +1241,44 @@ END FN_ObtenerProducto;
 Autor: Horacio Porras Marin
 Id Requirement: AR-009
 Creation Date: 10/08/2024   (MM/dd/YYYY)
+Requirement: Función para eliminar un producto existente en la tabla PRODUCTO.
+****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************
+Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+****************************************************************************************************************************************************************/
+CREATE OR REPLACE FUNCTION FN_EliminarProducto (
+    p_productoId IN NUMBER
+) RETURN BOOLEAN
+IS
+    v_result BOOLEAN := FALSE;
+BEGIN
+    BEGIN
+        DELETE FROM ARTAVIARACING.PRODUCTO
+        WHERE PRODUCTOID = p_productoId;
+
+        -- Verificamos si se eliminó algún registro
+        IF SQL%ROWCOUNT > 0 THEN
+            v_result := TRUE;
+        ELSE
+            v_result := FALSE;
+        END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si ocurre algún error, retornamos FALSE
+            v_result := FALSE;
+    END;
+
+    RETURN v_result;
+END FN_EliminarProducto;
+/
+
+/****************************************************************************************************************************************************************
+Autor: Horacio Porras Marin
+Id Requirement: AR-009
+Creation Date: 10/08/2024   (MM/dd/YYYY)
 Requirement: Función para mostrar productos existentes en la tabla PRODUCTO.
 ****************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************
@@ -2812,44 +2850,6 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('Ocurrió un error al eliminar el producto o no se encontró el producto.');
     END IF;
 END USP_EliminarProducto;
-
- /****************************************************************************************************************************************************************
-Autor: Horacio Porras Marin
-Id Requirement: AR-009
-Creation Date: 10/08/2024   (MM/dd/YYYY)
-Requirement: Función para eliminar un producto existente en la tabla PRODUCTO.
-****************************************************************************************************************************************************************/
-/****************************************************************************************************************************************************************
-Updated By                                  (MM/dd/YYYY)                                 ITEM and Detail
------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-****************************************************************************************************************************************************************/
-CREATE OR REPLACE FUNCTION FN_EliminarProducto (
-    p_productoId IN NUMBER
-) RETURN BOOLEAN
-IS
-    v_result BOOLEAN := FALSE;
-BEGIN
-    BEGIN
-        DELETE FROM ARTAVIARACING.PRODUCTO
-        WHERE PRODUCTOID = p_productoId;
-
-        -- Verificamos si se eliminó algún registro
-        IF SQL%ROWCOUNT > 0 THEN
-            v_result := TRUE;
-        ELSE
-            v_result := FALSE;
-        END IF;
-
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- Si ocurre algún error, retornamos FALSE
-            v_result := FALSE;
-    END;
-
-    RETURN v_result;
-END FN_EliminarProducto;
-/
 
 /****************************************************************************************************************************************************************
 Autor: Andrés Alvarado Matamoros
